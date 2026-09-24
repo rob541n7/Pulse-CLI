@@ -146,7 +146,7 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
 
     res = swing.backtest(ind, mcap, bench, params)
     stats = {k: _num(val, 4) for k, val in res.stats().items()}
-    eq = res.equity.iloc[::5]
+    eq = res.equity.iloc[::-5][::-1]  # sampling mingguan, titik terakhir selalu ikut
     b = res.benchmark.reindex(eq.index).ffill()
 
     bb = bench.tail(250)
