@@ -217,6 +217,7 @@ You'll see the TUI interface:
 | `/ihsgx` | `/exhsc`, `/hsc` | **IHSG vs IHSG ex-HSC** |
 | `/universe` | `/bigcap`, `/uni` | **Big cap universe (free float riil, non-HSC)** |
 | `/swing` | `/sw` | **Swing 2-8 minggu: screener, analisa, backtest** |
+| `/dashboard` | `/dash` | **Update data IDX & buka dashboard HTML** |
 | `/models` | `/model`, `/m` | Switch AI model |
 | `/auth` | `/login` | Stockbit authentication (set token) |
 | `/clear` | `/cls` | Clear chat history |
@@ -699,10 +700,34 @@ Aturan strategi (sinyal mingguan, eksekusi open hari berikutnya):
 
 Backtest memakai universe dinamis (top 70 market cap pada tiap tanggal) untuk menghindari survivorship bias. Free float & HSC tetap memakai data terkini, jadi hasil cenderung optimistis.
 
+### Dashboard
+
+Alur harian (setelah ±17:00 WIB):
+
+1. Unduh **Ringkasan Saham** dari idx.co.id, simpan ke `data/idx/` (nama asli `Ringkasan Saham-YYYYMMDD.xlsx`)
+2. Klik dua kali **`update_dashboard.bat`** (atau `/dashboard` di TUI)
+3. `data/reports/dashboard.html` terbuka di browser: satu file mandiri, bisa dibuka offline
+
+Isi dashboard: status pasar (IHSG ex-HSC vs MA50), IHSG vs ex-HSC, screener 70 big cap dengan filter setup/sektor dan panel detail (grafik, SL/TP), rotasi sektor (RRG), asing hari ini, dan backtest.
+
+Faktor per saham ditampilkan **terpisah, tidak dijumlahkan** (supaya tidak ada satu skor yang menyembunyikan konflik antar sinyal):
+
+| Faktor | Cara hitung | Bull / Bear |
+|--------|-------------|-------------|
+| Fase | Stage MA150 (30 minggu), debounce 5 hari: Markup / Markdown / Akumulasi / Distribusi | Markup / Markdown |
+| RS 13w | Return 13 minggu vs IHSG ex-HSC | > +5% / < -5% |
+| CMF 20 | Chaikin Money Flow 20 hari | > 0,05 / < -0,05 |
+| VWAP 20 | Close vs VWAP 20 hari | konteks (premium/diskon) |
+| Asing 20d | Net asing (lembar × close) % nilai transaksi, dari histori Excel IDX | > +2% / < -2% (min 5 hari data) |
+| Lot besar | Nilai per transaksi hari ini vs rata-rata 20 hari | > 1,3× |
+
+Faktor asing & lot besar aktif setelah histori Excel IDX terkumpul (≥5 hari). Semakin rutin file diunduh, semakin lengkap.
+
 ### Update Harian Tanpa TUI
 
 ```bash
-python -m pulse.core.idx daily        # gabung Excel IDX baru + IHSG ex-HSC + screener swing
+python -m pulse.core.idx daily --open # gabung Excel IDX baru + IHSG ex-HSC + screener + dashboard
+python -m pulse.core.idx dashboard --open
 python -m pulse.core.idx ownership    # bulanan: free float BEI & KSEI
 python -m pulse.core.idx universe 70  # bulanan: bangun ulang universe
 python -m pulse.core.idx swing BBRI

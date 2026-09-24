@@ -249,6 +249,14 @@ class CommandRegistry:
             aliases=["sw"],
         )
 
+        self.register(
+            "dashboard",
+            self._cmd_dashboard,
+            "Update data IDX & buka dashboard HTML",
+            "/dashboard",
+            aliases=["dash"],
+        )
+
     async def _cmd_help(self, args: str) -> str:
         """Help command handler."""
         if args:
@@ -1142,3 +1150,15 @@ Broker Profiles:
         if parts:
             return swing.format_ticker(parts[0].upper(), snap)
         return swing.format_screen(snap)
+
+    async def _cmd_dashboard(self, args: str) -> str:
+        """Merge new IDX files, rebuild and open the HTML dashboard."""
+        import asyncio
+
+        from pulse.core.idx.dashboard import build_dashboard
+
+        try:
+            path = await asyncio.to_thread(build_dashboard, True)
+        except FileNotFoundError as e:
+            return str(e)
+        return f"Dashboard diperbarui dan dibuka:\n{path}"

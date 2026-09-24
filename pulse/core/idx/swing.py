@@ -81,6 +81,9 @@ def indicators(panel: dict[str, pd.DataFrame], index_close: pd.Series) -> dict[s
     return {
         "close": c,
         "open": panel["open"],
+        "high": high,
+        "low": low,
+        "volume": v,
         "ma20": c.rolling(20).mean(),
         "ma50": c.rolling(50).mean(),
         "ma100": c.rolling(100).mean(),

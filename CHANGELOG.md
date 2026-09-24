@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - IHSG ex-HSC benchmark (`/ihsgx`)
 - Swing 2-8 week screener and Relative-Strength Breakout backtest (`/swing`)
 - Batch entry point `python -m pulse.core.idx` for scheduled daily updates
+- Self-contained HTML dashboard (`/dashboard`, `update_dashboard.bat`): market regime,
+  IHSG vs ex-HSC, screener with detail panel, sector rotation (RRG), foreign flow, backtest
+- Per-stock factors shown side by side: stage (MA150), RS 13w, CMF 20, VWAP 20,
+  foreign net 20d, big-lot ratio
 - Initial public release preparation
 - Comprehensive README documentation
 - Contributing guidelines

@@ -6,13 +6,15 @@ python -m pulse.core.idx universe [70]   # bangun ulang universe big cap
 python -m pulse.core.idx ihsgx           # IHSG vs IHSG ex-HSC
 python -m pulse.core.idx swing [TICKER]  # screener swing / analisa satu saham
 python -m pulse.core.idx backtest [--nofilter]
-python -m pulse.core.idx daily           # update + ihsgx + swing
+python -m pulse.core.idx dashboard [--open]  # bangun data/reports/dashboard.html
+python -m pulse.core.idx daily [--open]  # update + ihsgx + swing + dashboard
 """
 
 import sys
 
 from pulse.core.idx import swing
 from pulse.core.idx.benchmark import build_ihsg_ex_hsc, format_benchmark
+from pulse.core.idx.dashboard import build_dashboard
 from pulse.core.idx.ownership import fetch_ownership
 from pulse.core.idx.summary import update_history
 from pulse.core.idx.universe import UniverseRules, build_universe, format_universe
@@ -48,10 +50,13 @@ def main(argv: list[str]) -> None:
         print(_swing(args))
     elif cmd == "backtest":
         print(_swing(["backtest", *args]))
+    elif cmd == "dashboard":
+        print(f"Dashboard: {build_dashboard(open_browser='--open' in args)}")
     elif cmd == "daily":
         print(format_benchmark(build_ihsg_ex_hsc(refresh=True)))
         print()
         print(_swing([]))
+        print(f"\nDashboard: {build_dashboard(open_browser='--open' in args, update=False)}")
     elif cmd != "update":
         print(__doc__)
 
