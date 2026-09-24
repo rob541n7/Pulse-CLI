@@ -232,7 +232,7 @@ const isNum = (v) => typeof v === "number" && isFinite(v);
 const fmt = (v, f = nf0) => isNum(v) ? f.format(v) : "–";
 const pct = (v, f = nf1) => isNum(v) ? (v > 0 ? "+" : "") + f.format(v) + "%" : "–";
 const cls = (v) => !isNum(v) ? "mut" : v > 0 ? "pos" : v < 0 ? "neg" : "";
-const SETUP_CLS = { BREAKOUT: "bull", PULLBACK: "amber", TREND: "teal", NETRAL: "", HINDARI: "bear" };
+const SETUP_CLS = { BREAKOUT: "bull", PULLBACK: "amber", TREND: "teal", NETRAL: "", HINDARI: "bear", "TIDAK AKTIF": "na" };
 const STAGE_CLS = { MARKUP: "bull", MARKDOWN: "bear", AKUMULASI: "teal", DISTRIBUSI: "amber" };
 const STAGE_SHORT = { MARKUP: "Markup", MARKDOWN: "Markdown", AKUMULASI: "Akum", DISTRIBUSI: "Distr" };
 const FACTORS = [
@@ -348,7 +348,7 @@ const COLS = [
   ["stage", "Fase"], ["factors", "Faktor"], ["cmf", "CMF"], ["vwap", "VWAP"], ["foreign_pct", "Asing"],
   ["vol_ratio", "Vol"], ["rsi", "RSI"], ["risk_pct", "SL %"], ["pe", "PE"], ["roe", "ROE"], ["mcap_t", "Mcap T"],
 ];
-const SETUPS = ["BREAKOUT", "PULLBACK", "TREND", "NETRAL", "HINDARI"];
+const SETUPS = ["BREAKOUT", "PULLBACK", "TREND", "NETRAL", "HINDARI", "TIDAK AKTIF"].filter((s) => s !== "TIDAK AKTIF" || DATA.rows.some((r) => r.setup === s));
 let state = { setup: null, sector: "", q: "", sort: "score", asc: false, sel: null };
 try { Object.assign(state, JSON.parse(localStorage.getItem("pulse-filter") || "{}"), { sel: null }); } catch (e) {}
 
@@ -564,7 +564,7 @@ const R = M.universe_rules;
 $("#footer").innerHTML = `
   <b>Universe:</b> ${DATA.rows.length} big cap (data ${esc(M.universe_as_of)}), bukan HSC, free float riil KSEI ≥ ${R.min_ff_ksei}% (snapshot ${esc(M.ksei_snapshot)}), likuiditas ≥ Rp ${R.min_avg_value_bn} M/hari.<br>
   <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: ${FACTORS.map(([, n, d]) => `${n} (${esc(d)})`).join("; ")}.<br>
-  <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar.<br>
+  <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler hari itu (cek suspensi), harga basi.<br>
   <b>Fundamental:</b> XBRL laporan keuangan idx.co.id (data ${esc(M.fund_generated || "–")}). Laba TTM = tahun buku terakhir + YTD berjalan − YTD tahun lalu; laporan USD dikonversi kurs ${fmt(M.usd_idr)} per USD. Fundamental adalah konteks, bukan sinyal timing.<br>
   <b>Sumber:</b> Yahoo Finance (OHLCV), Ringkasan Saham & XBRL & pengumuman idx.co.id, ff/1pct.klinikpenyesalan.com (free float BEI & KSEI), pengumuman HSC BEI.<br>
   Bukan rekomendasi beli/jual. Lakukan riset sendiri dan kelola risiko Anda.`;

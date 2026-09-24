@@ -176,6 +176,30 @@ def test_classify_setups():
     assert classify(pd.Series({**base, "close": 95.0, "rs13": -3.0})) == "HINDARI"
 
 
+def test_screen_marks_untraded_stock_inactive():
+    from pulse.core.idx.swing import screen
+
+    dates = pd.bdate_range("2026-01-01", periods=5)
+    frame = lambda a, b: pd.DataFrame({"AAA": a, "BBB": b}, index=dates)  # noqa: E731
+    ind = {
+        "close": frame(110.0, 110.0),
+        "ma20": frame(105.0, 105.0),
+        "ma50": frame(100.0, 100.0),
+        "ma100": frame(90.0, 90.0),
+        "atr": frame(3.0, 3.0),
+        "hh55": frame(111.0, 111.0),
+        "vol_ratio": frame(1.2, 1.2),
+        "rsi": frame(60.0, 60.0),
+        "rs13": frame(0.1, 0.1),
+        "rs4": frame(0.05, 0.05),
+        "volume": frame(1e6, [1e6] * 4 + [np.nan]),
+        "market_ok": pd.Series(True, index=dates),
+    }
+    snap = screen(ind, ["AAA", "BBB"], SwingParams())
+    assert snap.at["AAA", "setup"] == "BREAKOUT"
+    assert snap.at["BBB", "setup"] == "TIDAK AKTIF"  # mis. SINI 24 Sep 2026: order book kosong
+
+
 def test_last_complete_session():
     # Thursday 14:02 WIB, market still open -> Wednesday
     assert str(last_complete_session(datetime(2026, 9, 24, 14, 2, tzinfo=WIB))) == "2026-09-23"

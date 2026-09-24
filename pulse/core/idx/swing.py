@@ -268,6 +268,9 @@ def screen(ind: dict, tickers: list[str], p: SwingParams) -> pd.DataFrame:
     snap["rs4"] = ind["rs4"].loc[d, tickers] * 100
     snap["to_hh55"] = (snap.close / snap.hh55 - 1) * 100
     snap["setup"] = snap.apply(classify, axis=1, near_high_pct=p.near_high_pct)
+    # Tanpa transaksi reguler di hari terakhir (suspensi / order book kosong): harga basi
+    traded = ind["volume"].loc[d, tickers].fillna(0) > 0
+    snap.loc[~traded, "setup"] = "TIDAK AKTIF"
     snap["score"] = (
         snap.rs13.rank(pct=True) * 0.5
         + snap.rs4.rank(pct=True) * 0.3
@@ -314,6 +317,12 @@ def format_screen(snap: pd.DataFrame) -> str:
         if len(sub):
             lines.append(f"\n{setup} ({note})")
             lines += [_row(code, r) for code, r in sub.iterrows()]
+    idle = snap[snap.setup == "TIDAK AKTIF"]
+    if len(idle):
+        lines.append(
+            "\nTIDAK AKTIF (tanpa transaksi reguler hari ini, cek suspensi): "
+            + ", ".join(idle.index)
+        )
     weak = snap[snap.setup == "HINDARI"].tail(8)
     if len(weak):
         lines.append("\nHINDARI (terlemah): " + ", ".join(weak.index[::-1]))
