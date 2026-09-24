@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `pulse.core.idx` package: IDX Ringkasan Saham Excel loader + foreign-flow history,
+  free float (BEI) & >=1% ownership (KSEI), HSC list, cached OHLCV panel
+- Big cap universe (`/universe`): top-N market cap, non-HSC, real free float >= 12.5%, liquid
+- IHSG ex-HSC benchmark (`/ihsgx`)
+- Swing 2-8 week screener and Relative-Strength Breakout backtest (`/swing`)
+- Batch entry point `python -m pulse.core.idx` for scheduled daily updates
 - Initial public release preparation
 - Comprehensive README documentation
 - Contributing guidelines

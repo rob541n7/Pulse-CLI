@@ -214,6 +214,9 @@ You'll see the TUI interface:
 | `/plan` | `/tp`, `/sl` | Trading plan generator |
 | `/sapta` | `/premarkup` | SAPTA pre-markup detection |
 | `/ihsg` | `/index`, `/market` | Market index status |
+| `/ihsgx` | `/exhsc`, `/hsc` | **IHSG vs IHSG ex-HSC** |
+| `/universe` | `/bigcap`, `/uni` | **Big cap universe (free float riil, non-HSC)** |
+| `/swing` | `/sw` | **Swing 2-8 minggu: screener, analisa, backtest** |
 | `/models` | `/model`, `/m` | Switch AI model |
 | `/auth` | `/login` | Stockbit authentication (set token) |
 | `/clear` | `/cls` | Clear chat history |
@@ -647,6 +650,63 @@ Signals
   - Bollinger squeeze active
   - Wave 3 position confirmed
   - Near Fibonacci time cluster
+```
+
+---
+
+## Big Cap Swing (IDX data, IHSG ex-HSC)
+
+Fokus ke saham besar yang benar-benar diperdagangkan publik, dengan pembanding yang tidak terdistorsi saham HSC.
+
+### Sumber Data
+
+| Data | Sumber | Frekuensi |
+|------|--------|-----------|
+| OHLCV harian | Yahoo Finance (close & volume identik dengan IDX untuk 100/100 big cap) | Harian |
+| Foreign buy/sell, nilai, frekuensi, listed shares | File Excel **Ringkasan Saham** idx.co.id, taruh di `data/idx/` | Harian (±17:00 WIB) |
+| Free float resmi BEI | [ff.klinikpenyesalan.com](https://ff.klinikpenyesalan.com/) | Bulanan |
+| Kepemilikan >=1% (free float riil) | [1pct.klinikpenyesalan.com](https://1pct.klinikpenyesalan.com/) (data KSEI) | Bulanan |
+| Daftar HSC | Pengumuman BEI, disimpan di `data/hsc.json` (update manual) | Saat ada pengumuman |
+
+> API JSON idx.co.id dilindungi Cloudflare bot detection, jadi Pulse tidak melakukan scraping ke sana. Unduh file Excel harian lewat browser (tombol unduh di halaman Ringkasan Saham) lalu simpan ke `data/idx/` dengan nama aslinya (`Ringkasan Saham-YYYYMMDD.xlsx`).
+
+### Universe Big Cap
+
+`/universe rebuild [size]` memilih N saham (default 70) dengan market cap terbesar yang lolos:
+
+- **Bukan HSC** (`data/hsc.json`)
+- **Free float riil KSEI >= 12,5%** (100% - total pemegang >=1%). Free float resmi BEI menghitung pemegang 1-5% sebagai publik, sehingga saham seperti BYAN (BEI 21,3% vs KSEI 1,5%), MORA dan DSSA tampak lolos padahal tidak.
+- **Likuid**: rata-rata nilai transaksi 20 hari >= Rp 5 miliar
+- Tidak sedang proses delisting
+
+### IHSG ex-HSC
+
+`/ihsgx` menghitung IHSG tanpa saham HSC: return IHSG resmi dikurangi kontribusi saham HSC (bobot = market cap kemarin). Per September 2026 bobot HSC ~26% IHSG, dan IHSG YTD -28% vs ex-HSC -19%.
+
+### Swing 2-8 Minggu
+
+```
+/swing              # screener universe: BREAKOUT / PULLBACK / TREND / HINDARI + SL/TP
+/swing MDKA         # analisa satu saham
+/swing backtest     # backtest Relative-Strength Breakout (filter pasar ON)
+/swing backtest --nofilter
+```
+
+Aturan strategi (sinyal mingguan, eksekusi open hari berikutnya):
+- Entry: close > MA50 > MA100, return 13 minggu > IHSG ex-HSC, close <= 5% dari high 55 hari, volume 5d >= 50d, IHSG ex-HSC > MA50
+- Exit: stop 2 ATR, trailing 2,5 ATR dari puncak close, atau 40 hari bursa
+- Maks 5 posisi, fee beli 0,15% / jual 0,25%, fraksi harga IDX
+
+Backtest memakai universe dinamis (top 70 market cap pada tiap tanggal) untuk menghindari survivorship bias. Free float & HSC tetap memakai data terkini, jadi hasil cenderung optimistis.
+
+### Update Harian Tanpa TUI
+
+```bash
+python -m pulse.core.idx daily        # gabung Excel IDX baru + IHSG ex-HSC + screener swing
+python -m pulse.core.idx ownership    # bulanan: free float BEI & KSEI
+python -m pulse.core.idx universe 70  # bulanan: bangun ulang universe
+python -m pulse.core.idx swing BBRI
+python -m pulse.core.idx backtest
 ```
 
 ---
