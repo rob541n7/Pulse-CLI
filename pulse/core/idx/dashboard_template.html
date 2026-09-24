@@ -221,7 +221,7 @@ const FACTORS = [
   ["cmf", "CMF 20", "Chaikin Money Flow (±0,05)"],
   ["vwap", "VWAP 20", "Harga vs VWAP 20 hari (konteks)"],
   ["foreign", "Asing 20d", "Net asing % nilai transaksi (±2%), min 5 hari data"],
-  ["big_lot", "Lot besar", "Nilai per transaksi vs rata-rata 20 hari (>1,3×)"],
+  ["big_lot", "Lot besar", "Nilai per transaksi reguler vs rata-rata 20 hari (>1,3×), arah dari harga hari itu"],
 ];
 
 /* ---------- theme ---------- */
@@ -399,7 +399,9 @@ function factorValue(r, k) {
     case "vwap": return r.vwap == null ? "–" : `${pct(r.vwap)} <span class="d">${r.vwap > 3 ? "premium" : r.vwap < -3 ? "diskon" : "wajar"}</span>`;
     case "foreign": return r.foreign_days >= 5 ? `${pct(r.foreign_pct)}<div class="d">5h Rp ${fmt(r.foreign_net5_bn, nf1)} M</div>`
       : `<span class="mut">${r.foreign_days}/5 hari</span>` + (isNum(r.foreign_today_bn) ? `<div class="d">hari ini Rp ${fmt(r.foreign_today_bn, nf1)} M</div>` : "");
-    case "big_lot": return isNum(r.big_lot) ? `${fmt(r.big_lot, nf2)}×` : `<span class="mut">butuh ≥6 hari</span>`;
+    case "big_lot": return isNum(r.big_lot)
+      ? `${r.big_lot > 10 ? "≥10" : fmt(r.big_lot, nf2)}× <span class="d">${r.labels.big_lot === "bull" ? "harga naik" : r.labels.big_lot === "bear" ? "harga turun" : ""}</span>`
+      : `<span class="mut">butuh ≥6 hari</span>`;
   }
 }
 function selectRow(code) {

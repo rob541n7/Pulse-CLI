@@ -67,6 +67,29 @@ def test_foreign_factors_convert_shares_to_rupiah():
     assert ff.loc["XXXX", "days"] == 0
 
 
+def test_big_lot_label_uses_price_direction():
+    assert factors.big_lot_label(2.0, 1.5) == "bull"
+    assert factors.big_lot_label(247.0, -1.0) == "bear"  # CARE 23 Sep 2026: blok besar, harga turun
+    assert factors.big_lot_label(1.1, 3.0) == "neutral"
+    assert factors.big_lot_label(float("nan"), 1.0) == "na"
+
+
+def test_nonreg_share_of_total():
+    dates = pd.bdate_range("2026-09-01", periods=6)
+    hist = pd.DataFrame(
+        {
+            "date": dates,
+            "code": "CARE",
+            "close": 400.0,
+            "foreign_net": 0,
+            "value": 1e9,
+            "frequency": 100,
+            "nonreg_value": 3e9,  # nego jauh lebih besar dari reguler
+        }
+    )
+    assert factors.foreign_factors(hist, ["CARE"]).loc["CARE", "nonreg_pct"] == pytest.approx(75.0)
+
+
 def test_labels():
     assert factors.label("stage", factors.MARKUP) == "bull"
     assert factors.label("rs13", -6) == "bear"

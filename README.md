@@ -719,7 +719,9 @@ Faktor per saham ditampilkan **terpisah, tidak dijumlahkan** (supaya tidak ada s
 | CMF 20 | Chaikin Money Flow 20 hari | > 0,05 / < -0,05 |
 | VWAP 20 | Close vs VWAP 20 hari | konteks (premium/diskon) |
 | Asing 20d | Net asing (lembar × close) % nilai transaksi, dari histori Excel IDX | > +2% / < -2% (min 5 hari data) |
-| Lot besar | Nilai per transaksi hari ini vs rata-rata 20 hari | > 1,3× |
+| Lot besar | Nilai per transaksi reguler hari ini vs rata-rata 20 hari | > 1,3× dengan harga naik / turun |
+
+Catatan data IDX: kolom Volume/Nilai/Frekuensi hanya mencakup **pasar reguler**; transaksi nego tercatat di kolom Non Regular.
 
 Faktor asing & lot besar aktif setelah histori Excel IDX terkumpul (≥5 hari). Semakin rutin file diunduh, semakin lengkap.
 

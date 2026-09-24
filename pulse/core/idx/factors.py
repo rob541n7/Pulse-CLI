@@ -7,7 +7,10 @@ Chosen for low noise on liquid big caps, using only data Pulse already has:
     CMF 20      Chaikin Money Flow: closing position within the day's range x volume
     VWAP 20     Close vs 20-day VWAP (premium / discount to where volume traded)
     Asing 20d   Net foreign buy as % of traded value (IDX Excel history)
-    Lot besar   Average value per trade today vs 20-day average (IDX Excel history)
+    Lot besar   Average value per trade today vs 20-day average (IDX Excel history),
+                read with the day's price move (big trades + up = bull, + down = bear)
+
+IDX Volume/Nilai/Frekuensi cover the regular market; negotiated trades are separate.
 """
 
 import numpy as np
@@ -110,8 +113,19 @@ def foreign_factors(history: pd.DataFrame, codes: list[str]) -> pd.DataFrame:
     out["net_today_bn"] = net.iloc[-1] / 1e9
     prev = size.iloc[:-1].tail(19)
     out["big_lot"] = (size.iloc[-1] / prev.mean()).where(prev.notna().sum() >= 5)
-    out["nonreg_pct"] = piv["nonreg_value"].iloc[-1] / value.iloc[-1] * 100
+    # Kolom Volume/Nilai/Frekuensi IDX = pasar reguler; nego (non regular) dicatat terpisah
+    nonreg = piv["nonreg_value"].iloc[-1]
+    out["nonreg_pct"] = nonreg / (value.iloc[-1] + nonreg) * 100
     return out
+
+
+def big_lot_label(ratio, day_change_pct) -> str:
+    """Large average trade size is directionless on its own: read it with the day's move."""
+    if ratio is None or day_change_pct is None or np.isnan(ratio) or np.isnan(day_change_pct):
+        return "na"
+    if ratio <= 1.3:
+        return "neutral"
+    return "bull" if day_change_pct > 0 else "bear" if day_change_pct < 0 else "neutral"
 
 
 def sector_rotation(
@@ -164,6 +178,5 @@ def label(factor: str, v) -> str:
         "cmf": lambda x: "bull" if x > 0.05 else "bear" if x < -0.05 else "neutral",
         "vwap": lambda x: "neutral",
         "foreign": lambda x: "bull" if x > 2 else "bear" if x < -2 else "neutral",
-        "big_lot": lambda x: "bull" if x > 1.3 else "neutral",
     }
     return rules[factor](v)

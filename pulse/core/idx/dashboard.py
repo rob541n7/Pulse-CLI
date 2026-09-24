@@ -74,9 +74,10 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             "cmf": cmf.get(code),
             "vwap": vwap.get(code),
             "foreign": f.get("net20_pct") if f.get("days", 0) >= 5 else None,
-            "big_lot": f.get("big_lot"),
         }
         labels = {k: factors.label(k, val) for k, val in vals.items()}
+        vals["big_lot"] = f.get("big_lot")
+        labels["big_lot"] = factors.big_lot_label(vals["big_lot"], chg1d.get(code))
         closes = ind["close"][code].tail(SPARK_DAYS)
         rows.append(
             {
