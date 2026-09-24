@@ -225,6 +225,38 @@ class CommandRegistry:
             aliases=["bandarmology", "bm"],
         )
 
+        self.register(
+            "universe",
+            self._cmd_universe,
+            "Big cap universe (free float riil, likuid, non-HSC)",
+            "/universe [rebuild [size]]",
+            aliases=["bigcap", "uni"],
+        )
+
+        self.register(
+            "ihsgx",
+            self._cmd_ihsgx,
+            "IHSG vs IHSG ex-HSC performance",
+            "/ihsgx",
+            aliases=["exhsc", "hsc"],
+        )
+
+        self.register(
+            "swing",
+            self._cmd_swing,
+            "Swing 2-8 minggu: screener, analisa ticker, backtest",
+            "/swing [TICKER] | /swing backtest [--nofilter]",
+            aliases=["sw"],
+        )
+
+        self.register(
+            "dashboard",
+            self._cmd_dashboard,
+            "Update data IDX & buka dashboard HTML",
+            "/dashboard",
+            aliases=["dash"],
+        )
+
     async def _cmd_help(self, args: str) -> str:
         """Help command handler."""
         if args:
@@ -1062,3 +1094,71 @@ Broker Profiles:
             return f"Could not analyze {ticker}. Make sure the ticker is valid and you have a valid Stockbit token."
 
         return engine.format_report(result, detailed=detailed)
+
+    async def _cmd_universe(self, args: str) -> str:
+        """Show or rebuild the big-cap universe."""
+        import asyncio
+
+        from pulse.core.idx.universe import (
+            UniverseRules,
+            build_universe,
+            format_universe,
+            load_universe,
+        )
+
+        parts = args.lower().split()
+        try:
+            if parts and parts[0] == "rebuild":
+                size = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 70
+                u = await asyncio.to_thread(
+                    build_universe, UniverseRules(size=size), refresh_ownership=True
+                )
+            else:
+                u = load_universe()
+        except FileNotFoundError as e:
+            return str(e)
+        return format_universe(u)
+
+    async def _cmd_ihsgx(self, args: str) -> str:
+        """IHSG vs IHSG ex-HSC."""
+        import asyncio
+
+        from pulse.core.idx.benchmark import build_ihsg_ex_hsc, format_benchmark
+
+        try:
+            bench = await asyncio.to_thread(build_ihsg_ex_hsc)
+        except FileNotFoundError as e:
+            return str(e)
+        return format_benchmark(bench)
+
+    async def _cmd_swing(self, args: str) -> str:
+        """Swing screener / single ticker / backtest."""
+        import asyncio
+
+        from pulse.core.idx import swing
+
+        parts = args.split()
+        params = swing.SwingParams(market_filter="--nofilter" not in args.lower())
+        try:
+            ind, bench, mcap = await asyncio.to_thread(swing.load_market, params)
+            if parts and parts[0].lower() == "backtest":
+                res = await asyncio.to_thread(swing.backtest, ind, mcap, bench, params)
+                return swing.format_backtest(res)
+            snap = swing.screen(ind, swing.current_universe(), params)
+        except FileNotFoundError as e:
+            return str(e)
+        if parts:
+            return swing.format_ticker(parts[0].upper(), snap)
+        return swing.format_screen(snap)
+
+    async def _cmd_dashboard(self, args: str) -> str:
+        """Merge new IDX files, rebuild and open the HTML dashboard."""
+        import asyncio
+
+        from pulse.core.idx.dashboard import build_dashboard
+
+        try:
+            path = await asyncio.to_thread(build_dashboard, True)
+        except FileNotFoundError as e:
+            return str(e)
+        return f"Dashboard diperbarui dan dibuka:\n{path}"

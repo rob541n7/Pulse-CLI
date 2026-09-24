@@ -162,6 +162,11 @@ data/logs/
 data/stockbit/
 data/broker_summary/
 data/reports/
+# IDX raw files (unduh sendiri dari idx.co.id) & data pihak ketiga hasil fetch
+data/idx/*.xlsx
+data/idx/history.csv.gz
+data/ownership/
+data/fundamentals/
 charts/
 *.png
 !docs/*.png

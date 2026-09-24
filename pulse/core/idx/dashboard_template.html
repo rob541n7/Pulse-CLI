@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pulse Big Cap Swing</title>
+<style>
+:root {
+  --bg: #f5f6f8; --panel: #ffffff; --panel-2: #f0f2f5; --border: #e2e5ea;
+  --text: #16191f; --muted: #667085; --faint: #98a2b3;
+  --accent: #2f5bea; --bull: #0f8a5f; --bull-bg: #e3f5ec; --bear: #c8372d; --bear-bg: #fbe7e5;
+  --neutral: #6b7280; --neutral-bg: #eef0f3; --amber: #b7791f; --amber-bg: #fcf1dc;
+  --teal: #0e7c86; --teal-bg: #dff3f4; --line-2: #9aa4b2;
+  --shadow: 0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1116; --panel: #161a21; --panel-2: #1d222b; --border: #2a303b;
+    --text: #e6e9ef; --muted: #9aa3b2; --faint: #6b7483;
+    --accent: #7b9cff; --bull: #3ccf91; --bull-bg: #13322a; --bear: #ff7a6e; --bear-bg: #3a1c1a;
+    --neutral: #a0a8b6; --neutral-bg: #242a34; --amber: #f0b54e; --amber-bg: #3a2e15;
+    --teal: #4fd1dc; --teal-bg: #133337; --line-2: #6b7483; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1116; --panel: #161a21; --panel-2: #1d222b; --border: #2a303b;
+  --text: #e6e9ef; --muted: #9aa3b2; --faint: #6b7483;
+  --accent: #7b9cff; --bull: #3ccf91; --bull-bg: #13322a; --bear: #ff7a6e; --bear-bg: #3a1c1a;
+  --neutral: #a0a8b6; --neutral-bg: #242a34; --amber: #f0b54e; --amber-bg: #3a2e15;
+  --teal: #4fd1dc; --teal-bg: #133337; --line-2: #6b7483; --shadow: none;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 20px 16px 48px; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 18px; }
+header h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; }
+header .sub { color: var(--muted); font-size: 13px; }
+.spacer { flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; background: var(--neutral-bg); color: var(--neutral); white-space: nowrap; }
+.chip.bull { background: var(--bull-bg); color: var(--bull); }
+.chip.bear { background: var(--bear-bg); color: var(--bear); }
+.chip.amber { background: var(--amber-bg); color: var(--amber); }
+.chip.teal { background: var(--teal-bg); color: var(--teal); }
+.chip.accent { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); }
+.chip.na { background: transparent; color: var(--faint); border: 1px dashed var(--border); }
+button.theme { background: var(--panel); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 6px 10px; cursor: pointer; font: inherit; font-size: 12px; }
+.grid { display: grid; gap: 16px; }
+.g-top { grid-template-columns: 1.1fr 1.4fr; }
+.g-2 { grid-template-columns: 1fr 1fr; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+  box-shadow: var(--shadow); min-width: 0; }
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+  margin: 0 0 12px; font-weight: 700; }
+.card h2 .hint { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--faint); margin-left: 6px; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.kpi .label { font-size: 12px; color: var(--muted); }
+.kpi .val { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi .small { font-size: 12px; color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; }
+.perf td, .perf th { padding: 5px 6px; }
+.pos { color: var(--bull); } .neg { color: var(--bear); } .mut { color: var(--muted); }
+.setups { display: flex; flex-wrap: wrap; gap: 8px; }
+.setups .chip { cursor: pointer; font-size: 13px; padding: 5px 12px; border: 1px solid transparent; }
+.setups .chip.active { border-color: currentColor; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+.toolbar input, .toolbar select { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 10px; font: inherit; min-width: 0; }
+.toolbar input { flex: 1 1 160px; max-width: 260px; }
+.scroll { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+#screener th { cursor: pointer; user-select: none; position: sticky; top: 0; background: var(--panel); }
+#screener th.sorted::after { content: " ▾"; }
+#screener th.sorted.asc::after { content: " ▴"; }
+#screener tbody tr { cursor: pointer; }
+#screener tbody tr:hover { background: var(--panel-2); }
+#screener tbody tr.sel { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+td.code { font-weight: 700; }
+td.code .nm { display: block; font-weight: 400; font-size: 11px; color: var(--muted); max-width: 180px;
+  overflow: hidden; text-overflow: ellipsis; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--neutral-bg);
+  border: 1px solid var(--border); vertical-align: middle; }
+.dot.bull { background: var(--bull); border-color: var(--bull); }
+.dot.bear { background: var(--bear); border-color: var(--bear); }
+.dot.neutral { background: var(--neutral); border-color: var(--neutral); opacity: .45; }
+.dots { display: inline-flex; gap: 3px; }
+.detail { position: sticky; top: 12px; }
+.detail .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.detail .head .t { font-size: 22px; font-weight: 800; }
+.detail .head .p { font-size: 18px; font-variant-numeric: tabular-nums; }
+.factors { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.factor { border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; }
+.factor .n { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.factor .v { font-weight: 700; font-variant-numeric: tabular-nums; }
+.factor .d { font-size: 11px; color: var(--faint); }
+.factor.bull { border-color: color-mix(in srgb, var(--bull) 45%, var(--border)); }
+.factor.bear { border-color: color-mix(in srgb, var(--bear) 45%, var(--border)); }
+.levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.levels div { background: var(--panel-2); border-radius: 8px; padding: 6px 8px; }
+.levels .n { font-size: 11px; color: var(--muted); }
+.levels .v { font-weight: 700; font-variant-numeric: tabular-nums; }
+.main-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
+.bars .row { display: grid; grid-template-columns: 52px 1fr 70px; gap: 8px; align-items: center; margin: 5px 0; font-size: 13px; }
+.bars .track { height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
+.bars .fill { height: 100%; border-radius: 4px; }
+.note { color: var(--muted); font-size: 12px; margin-top: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+svg text { fill: var(--muted); font-size: 10px; }
+.tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 9px; font-size: 12px; box-shadow: var(--shadow); display: none; z-index: 10;
+  font-variant-numeric: tabular-nums; }
+.sub-h { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin: 14px 0 8px; }
+.sub-h .mut { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.levels.fund { grid-template-columns: repeat(4, 1fr); }
+.flags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.evdot { color: var(--accent); font-size: 10px; vertical-align: top; cursor: help; }
+ul.events { list-style: none; padding: 0; margin: 0; font-size: 12.5px; }
+ul.events li { padding: 6px 0; border-bottom: 1px solid var(--border); line-height: 1.5; }
+ul.events a { color: var(--text); text-decoration: none; }
+ul.events a:hover { color: var(--accent); text-decoration: underline; }
+ul.events .chip { font-size: 11px; padding: 1px 8px; margin-right: 4px; }
+.evtable td { white-space: normal; text-align: left; vertical-align: top; }
+.evtable td:first-child { white-space: nowrap; }
+.evtable a { color: var(--text); text-decoration: none; } .evtable a:hover { color: var(--accent); text-decoration: underline; }
+footer { margin-top: 22px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.warn { background: var(--amber-bg); color: var(--amber); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-bottom: 14px; }
+@media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } .detail { position: static; order: -1; } }
+@media (max-width: 860px) { .g-top, .g-2 { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .kpis { grid-template-columns: 1fr 1fr; } .factors { grid-template-columns: 1fr; }
+  .levels { grid-template-columns: 1fr 1fr; } header h1 { font-size: 18px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Pulse · Big Cap Swing 2–8 Minggu</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="spacer"></div>
+    <span id="regime" class="chip"></span>
+    <button class="theme" id="themeBtn" type="button">Tema</button>
+  </header>
+
+  <div id="warnings"></div>
+
+  <div class="grid g-top">
+    <section class="card">
+      <h2>Pasar <span class="hint">IHSG ex-HSC sebagai pembanding</span></h2>
+      <div class="kpis" id="kpis"></div>
+      <div class="scroll"><table class="perf" id="perf"></table></div>
+    </section>
+    <section class="card">
+      <h2>IHSG vs IHSG ex-HSC <span class="hint">1 tahun, basis 100</span></h2>
+      <div class="legend"><span><i style="background:var(--accent)"></i>IHSG ex-HSC</span>
+        <span><i style="background:var(--line-2)"></i>IHSG</span></div>
+      <div id="benchChart"></div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2>Screener <span class="hint">klik baris untuk detail · klik judul kolom untuk urutkan</span></h2>
+    <div class="toolbar">
+      <div class="setups" id="setupFilter"></div>
+      <select id="sectorFilter" aria-label="Sektor"></select>
+      <input id="search" type="search" placeholder="Cari kode / nama…" aria-label="Cari">
+    </div>
+    <div class="main-grid">
+      <div class="scroll"><table id="screener"><thead></thead><tbody></tbody></table></div>
+      <aside class="card detail" id="detail"></aside>
+    </div>
+  </section>
+
+  <div class="grid g-2" style="margin-top:16px">
+    <section class="card">
+      <h2>Rotasi Sektor <span class="hint">RRG vs IHSG ex-HSC, jejak 5 minggu</span></h2>
+      <div id="rrg"></div>
+    </section>
+    <section class="card">
+      <h2>Asing Hari Ini <span class="hint" id="ftDate"></span></h2>
+      <div class="grid g-2" style="gap:18px">
+        <div><div class="mut" style="font-size:12px;margin-bottom:4px">Net beli terbesar</div><div class="bars" id="fbuy"></div></div>
+        <div><div class="mut" style="font-size:12px;margin-bottom:4px">Net jual terbesar</div><div class="bars" id="fsell"></div></div>
+      </div>
+      <div class="note">Rp miliar, universe big cap. Foreign Buy/Sell IDX (lembar) × harga penutupan.</div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2>Keterbukaan Informasi Penting <span class="hint" id="evHint"></span></h2>
+    <div class="toolbar"><div class="setups" id="evFilter"></div></div>
+    <div class="scroll" style="max-height:420px;overflow-y:auto"><table class="evtable"><tbody id="evBody"></tbody></table></div>
+    <div class="note">Laporan rutin (registrasi pemegang efek, aktivitas eksplorasi bulanan, jadwal) disaring. Klik judul untuk membuka PDF di idx.co.id.</div>
+  </section>
+
+  <section class="card" style="margin-top:16px">
+    <h2>Backtest Relative-Strength Breakout <span class="hint" id="btHint"></span></h2>
+    <div class="grid g-top">
+      <div>
+        <div class="kpis" id="btKpis"></div>
+        <table id="btTrades"></table>
+      </div>
+      <div>
+        <div class="legend"><span><i style="background:var(--bull)"></i>Strategi</span>
+          <span><i style="background:var(--accent)"></i>IHSG ex-HSC</span>
+          <span><i style="background:var(--line-2)"></i>IHSG</span></div>
+        <div id="btChart"></div>
+      </div>
+    </div>
+    <div class="note">Universe dinamis (top 70 market cap per tanggal). Free float & HSC memakai data terkini untuk seluruh periode, jumlah saham dianggap tetap → hasil cenderung optimistis.</div>
+  </section>
+
+  <footer id="footer"></footer>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const DATA = /*__PULSE_DATA__*/null;
+
+/* ---------- helpers ---------- */
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const nf0 = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 });
+const nf1 = new Intl.NumberFormat("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const nf2 = new Intl.NumberFormat("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const isNum = (v) => typeof v === "number" && isFinite(v);
+const fmt = (v, f = nf0) => isNum(v) ? f.format(v) : "–";
+const pct = (v, f = nf1) => isNum(v) ? (v > 0 ? "+" : "") + f.format(v) + "%" : "–";
+const cls = (v) => !isNum(v) ? "mut" : v > 0 ? "pos" : v < 0 ? "neg" : "";
+const SETUP_CLS = { BREAKOUT: "bull", PULLBACK: "amber", TREND: "teal", NETRAL: "", HINDARI: "bear", "TIDAK AKTIF": "na" };
+const STAGE_CLS = { MARKUP: "bull", MARKDOWN: "bear", AKUMULASI: "teal", DISTRIBUSI: "amber" };
+const STAGE_SHORT = { MARKUP: "Markup", MARKDOWN: "Markdown", AKUMULASI: "Akum", DISTRIBUSI: "Distr" };
+const FACTORS = [
+  ["stage", "Fase", "Stage MA150 (30 minggu), debounce 5 hari"],
+  ["rs13", "RS 13w", "Return 13 minggu vs IHSG ex-HSC (±5%)"],
+  ["cmf", "CMF 20", "Chaikin Money Flow (±0,05)"],
+  ["vwap", "VWAP 20", "Harga vs VWAP 20 hari (konteks)"],
+  ["foreign", "Asing 20d", "Net asing % nilai transaksi (±2%), min 5 hari data"],
+  ["big_lot", "Lot besar", "Nilai per transaksi reguler vs rata-rata 20 hari (>1,3×), arah dari harga hari itu"],
+];
+
+/* ---------- theme ---------- */
+(function theme() {
+  const root = document.documentElement;
+  let saved = null;
+  try { saved = localStorage.getItem("pulse-theme"); } catch (e) {}
+  if (saved) root.dataset.theme = saved;
+  $("#themeBtn").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("pulse-theme", root.dataset.theme); } catch (e) {}
+    renderCharts();
+  });
+})();
+
+/* ---------- SVG line chart ---------- */
+const tip = $("#tip");
+function lineChart(el, { dates, series, hlines = [], height = 220, fmtY = (v) => nf0.format(v) }) {
+  const W = Math.max(el.clientWidth || 600, 280), H = height, pad = { l: 44, r: 10, t: 8, b: 22 };
+  const all = series.flatMap((s) => s.values).concat(hlines.map((h) => h.y)).filter(isNum);
+  if (!all.length) { el.innerHTML = '<div class="note">Data tidak tersedia</div>'; return; }
+  let lo = Math.min(...all), hi = Math.max(...all);
+  const span = hi - lo || Math.abs(hi) || 1; lo -= span * 0.06; hi += span * 0.06;
+  const n = dates.length, x = (i) => pad.l + (i / Math.max(n - 1, 1)) * (W - pad.l - pad.r);
+  const y = (v) => pad.t + (1 - (v - lo) / (hi - lo)) * (H - pad.t - pad.b);
+  const css = getComputedStyle(document.documentElement);
+  const col = (c) => c.startsWith("var(") ? css.getPropertyValue(c.slice(4, -1)).trim() : c;
+  let g = "";
+  for (let k = 0; k <= 4; k++) {
+    const v = lo + (k / 4) * (hi - lo);
+    g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col("var(--border)")}" />`;
+    g += `<text x="${pad.l - 6}" y="${y(v) + 3}" text-anchor="end">${esc(fmtY(v))}</text>`;
+  }
+  const ticks = 5;
+  for (let k = 0; k < ticks; k++) {
+    const i = Math.round((k / (ticks - 1)) * (n - 1));
+    g += `<text x="${x(i)}" y="${H - 6}" text-anchor="${k === 0 ? "start" : k === ticks - 1 ? "end" : "middle"}">${esc(dates[i]?.slice(2))}</text>`;
+  }
+  hlines.forEach((h) => {
+    if (!isNum(h.y)) return;
+    g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(h.y)}" y2="${y(h.y)}" stroke="${col(h.color)}" stroke-dasharray="4 3" />`;
+    g += `<text x="${W - pad.r - 2}" y="${y(h.y) - 3}" text-anchor="end" style="fill:${col(h.color)}">${esc(h.label)}</text>`;
+  });
+  series.forEach((s) => {
+    let d = "", pen = false;
+    s.values.forEach((v, i) => {
+      if (!isNum(v)) { pen = false; return; }
+      d += (pen ? "L" : "M") + x(i).toFixed(1) + "," + y(v).toFixed(1); pen = true;
+    });
+    g += `<path d="${d}" fill="none" stroke="${col(s.color)}" stroke-width="${s.width || 1.8}" ${s.dash ? `stroke-dasharray="${s.dash}"` : ""} stroke-linejoin="round" />`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img">${g}
+    <line class="xh" y1="${pad.t}" y2="${H - pad.b}" stroke="${col("var(--faint)")}" style="display:none" />
+    <rect x="${pad.l}" y="${pad.t}" width="${W - pad.l - pad.r}" height="${H - pad.t - pad.b}" fill="transparent" /></svg>`;
+  const svg = el.querySelector("svg"), xh = svg.querySelector(".xh");
+  svg.addEventListener("mousemove", (ev) => {
+    const r = svg.getBoundingClientRect(), px = (ev.clientX - r.left) * (W / r.width);
+    const i = Math.min(n - 1, Math.max(0, Math.round(((px - pad.l) / (W - pad.l - pad.r)) * (n - 1))));
+    xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.style.display = "";
+    tip.innerHTML = `<b>${esc(dates[i])}</b><br>` + series.map((s) =>
+      `<span style="color:${col(s.color)}">●</span> ${esc(s.name)}: ${isNum(s.values[i]) ? esc(fmtY(s.values[i])) : "–"}`).join("<br>");
+    tip.style.display = "block";
+    tip.style.left = Math.min(ev.clientX + 14, innerWidth - tip.offsetWidth - 8) + "px";
+    tip.style.top = ev.clientY + 14 + "px";
+  });
+  svg.addEventListener("mouseleave", () => { xh.style.display = "none"; tip.style.display = "none"; });
+}
+
+/* ---------- header, warnings, market ---------- */
+const M = DATA.meta;
+$("#sub").textContent = `Harga s/d ${M.price_date} · File IDX ${M.idx_file_date} · dibuat ${M.generated}`;
+const rg = $("#regime");
+rg.className = "chip " + (M.market_ok ? "bull" : "bear");
+rg.textContent = M.market_ok ? "Pasar: entry diizinkan" : "Pasar: tahan entry baru";
+rg.title = `IHSG ex-HSC ${fmt(M.exhsc, nf2)} vs MA50 ${fmt(M.exhsc_ma50, nf2)}`;
+
+const warns = [];
+if (M.idx_file_date !== M.price_date)
+  warns.push(`File Ringkasan Saham terbaru (${M.idx_file_date}) berbeda dengan tanggal harga (${M.price_date}). Unduh file IDX terbaru ke data/idx/ lalu jalankan update.`);
+if (M.idx_days < 5)
+  warns.push(`Histori asing baru ${M.idx_days} hari. Faktor "Asing 20d" aktif setelah minimal 5 file harian, idealnya 20.`);
+$("#warnings").innerHTML = warns.map((w) => `<div class="warn">${esc(w)}</div>`).join("");
+
+const counts = {};
+DATA.rows.forEach((r) => (counts[r.setup] = (counts[r.setup] || 0) + 1));
+$("#kpis").innerHTML = `
+  <div class="kpi"><div class="label">IHSG ex-HSC</div><div class="val">${fmt(M.exhsc, nf2)}</div>
+    <div class="small">MA50 ${fmt(M.exhsc_ma50, nf2)}</div></div>
+  <div class="kpi"><div class="label">Bobot HSC di IHSG</div><div class="val">${fmt(M.hsc_weight * 100, nf1)}%</div>
+    <div class="small">${M.hsc_count} saham · daftar ${esc(M.hsc_as_of)}</div></div>
+  <div class="kpi"><div class="label">Setup Breakout</div><div class="val">${counts.BREAKOUT || 0}</div>
+    <div class="small">dari ${DATA.rows.length} big cap</div></div>`;
+const P = DATA.bench.perf, periods = Object.keys(P);
+$("#perf").innerHTML = `<thead><tr><th></th>${periods.map((p) => `<th>${esc(p)}</th>`).join("")}</tr></thead><tbody>
+  <tr><td>IHSG</td>${periods.map((p) => `<td class="${cls(P[p].ihsg)}">${pct(P[p].ihsg)}</td>`).join("")}</tr>
+  <tr><td><b>ex-HSC</b></td>${periods.map((p) => `<td class="${cls(P[p].exhsc)}"><b>${pct(P[p].exhsc)}</b></td>`).join("")}</tr>
+  <tr><td class="mut">Selisih</td>${periods.map((p) => { const d = P[p].exhsc - P[p].ihsg; return `<td class="${cls(d)}">${pct(d)}</td>`; }).join("")}</tr></tbody>`;
+
+/* ---------- screener ---------- */
+const COLS = [
+  ["code", "Kode"], ["setup", "Setup"], ["close", "Harga"], ["chg1d", "1H"], ["rs4", "RS 4w"], ["rs13", "RS 13w"],
+  ["stage", "Fase"], ["factors", "Faktor"], ["cmf", "CMF"], ["vwap", "VWAP"], ["foreign_pct", "Asing"],
+  ["vol_ratio", "Vol"], ["rsi", "RSI"], ["risk_pct", "SL %"], ["pe", "PE"], ["roe", "ROE"], ["mcap_t", "Mcap T"],
+];
+const SETUPS = ["BREAKOUT", "PULLBACK", "TREND", "NETRAL", "HINDARI", "TIDAK AKTIF"].filter((s) => s !== "TIDAK AKTIF" || DATA.rows.some((r) => r.setup === s));
+let state = { setup: null, sector: "", q: "", sort: "score", asc: false, sel: null };
+try { Object.assign(state, JSON.parse(localStorage.getItem("pulse-filter") || "{}"), { sel: null }); } catch (e) {}
+
+$("#setupFilter").innerHTML = SETUPS.map((s) =>
+  `<span class="chip ${SETUP_CLS[s]}" data-s="${s}">${s} ${counts[s] || 0}</span>`).join("");
+$("#setupFilter").addEventListener("click", (e) => {
+  const s = e.target.closest("[data-s]")?.dataset.s; if (!s) return;
+  state.setup = state.setup === s ? null : s; renderTable();
+});
+const sectors = [...new Set(DATA.rows.map((r) => r.sector).filter(Boolean))].sort();
+$("#sectorFilter").innerHTML = `<option value="">Semua sektor</option>` + sectors.map((s) => `<option>${esc(s)}</option>`).join("");
+$("#sectorFilter").value = state.sector;
+$("#sectorFilter").addEventListener("change", (e) => { state.sector = e.target.value; renderTable(); });
+$("#search").value = state.q;
+$("#search").addEventListener("input", (e) => { state.q = e.target.value.trim().toUpperCase(); renderTable(); });
+
+$("#screener thead").innerHTML = "<tr>" + COLS.map(([k, n]) => `<th data-k="${k}">${n}</th>`).join("") + "</tr>";
+$("#screener thead").addEventListener("click", (e) => {
+  const k = e.target.closest("th")?.dataset.k; if (!k) return;
+  if (state.sort === k) state.asc = !state.asc; else { state.sort = k; state.asc = k === "code" || k === "risk_pct"; }
+  renderTable();
+});
+
+const sortVal = (r, k) => k === "factors" ? r.bull - r.bear : k === "stage" ? (r.stage || "") :
+  k === "setup" ? SETUPS.indexOf(r.setup) * -1 : k === "pe" || k === "roe" ? r.fund?.[k] ?? null : r[k];
+const daysAgo = (d) => Math.round((new Date(M.price_date) - new Date(d)) / 864e5);
+const recentEvents = (r) => (r.events || []).filter((e) => daysAgo(e.date) <= 14 && e.category !== "laporan_keuangan");
+function factorDots(r) {
+  return `<span class="dots" title="${FACTORS.map(([k, n]) => `${n}: ${r.labels[k]}`).join(" · ")}">` +
+    FACTORS.map(([k]) => `<span class="dot ${r.labels[k]}"></span>`).join("") + "</span>";
+}
+function renderTable() {
+  try { localStorage.setItem("pulse-filter", JSON.stringify({ setup: state.setup, sector: state.sector, q: state.q, sort: state.sort, asc: state.asc })); } catch (e) {}
+  document.querySelectorAll("#setupFilter .chip").forEach((c) => c.classList.toggle("active", c.dataset.s === state.setup));
+  document.querySelectorAll("#screener th").forEach((th) => {
+    th.classList.toggle("sorted", th.dataset.k === state.sort); th.classList.toggle("asc", th.dataset.k === state.sort && state.asc);
+  });
+  const rows = DATA.rows.filter((r) => (!state.setup || r.setup === state.setup) && (!state.sector || r.sector === state.sector) &&
+    (!state.q || r.code.includes(state.q) || (r.name || "").toUpperCase().includes(state.q)));
+  rows.sort((a, b) => {
+    const va = sortVal(a, state.sort), vb = sortVal(b, state.sort);
+    if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
+    return (va > vb ? 1 : va < vb ? -1 : 0) * (state.asc ? 1 : -1);
+  });
+  $("#screener tbody").innerHTML = rows.map((r) => `<tr data-c="${r.code}" class="${r.code === state.sel ? "sel" : ""}">
+    <td class="code">${r.code}${recentEvents(r).length ? ` <span class="evdot" title="${esc(recentEvents(r).map((e) => e.date + " " + e.label).join("\n"))}">●</span>` : ""}<span class="nm">${esc(r.name)}</span></td>
+    <td><span class="chip ${SETUP_CLS[r.setup]}">${r.setup}</span></td>
+    <td>${fmt(r.close)}</td><td class="${cls(r.chg1d)}">${pct(r.chg1d)}</td>
+    <td class="${cls(r.rs4)}">${pct(r.rs4)}</td><td class="${cls(r.rs13)}">${pct(r.rs13)}</td>
+    <td><span class="chip ${STAGE_CLS[r.stage] || ""}" title="sejak ${esc(r.stage_start)}">${r.stage ? STAGE_SHORT[r.stage] + " " + r.stage_days + "h" : "–"}</span></td>
+    <td>${factorDots(r)}</td>
+    <td class="${cls(r.cmf)}">${fmt(r.cmf, nf2)}</td><td class="${cls(r.vwap)}">${pct(r.vwap)}</td>
+    <td class="${r.foreign_days >= 5 ? cls(r.foreign_pct) : "mut"}">${r.foreign_days >= 5 ? pct(r.foreign_pct) : "–"}</td>
+    <td>${fmt(r.vol_ratio, nf2)}×</td><td>${fmt(r.rsi)}</td><td class="neg">${isNum(r.risk_pct) ? "−" + nf1.format(r.risk_pct) + "%" : "–"}</td>
+    <td>${isNum(r.fund?.pe) ? nf1.format(r.fund.pe) + "×" : "–"}</td><td class="${cls(r.fund?.roe)}">${isNum(r.fund?.roe) ? nf1.format(r.fund.roe) + "%" : "–"}</td>
+    <td>${fmt(r.mcap_t, nf1)}</td></tr>`).join("") ||
+    `<tr><td colspan="${COLS.length}" class="mut" style="text-align:center;padding:24px">Tidak ada saham yang cocok dengan filter.</td></tr>`;
+  if (!state.sel || !rows.some((r) => r.code === state.sel)) selectRow(rows[0]?.code);
+}
+$("#screener tbody").addEventListener("click", (e) => {
+  const c = e.target.closest("tr")?.dataset.c; if (!c) return;
+  selectRow(c);
+  if (matchMedia("(max-width: 1100px)").matches) $("#detail").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+function factorValue(r, k) {
+  switch (k) {
+    case "stage": return r.stage ? `${r.stage}<div class="d">${r.stage_days} hari · sejak ${esc(r.stage_start)}</div>` : "–";
+    case "rs13": return pct(r.rs13);
+    case "cmf": return fmt(r.cmf, nf2);
+    case "vwap": return r.vwap == null ? "–" : `${pct(r.vwap)} <span class="d">${r.vwap > 3 ? "premium" : r.vwap < -3 ? "diskon" : "wajar"}</span>`;
+    case "foreign": return r.foreign_days >= 5 ? `${pct(r.foreign_pct)}<div class="d">5h Rp ${fmt(r.foreign_net5_bn, nf1)} M</div>`
+      : `<span class="mut">${r.foreign_days}/5 hari</span>` + (isNum(r.foreign_today_bn) ? `<div class="d">hari ini Rp ${fmt(r.foreign_today_bn, nf1)} M</div>` : "");
+    case "big_lot": return isNum(r.big_lot)
+      ? `${r.big_lot > 10 ? "≥10" : fmt(r.big_lot, nf2)}× <span class="d">${r.labels.big_lot === "bull" ? "harga naik" : r.labels.big_lot === "bear" ? "harga turun" : ""}</span>`
+      : `<span class="mut">butuh ≥6 hari</span>`;
+  }
+}
+function fundBlock(r) {
+  const f = r.fund;
+  if (!f) return `<div class="sub-h">Fundamental</div><div class="note">Belum ada data. Jalankan scripts/idx_browser_extract.js di idx.co.id.</div>`;
+  const cell = (n, v, c = "") => `<div><div class="n">${n}</div><div class="v ${c}">${v}</div></div>`;
+  const x = (v, d = nf1) => isNum(v) ? d.format(v) + "×" : "–";
+  return `<div class="sub-h">Fundamental <span class="mut">${esc(f.report)} · ${esc(f.report_type)}${f.currency === "USD" ? " · lapor USD" : ""}</span></div>
+    <div class="levels fund">
+      ${cell("PE (TTM)", x(f.pe))}${cell("PBV", x(f.pbv, nf2))}${cell("ROE", isNum(f.roe) ? nf1.format(f.roe) + "%" : "–", cls(f.roe))}
+      ${cell("Laba YTD YoY", pct(f.ni_growth), cls(f.ni_growth))}${cell(f.bank ? "Pend. bunga YoY" : "Pendapatan YoY", pct(f.rev_growth), cls(f.rev_growth))}
+      ${cell("Net margin", isNum(f.net_margin) ? nf1.format(f.net_margin) + "%" : "–")}
+      ${cell(f.bank ? "Laba TTM" : "DER", f.bank ? "Rp " + fmt(f.ni_ttm_bn / 1000, nf1) + " T" : x(f.der, nf2))}
+      ${cell(f.bank ? "–" : "OCF / laba", f.bank ? "" : x(f.ocf_ni, nf2), isNum(f.ocf_ni) && f.ocf_ni < 0.5 ? "neg" : "")}</div>
+    ${f.flags?.length ? `<div class="flags">${f.flags.map((t) => `<span class="chip bear">${esc(t)}</span>`).join(" ")}</div>` : ""}`;
+}
+function eventBlock(r) {
+  if (!r.events?.length) return "";
+  return `<div class="sub-h">Keterbukaan informasi <span class="mut">45 hari</span></div><ul class="events">${r.events.map((e) =>
+    `<li><span class="mut">${esc(e.date.slice(5))}</span> <span class="chip ${EV_CLS[e.category] || ""}">${esc(e.label)}</span>
+     ${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a>` : esc(e.title)}</li>`).join("")}</ul>`;
+}
+const EV_CLS = { dividen: "bull", buyback: "bull", tender_offer: "accent", rights_issue: "amber", transaksi_material: "accent",
+  afiliasi: "amber", kepemilikan: "accent", penjelasan_bursa: "amber", suspensi: "bear", stock_split: "teal" };
+function selectRow(code) {
+  state.sel = code;
+  document.querySelectorAll("#screener tbody tr").forEach((tr) => tr.classList.toggle("sel", tr.dataset.c === code));
+  const r = DATA.rows.find((x) => x.code === code), el = $("#detail");
+  if (!r) { el.innerHTML = '<div class="note">Pilih saham di tabel.</div>'; return; }
+  el.innerHTML = `
+    <div class="head"><span class="t">${r.code}</span><span class="p">${fmt(r.close)}</span>
+      <span class="${cls(r.chg1d)}">${pct(r.chg1d)}</span><span class="chip ${SETUP_CLS[r.setup]}">${r.setup}</span></div>
+    <div class="mut" style="font-size:12px">${esc(r.name)} · ${esc(r.sector || "–")} · Rp ${fmt(r.mcap_t, nf1)} T</div>
+    <div class="legend" style="margin-top:10px"><span><i style="background:var(--accent)"></i>Close</span>
+      <span><i style="background:var(--line-2)"></i>MA50</span><span><i style="background:var(--bear)"></i>SL</span>
+      <span><i style="background:var(--bull)"></i>TP1</span></div>
+    <div id="spark"></div>
+    <div class="factors">${FACTORS.map(([k, n, d]) => `<div class="factor ${r.labels[k]}" title="${esc(d)}">
+      <div class="n">${n}</div><div class="v">${factorValue(r, k)}</div></div>`).join("")}</div>
+    <div class="levels">
+      <div><div class="n">Entry</div><div class="v">${fmt(r.close)}</div></div>
+      <div><div class="n">Stop (2 ATR)</div><div class="v neg">${fmt(r.stop)}</div></div>
+      <div><div class="n">TP1 · 2R</div><div class="v pos">${fmt(r.tp1)}</div></div>
+      <div><div class="n">TP2 · 3R</div><div class="v pos">${fmt(r.tp2)}</div></div></div>
+    ${fundBlock(r)}
+    ${eventBlock(r)}
+    <div class="note">RS 4w ${pct(r.rs4)} · RSI ${fmt(r.rsi)} · Vol 5d/50d ${fmt(r.vol_ratio, nf2)}× · ke high 55h ${pct(r.to_hh55)} · ATR ${fmt(r.atr_pct, nf1)}%
+      ${isNum(r.nonreg_pct) && r.nonreg_pct > 20 ? `<br><b>Catatan:</b> ${nf1.format(r.nonreg_pct)}% nilai hari ini dari pasar nego.` : ""}
+      <br>Trailing: puncak close − 2,5 ATR, maksimal 8 minggu.</div>`;
+  drawSpark(r);
+}
+function drawSpark(r) {
+  const el = document.getElementById("spark"); if (!el || !r) return;
+  lineChart(el, { dates: r.spark.dates, height: 170,
+    series: [{ name: "Close", values: r.spark.close, color: "var(--accent)" },
+             { name: "MA50", values: r.spark.ma50, color: "var(--line-2)", width: 1.2 }],
+    hlines: [{ y: r.stop, label: "SL", color: "var(--bear)" }, { y: r.tp1, label: "TP1", color: "var(--bull)" },
+             { y: r.spark.hh55, label: "High 55h", color: "var(--faint)" }] });
+}
+
+/* ---------- sector rotation (RRG) ---------- */
+function drawRRG() {
+  const el = $("#rrg"), S = DATA.sectors;
+  if (!S.length) { el.innerHTML = '<div class="note">Data sektor belum tersedia.</div>'; return; }
+  const W = Math.max(el.clientWidth || 500, 280), H = 320, pad = 34;
+  const pts = S.flatMap((s) => s.trail);
+  const dx = Math.max(...pts.map((p) => Math.abs(p[0] - 100)), 2) * 1.15;
+  const dy = Math.max(...pts.map((p) => Math.abs(p[1] - 100)), 2) * 1.15;
+  const x = (v) => pad + ((v - (100 - dx)) / (2 * dx)) * (W - 2 * pad);
+  const y = (v) => H - pad - ((v - (100 - dy)) / (2 * dy)) * (H - 2 * pad);
+  const css = getComputedStyle(document.documentElement), c = (n) => css.getPropertyValue(n).trim();
+  const QC = { LEADING: c("--bull"), WEAKENING: c("--amber"), LAGGING: c("--bear"), IMPROVING: c("--accent") };
+  let g = `<line x1="${x(100)}" x2="${x(100)}" y1="${pad}" y2="${H - pad}" stroke="${c("--border")}" />
+    <line x1="${pad}" x2="${W - pad}" y1="${y(100)}" y2="${y(100)}" stroke="${c("--border")}" />
+    <text x="${W - pad}" y="${pad - 8}" text-anchor="end" style="fill:${QC.LEADING}">LEADING</text>
+    <text x="${W - pad}" y="${H - pad + 18}" text-anchor="end" style="fill:${QC.WEAKENING}">WEAKENING</text>
+    <text x="${pad}" y="${H - pad + 18}" style="fill:${QC.LAGGING}">LAGGING</text>
+    <text x="${pad}" y="${pad - 8}" style="fill:${QC.IMPROVING}">IMPROVING</text>`;
+  S.forEach((s) => {
+    const col = QC[s.quadrant];
+    g += `<polyline points="${s.trail.map((p) => x(p[0]) + "," + y(p[1])).join(" ")}" fill="none" stroke="${col}" stroke-opacity=".45" stroke-width="1.5" />`;
+    s.trail.slice(0, -1).forEach((p) => g += `<circle cx="${x(p[0])}" cy="${y(p[1])}" r="2" fill="${col}" fill-opacity=".45" />`);
+    const last = s.trail[s.trail.length - 1];
+    g += `<circle cx="${x(last[0])}" cy="${y(last[1])}" r="5" fill="${col}"><title>${esc(s.sector)} (${s.n} saham) · ${s.quadrant} · 20h ${pct(s.ret20)}</title></circle>
+      <text x="${x(last[0]) + 7}" y="${y(last[1]) + 3}" style="fill:${c("--text")}">${esc(s.sector)}</text>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img">${g}</svg>
+    <div class="note">Sumbu X: RS-Ratio (kekuatan relatif). Sumbu Y: RS-Momentum. Equal-weight anggota universe per sektor.</div>`;
+}
+
+/* ---------- foreign today ---------- */
+function drawForeign() {
+  $("#ftDate").textContent = M.idx_file_date;
+  const mx = Math.max(...[...DATA.foreign_today.buy, ...DATA.foreign_today.sell].map((d) => Math.abs(d.net_bn || 0)), 1);
+  const bar = (d, col) => `<div class="row"><b>${d.code}</b><div class="track"><div class="fill" style="width:${Math.abs(d.net_bn) / mx * 100}%;background:${col}"></div></div>
+    <span class="${cls(d.net_bn)}" style="text-align:right">${d.net_bn > 0 ? "+" : ""}${fmt(d.net_bn, nf1)}</span></div>`;
+  $("#fbuy").innerHTML = DATA.foreign_today.buy.filter((d) => d.net_bn > 0).map((d) => bar(d, "var(--bull)")).join("") || '<div class="note">–</div>';
+  $("#fsell").innerHTML = DATA.foreign_today.sell.filter((d) => d.net_bn < 0).map((d) => bar(d, "var(--bear)")).join("") || '<div class="note">–</div>';
+}
+
+/* ---------- backtest ---------- */
+function drawBacktestStatic() {
+  const B = DATA.backtest, s = B.stats;
+  $("#btHint").textContent = `${B.dates[0]} – ${B.dates[B.dates.length - 1]}`;
+  const bx = B.exhsc[B.exhsc.length - 1] - 100;
+  $("#btKpis").innerHTML = `
+    <div class="kpi"><div class="label">Total strategi</div><div class="val ${cls(s.total)}">${pct(s.total * 100)}</div><div class="small">IHSG ex-HSC ${pct(bx)}</div></div>
+    <div class="kpi"><div class="label">CAGR · Max DD</div><div class="val">${pct(s.cagr * 100)}</div><div class="small">DD ${pct(s.max_dd * 100)}</div></div>
+    <div class="kpi"><div class="label">Win rate</div><div class="val">${fmt(s.win_rate * 100)}%</div><div class="small">${s.trades} trade · menang ${pct(s.avg_win * 100)} / kalah ${pct(s.avg_loss * 100)}</div></div>`;
+  $("#btTrades").innerHTML = `<thead><tr><th>Trade terakhir</th><th>Masuk</th><th>Keluar</th><th>Hari</th><th>Alasan</th><th>Return</th></tr></thead><tbody>` +
+    B.recent.map((t) => `<tr><td><b>${esc(t.code)}</b></td><td>${esc(t.entry_date)}</td><td>${esc(t.exit_date)}</td><td>${fmt(t.days)}</td>
+      <td class="mut">${esc(t.reason)}</td><td class="${cls(t.ret)}">${pct(t.ret * 100)}</td></tr>`).join("") + "</tbody>";
+}
+
+/* ---------- disclosures ---------- */
+let evCat = null;
+function drawEvents() {
+  const E = DATA.events || [];
+  $("#evHint").textContent = E.length ? `${E.length} pengumuman, 45 hari · data ${M.fund_generated || "–"}` : "belum ada data";
+  const cats = [...new Set(E.map((e) => e.category))];
+  $("#evFilter").innerHTML = cats.map((c) => `<span class="chip ${EV_CLS[c] || ""} ${evCat === c ? "active" : ""}" data-c="${c}">${esc(DATA.event_labels[c] || c)} ${E.filter((e) => e.category === c).length}</span>`).join("");
+  const rows = E.filter((e) => !evCat || e.category === evCat);
+  $("#evBody").innerHTML = rows.map((e) => `<tr><td class="mut">${esc(e.date)}</td><td><b><a href="#" data-code="${e.code}">${e.code}</a></b></td>
+    <td><span class="chip ${EV_CLS[e.category] || ""}">${esc(e.label)}</span></td>
+    <td>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a>` : esc(e.title)}</td></tr>`).join("") ||
+    `<tr><td class="mut">Belum ada data keterbukaan informasi. Jalankan scripts/idx_browser_extract.js di idx.co.id.</td></tr>`;
+}
+$("#evFilter").addEventListener("click", (e) => { const c = e.target.closest("[data-c]")?.dataset.c; if (!c) return; evCat = evCat === c ? null : c; drawEvents(); });
+$("#evBody").addEventListener("click", (e) => {
+  const code = e.target.closest("[data-code]")?.dataset.code; if (!code) return;
+  e.preventDefault(); state.setup = null; state.q = ""; $("#search").value = ""; renderTable(); selectRow(code);
+  $("#detail").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+/* ---------- footer ---------- */
+const R = M.universe_rules;
+$("#footer").innerHTML = `
+  <b>Universe:</b> ${DATA.rows.length} big cap (data ${esc(M.universe_as_of)}), bukan HSC, free float riil KSEI ≥ ${R.min_ff_ksei}% (snapshot ${esc(M.ksei_snapshot)}), likuiditas ≥ Rp ${R.min_avg_value_bn} M/hari.<br>
+  <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: ${FACTORS.map(([, n, d]) => `${n} (${esc(d)})`).join("; ")}.<br>
+  <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler hari itu (cek suspensi), harga basi.<br>
+  <b>Fundamental:</b> XBRL laporan keuangan idx.co.id (data ${esc(M.fund_generated || "–")}). Laba TTM = tahun buku terakhir + YTD berjalan − YTD tahun lalu; laporan USD dikonversi kurs ${fmt(M.usd_idr)} per USD. Fundamental adalah konteks, bukan sinyal timing.<br>
+  <b>Sumber:</b> Yahoo Finance (OHLCV), Ringkasan Saham & XBRL & pengumuman idx.co.id, ff/1pct.klinikpenyesalan.com (free float BEI & KSEI), pengumuman HSC BEI.<br>
+  Bukan rekomendasi beli/jual. Lakukan riset sendiri dan kelola risiko Anda.`;
+
+/* ---------- render ---------- */
+function renderCharts() {
+  lineChart($("#benchChart"), { dates: DATA.bench.dates, fmtY: (v) => nf0.format(v),
+    series: [{ name: "IHSG", values: DATA.bench.ihsg, color: "var(--line-2)", width: 1.4 },
+             { name: "IHSG ex-HSC", values: DATA.bench.exhsc, color: "var(--accent)" }] });
+  const B = DATA.backtest;
+  lineChart($("#btChart"), { dates: B.dates, fmtY: (v) => nf0.format(v),
+    series: [{ name: "IHSG", values: B.ihsg, color: "var(--line-2)", width: 1.2 },
+             { name: "IHSG ex-HSC", values: B.exhsc, color: "var(--accent)", width: 1.4 },
+             { name: "Strategi", values: B.equity, color: "var(--bull)", width: 2 }] });
+  drawRRG();
+  drawSpark(DATA.rows.find((r) => r.code === state.sel));
+}
+drawForeign();
+drawEvents();
+drawBacktestStatic();
+renderTable();
+renderCharts();
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderCharts, 150); });
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "as_of": "2026-09-24",
+  "source": "Pengumuman BEI - Daftar Efek dengan High Shareholding Concentration (HSC)",
+  "notes": "51 saham per 15 Jul 2026; +AGAR, ALKA, BKDP, MDIA, BAJA (Agu 2026); +BDKR, SAFE, NICK (Sep 2026); LUCY keluar. Perbarui saat BEI mengumumkan perubahan.",
+  "tickers": [
+    "AGAR", "AGII", "ALII", "ALKA", "BAJA", "BBHI", "BBSI", "BDKR", "BELI", "BINA",
+    "BKDP", "BNII", "BNLI", "BREN", "BTPN", "BYAN", "CMNP", "CMNT", "DCII", "DGWG",
+    "DNET", "DSSA", "ELPI", "FAPA", "FILM", "FITT", "GEMS", "HATM", "IFSH", "KING",
+    "KONI", "LIFE", "MCOL", "MDIA", "MEGA", "MGLV", "MGRO", "MKPI", "MLPT", "MORA",
+    "MPRO", "NICK", "PGUN", "POLU", "PRAY", "RISE", "RLCO", "ROCK", "SAFE", "SATU",
+    "SILO", "SMAR", "SOHO", "SOTS", "SRAJ", "STTP", "TCPI", "WBSA", "YUPI"
+  ]
+}
