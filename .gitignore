@@ -166,6 +166,7 @@ data/reports/
 data/idx/*.xlsx
 data/idx/history.csv.gz
 data/ownership/
+data/fundamentals/
 charts/
 *.png
 !docs/*.png

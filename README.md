@@ -725,6 +725,25 @@ Catatan data IDX: kolom Volume/Nilai/Frekuensi hanya mencakup **pasar reguler**;
 
 Faktor asing & lot besar aktif setelah histori Excel IDX terkumpul (≥5 hari). Semakin rutin file diunduh, semakin lengkap.
 
+### Fundamental & Keterbukaan Informasi (idx.co.id)
+
+idx.co.id memblokir klien non-browser, jadi data diambil **di browser Anda sendiri** dengan `scripts/idx_browser_extract.js`:
+
+1. Buka https://www.idx.co.id/id/perusahaan-tercatat/laporan-keuangan-dan-tahunan/ di Chrome
+2. F12 → Console, tempel isi `scripts/idx_browser_extract.js`, Enter
+3. `await pulseIdx.run()` (±5 menit untuk 70 saham, request berurutan dengan jeda)
+4. Pindahkan `pulse_idx_YYYYMMDD.json` dari Downloads ke `data/fundamentals/`, lalu jalankan `update_dashboard.bat`
+
+Cukup diulang setelah musim laporan keuangan (akhir Apr, Jul/Agu, Okt, Mar) dan sesekali untuk pengumuman terbaru.
+
+Yang diambil:
+- **XBRL laporan keuangan** terbaru (TW3/TW2/TW1/tahunan) + laporan tahunan sebelumnya. Laba TTM = tahun buku terakhir + YTD berjalan − YTD tahun lalu. Laporan dalam USD (19 dari 70 big cap per Sep 2026) dikonversi kurs USD/IDR terkini.
+- Metrik: PE, PBV, ROE, pertumbuhan laba & pendapatan YoY, net margin, DER, OCF/laba. Bank memakai pendapatan bunga, tanpa DER.
+- Peringatan otomatis: ekuitas negatif, rugi TTM, berbalik rugi, laba turun >20%, laba naik dari basis kecil, arus kas operasi negatif, laba belum jadi kas.
+- **Pengumuman penting** 90 hari: dividen, RUPS, buyback, rights issue, transaksi material/afiliasi, perubahan kepemilikan/pengendali, tender offer, penjelasan ke Bursa, suspensi, stock split, laporan keuangan. Laporan rutin disaring.
+
+Fundamental ditampilkan sebagai **konteks** di dashboard (kolom PE/ROE, panel detail, daftar keterbukaan informasi), bukan sinyal timing swing.
+
 ### Update Harian Tanpa TUI
 
 ```bash

@@ -114,6 +114,19 @@ svg text { fill: var(--muted); font-size: 10px; }
 .tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--border);
   border-radius: 8px; padding: 6px 9px; font-size: 12px; box-shadow: var(--shadow); display: none; z-index: 10;
   font-variant-numeric: tabular-nums; }
+.sub-h { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin: 14px 0 8px; }
+.sub-h .mut { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.levels.fund { grid-template-columns: repeat(4, 1fr); }
+.flags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.evdot { color: var(--accent); font-size: 10px; vertical-align: top; cursor: help; }
+ul.events { list-style: none; padding: 0; margin: 0; font-size: 12.5px; }
+ul.events li { padding: 6px 0; border-bottom: 1px solid var(--border); line-height: 1.5; }
+ul.events a { color: var(--text); text-decoration: none; }
+ul.events a:hover { color: var(--accent); text-decoration: underline; }
+ul.events .chip { font-size: 11px; padding: 1px 8px; margin-right: 4px; }
+.evtable td { white-space: normal; text-align: left; vertical-align: top; }
+.evtable td:first-child { white-space: nowrap; }
+.evtable a { color: var(--text); text-decoration: none; } .evtable a:hover { color: var(--accent); text-decoration: underline; }
 footer { margin-top: 22px; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .warn { background: var(--amber-bg); color: var(--amber); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-bottom: 14px; }
 @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } .detail { position: static; order: -1; } }
@@ -177,6 +190,13 @@ footer { margin-top: 22px; color: var(--muted); font-size: 12px; line-height: 1.
       <div class="note">Rp miliar, universe big cap. Foreign Buy/Sell IDX (lembar) × harga penutupan.</div>
     </section>
   </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2>Keterbukaan Informasi Penting <span class="hint" id="evHint"></span></h2>
+    <div class="toolbar"><div class="setups" id="evFilter"></div></div>
+    <div class="scroll" style="max-height:420px;overflow-y:auto"><table class="evtable"><tbody id="evBody"></tbody></table></div>
+    <div class="note">Laporan rutin (registrasi pemegang efek, aktivitas eksplorasi bulanan, jadwal) disaring. Klik judul untuk membuka PDF di idx.co.id.</div>
+  </section>
 
   <section class="card" style="margin-top:16px">
     <h2>Backtest Relative-Strength Breakout <span class="hint" id="btHint"></span></h2>
@@ -326,7 +346,7 @@ $("#perf").innerHTML = `<thead><tr><th></th>${periods.map((p) => `<th>${esc(p)}<
 const COLS = [
   ["code", "Kode"], ["setup", "Setup"], ["close", "Harga"], ["chg1d", "1H"], ["rs4", "RS 4w"], ["rs13", "RS 13w"],
   ["stage", "Fase"], ["factors", "Faktor"], ["cmf", "CMF"], ["vwap", "VWAP"], ["foreign_pct", "Asing"],
-  ["vol_ratio", "Vol"], ["rsi", "RSI"], ["risk_pct", "SL %"], ["mcap_t", "Mcap T"],
+  ["vol_ratio", "Vol"], ["rsi", "RSI"], ["risk_pct", "SL %"], ["pe", "PE"], ["roe", "ROE"], ["mcap_t", "Mcap T"],
 ];
 const SETUPS = ["BREAKOUT", "PULLBACK", "TREND", "NETRAL", "HINDARI"];
 let state = { setup: null, sector: "", q: "", sort: "score", asc: false, sel: null };
@@ -353,7 +373,9 @@ $("#screener thead").addEventListener("click", (e) => {
 });
 
 const sortVal = (r, k) => k === "factors" ? r.bull - r.bear : k === "stage" ? (r.stage || "") :
-  k === "setup" ? SETUPS.indexOf(r.setup) * -1 : r[k];
+  k === "setup" ? SETUPS.indexOf(r.setup) * -1 : k === "pe" || k === "roe" ? r.fund?.[k] ?? null : r[k];
+const daysAgo = (d) => Math.round((new Date(M.price_date) - new Date(d)) / 864e5);
+const recentEvents = (r) => (r.events || []).filter((e) => daysAgo(e.date) <= 14 && e.category !== "laporan_keuangan");
 function factorDots(r) {
   return `<span class="dots" title="${FACTORS.map(([k, n]) => `${n}: ${r.labels[k]}`).join(" · ")}">` +
     FACTORS.map(([k]) => `<span class="dot ${r.labels[k]}"></span>`).join("") + "</span>";
@@ -372,7 +394,7 @@ function renderTable() {
     return (va > vb ? 1 : va < vb ? -1 : 0) * (state.asc ? 1 : -1);
   });
   $("#screener tbody").innerHTML = rows.map((r) => `<tr data-c="${r.code}" class="${r.code === state.sel ? "sel" : ""}">
-    <td class="code">${r.code}<span class="nm">${esc(r.name)}</span></td>
+    <td class="code">${r.code}${recentEvents(r).length ? ` <span class="evdot" title="${esc(recentEvents(r).map((e) => e.date + " " + e.label).join("\n"))}">●</span>` : ""}<span class="nm">${esc(r.name)}</span></td>
     <td><span class="chip ${SETUP_CLS[r.setup]}">${r.setup}</span></td>
     <td>${fmt(r.close)}</td><td class="${cls(r.chg1d)}">${pct(r.chg1d)}</td>
     <td class="${cls(r.rs4)}">${pct(r.rs4)}</td><td class="${cls(r.rs13)}">${pct(r.rs13)}</td>
@@ -381,6 +403,7 @@ function renderTable() {
     <td class="${cls(r.cmf)}">${fmt(r.cmf, nf2)}</td><td class="${cls(r.vwap)}">${pct(r.vwap)}</td>
     <td class="${r.foreign_days >= 5 ? cls(r.foreign_pct) : "mut"}">${r.foreign_days >= 5 ? pct(r.foreign_pct) : "–"}</td>
     <td>${fmt(r.vol_ratio, nf2)}×</td><td>${fmt(r.rsi)}</td><td class="neg">${isNum(r.risk_pct) ? "−" + nf1.format(r.risk_pct) + "%" : "–"}</td>
+    <td>${isNum(r.fund?.pe) ? nf1.format(r.fund.pe) + "×" : "–"}</td><td class="${cls(r.fund?.roe)}">${isNum(r.fund?.roe) ? nf1.format(r.fund.roe) + "%" : "–"}</td>
     <td>${fmt(r.mcap_t, nf1)}</td></tr>`).join("") ||
     `<tr><td colspan="${COLS.length}" class="mut" style="text-align:center;padding:24px">Tidak ada saham yang cocok dengan filter.</td></tr>`;
   if (!state.sel || !rows.some((r) => r.code === state.sel)) selectRow(rows[0]?.code);
@@ -404,6 +427,28 @@ function factorValue(r, k) {
       : `<span class="mut">butuh ≥6 hari</span>`;
   }
 }
+function fundBlock(r) {
+  const f = r.fund;
+  if (!f) return `<div class="sub-h">Fundamental</div><div class="note">Belum ada data. Jalankan scripts/idx_browser_extract.js di idx.co.id.</div>`;
+  const cell = (n, v, c = "") => `<div><div class="n">${n}</div><div class="v ${c}">${v}</div></div>`;
+  const x = (v, d = nf1) => isNum(v) ? d.format(v) + "×" : "–";
+  return `<div class="sub-h">Fundamental <span class="mut">${esc(f.report)} · ${esc(f.report_type)}${f.currency === "USD" ? " · lapor USD" : ""}</span></div>
+    <div class="levels fund">
+      ${cell("PE (TTM)", x(f.pe))}${cell("PBV", x(f.pbv, nf2))}${cell("ROE", isNum(f.roe) ? nf1.format(f.roe) + "%" : "–", cls(f.roe))}
+      ${cell("Laba YTD YoY", pct(f.ni_growth), cls(f.ni_growth))}${cell(f.bank ? "Pend. bunga YoY" : "Pendapatan YoY", pct(f.rev_growth), cls(f.rev_growth))}
+      ${cell("Net margin", isNum(f.net_margin) ? nf1.format(f.net_margin) + "%" : "–")}
+      ${cell(f.bank ? "Laba TTM" : "DER", f.bank ? "Rp " + fmt(f.ni_ttm_bn / 1000, nf1) + " T" : x(f.der, nf2))}
+      ${cell(f.bank ? "–" : "OCF / laba", f.bank ? "" : x(f.ocf_ni, nf2), isNum(f.ocf_ni) && f.ocf_ni < 0.5 ? "neg" : "")}</div>
+    ${f.flags?.length ? `<div class="flags">${f.flags.map((t) => `<span class="chip bear">${esc(t)}</span>`).join(" ")}</div>` : ""}`;
+}
+function eventBlock(r) {
+  if (!r.events?.length) return "";
+  return `<div class="sub-h">Keterbukaan informasi <span class="mut">45 hari</span></div><ul class="events">${r.events.map((e) =>
+    `<li><span class="mut">${esc(e.date.slice(5))}</span> <span class="chip ${EV_CLS[e.category] || ""}">${esc(e.label)}</span>
+     ${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a>` : esc(e.title)}</li>`).join("")}</ul>`;
+}
+const EV_CLS = { dividen: "bull", buyback: "bull", tender_offer: "accent", rights_issue: "amber", transaksi_material: "accent",
+  afiliasi: "amber", kepemilikan: "accent", penjelasan_bursa: "amber", suspensi: "bear", stock_split: "teal" };
 function selectRow(code) {
   state.sel = code;
   document.querySelectorAll("#screener tbody tr").forEach((tr) => tr.classList.toggle("sel", tr.dataset.c === code));
@@ -424,6 +469,8 @@ function selectRow(code) {
       <div><div class="n">Stop (2 ATR)</div><div class="v neg">${fmt(r.stop)}</div></div>
       <div><div class="n">TP1 · 2R</div><div class="v pos">${fmt(r.tp1)}</div></div>
       <div><div class="n">TP2 · 3R</div><div class="v pos">${fmt(r.tp2)}</div></div></div>
+    ${fundBlock(r)}
+    ${eventBlock(r)}
     <div class="note">RS 4w ${pct(r.rs4)} · RSI ${fmt(r.rsi)} · Vol 5d/50d ${fmt(r.vol_ratio, nf2)}× · ke high 55h ${pct(r.to_hh55)} · ATR ${fmt(r.atr_pct, nf1)}%
       ${isNum(r.nonreg_pct) && r.nonreg_pct > 20 ? `<br><b>Catatan:</b> ${nf1.format(r.nonreg_pct)}% nilai hari ini dari pasar nego.` : ""}
       <br>Trailing: puncak close − 2,5 ATR, maksimal 8 minggu.</div>`;
@@ -492,13 +539,34 @@ function drawBacktestStatic() {
       <td class="mut">${esc(t.reason)}</td><td class="${cls(t.ret)}">${pct(t.ret * 100)}</td></tr>`).join("") + "</tbody>";
 }
 
+/* ---------- disclosures ---------- */
+let evCat = null;
+function drawEvents() {
+  const E = DATA.events || [];
+  $("#evHint").textContent = E.length ? `${E.length} pengumuman, 45 hari · data ${M.fund_generated || "–"}` : "belum ada data";
+  const cats = [...new Set(E.map((e) => e.category))];
+  $("#evFilter").innerHTML = cats.map((c) => `<span class="chip ${EV_CLS[c] || ""} ${evCat === c ? "active" : ""}" data-c="${c}">${esc(DATA.event_labels[c] || c)} ${E.filter((e) => e.category === c).length}</span>`).join("");
+  const rows = E.filter((e) => !evCat || e.category === evCat);
+  $("#evBody").innerHTML = rows.map((e) => `<tr><td class="mut">${esc(e.date)}</td><td><b><a href="#" data-code="${e.code}">${e.code}</a></b></td>
+    <td><span class="chip ${EV_CLS[e.category] || ""}">${esc(e.label)}</span></td>
+    <td>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a>` : esc(e.title)}</td></tr>`).join("") ||
+    `<tr><td class="mut">Belum ada data keterbukaan informasi. Jalankan scripts/idx_browser_extract.js di idx.co.id.</td></tr>`;
+}
+$("#evFilter").addEventListener("click", (e) => { const c = e.target.closest("[data-c]")?.dataset.c; if (!c) return; evCat = evCat === c ? null : c; drawEvents(); });
+$("#evBody").addEventListener("click", (e) => {
+  const code = e.target.closest("[data-code]")?.dataset.code; if (!code) return;
+  e.preventDefault(); state.setup = null; state.q = ""; $("#search").value = ""; renderTable(); selectRow(code);
+  $("#detail").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 /* ---------- footer ---------- */
 const R = M.universe_rules;
 $("#footer").innerHTML = `
   <b>Universe:</b> ${DATA.rows.length} big cap (data ${esc(M.universe_as_of)}), bukan HSC, free float riil KSEI ≥ ${R.min_ff_ksei}% (snapshot ${esc(M.ksei_snapshot)}), likuiditas ≥ Rp ${R.min_avg_value_bn} M/hari.<br>
   <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: ${FACTORS.map(([, n, d]) => `${n} (${esc(d)})`).join("; ")}.<br>
   <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar.<br>
-  <b>Sumber:</b> Yahoo Finance (OHLCV), Ringkasan Saham idx.co.id (asing, nilai, frekuensi), ff/1pct.klinikpenyesalan.com (free float BEI & KSEI), pengumuman HSC BEI.<br>
+  <b>Fundamental:</b> XBRL laporan keuangan idx.co.id (data ${esc(M.fund_generated || "–")}). Laba TTM = tahun buku terakhir + YTD berjalan − YTD tahun lalu; laporan USD dikonversi kurs ${fmt(M.usd_idr)} per USD. Fundamental adalah konteks, bukan sinyal timing.<br>
+  <b>Sumber:</b> Yahoo Finance (OHLCV), Ringkasan Saham & XBRL & pengumuman idx.co.id, ff/1pct.klinikpenyesalan.com (free float BEI & KSEI), pengumuman HSC BEI.<br>
   Bukan rekomendasi beli/jual. Lakukan riset sendiri dan kelola risiko Anda.`;
 
 /* ---------- render ---------- */
@@ -515,6 +583,7 @@ function renderCharts() {
   drawSpark(DATA.rows.find((r) => r.code === state.sel));
 }
 drawForeign();
+drawEvents();
 drawBacktestStatic();
 renderTable();
 renderCharts();

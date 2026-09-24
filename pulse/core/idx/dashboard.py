@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from pulse.core.idx import DATA_DIR, factors, swing
+from pulse.core.idx import DATA_DIR, factors, fundamentals, swing
 from pulse.core.idx.benchmark import performance_table
 from pulse.core.idx.hsc import load_hsc
 from pulse.core.idx.ownership import load_ownership
@@ -32,8 +32,8 @@ SPARK_DAYS = 120
 
 
 def _num(v, nd: int = 2):
-    if v is None:
-        return None
+    if v is None or isinstance(v, bool | str):
+        return v
     try:
         f = float(v)
     except (TypeError, ValueError):
@@ -57,6 +57,13 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
     own = load_ownership().set_index("code")
     history = pd.read_csv(HISTORY_FILE, parse_dates=["date"]) if HISTORY_FILE.exists() else None
     ff = factors.foreign_factors(history, tickers)
+
+    raw_fund = fundamentals.load_raw()
+    fund = fundamentals.fundamentals_table(mcap[tickers].iloc[-1], raw_fund)
+    events = fundamentals.recent_events(raw_fund, days=45)
+    events_by_code: dict[str, list] = {}
+    for e in events:
+        events_by_code.setdefault(e["code"], []).append(e)
 
     c, h, lo, v = (ind[k][tickers] for k in ("close", "high", "low", "volume"))
     cmf = factors.cmf(h, lo, c, v).iloc[-1]
@@ -113,6 +120,12 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
                 "labels": labels,
                 "bull": sum(v == "bull" for v in labels.values()),
                 "bear": sum(v == "bear" for v in labels.values()),
+                "fund": (
+                    {k: _num(val) if k != "flags" else val for k, val in fund.loc[code].items()}
+                    if code in fund.index
+                    else None
+                ),
+                "events": events_by_code.get(code, [])[:6],
                 "spark": {
                     "dates": [d.strftime("%Y-%m-%d") for d in closes.index],
                     "close": _series(closes, 0),
@@ -156,7 +169,11 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             "market_ok": bool(ind["market_ok"].iloc[-1]),
             "exhsc": _num(bench.IHSG_exHSC.iloc[-1]),
             "exhsc_ma50": _num(bench.IHSG_exHSC.rolling(50).mean().iloc[-1]),
+            "fund_generated": (raw_fund or {}).get("generated", "")[:10] or None,
+            "usd_idr": _num(fund.attrs.get("usd_idr"), 0),
         },
+        "events": [e for e in events if e["code"] in set(tickers)][:250],
+        "event_labels": fundamentals.EVENT_LABELS,
         "bench": {
             "dates": [d.strftime("%Y-%m-%d") for d in bb.index],
             "ihsg": _series(bb.IHSG / bb.IHSG.iloc[0] * 100),
