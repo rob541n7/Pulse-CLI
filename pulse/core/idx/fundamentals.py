@@ -119,7 +119,9 @@ def compute(item: dict, market_cap: float | None, fx_usd: float) -> dict | None:
         flags.append("Rugi (TTM)")
     g = _growth(_get(cur, NI), _get(prior, NI))
     prior_ni, cur_ni = _get(prior, NI), _get(cur, NI)
-    if prior_ni is not None and cur_ni is not None and prior_ni > 0 > cur_ni:
+    if prior_ni is not None and cur_ni is not None and prior_ni < 0 < cur_ni:
+        flags.append("Berbalik laba YTD")
+    elif prior_ni is not None and cur_ni is not None and prior_ni > 0 > cur_ni:
         flags.append("Berbalik rugi YTD")
     elif g is not None and g < -20:
         flags.append(f"Laba YTD turun {abs(g):.0f}% YoY")

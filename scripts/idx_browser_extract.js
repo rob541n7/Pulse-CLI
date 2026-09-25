@@ -13,6 +13,8 @@
  *   4. Move the downloaded file to Pulse-CLI/data/fundamentals/ and run update_dashboard.bat
  *
  * Requests are sequential with a pause between them to stay polite to idx.co.id.
+ * Progress is kept in localStorage: if the page reloads, paste the script again and re-run
+ * `await pulseIdx.run()`; finished tickers are skipped.
  */
 (() => {
   const DELAY_MS = 400;
@@ -35,7 +37,7 @@
     ["rups", /rapat umum|rups/i],
     ["buyback", /pembelian kembali|buy ?back/i],
     ["rights_issue", /hmetd|right|penambahan modal|private placement|pmthmetd/i],
-    ["transaksi_material", /transaksi material|akuisisi|pengambilalihan|penggabungan|merger|divestasi/i],
+    ["transaksi_material", /transaksi material|akuisisi|pengambilalihan|penggabungan|merger|divestasi|penjualan dan pengalihan saham/i],
     ["afiliasi", /transaksi afiliasi|benturan kepentingan/i],
     ["kepemilikan", /perubahan kepemilikan|kepemilikan saham|pengendali/i],
     ["tender_offer", /penawaran tender|tender offer/i],
@@ -148,20 +150,27 @@
     return out;
   }
 
+  // Progres disimpan di localStorage per hari: kalau halaman reload, jalankan lagi dan proses lanjut.
+  const storageKey = () => `pulse_idx_${new Date().toISOString().slice(0, 10).replaceAll("-", "")}`;
+
   async function collect(codes = DEFAULT_TICKERS, { days = 90, onProgress = console.log } = {}) {
     const since = new Date(Date.now() - days * 864e5).toISOString().slice(0, 10).replaceAll("-", "");
-    const result = { generated: new Date().toISOString(), source: "idx.co.id (XBRL instance & pengumuman)", since,
-                     fundamentals: {}, announcements: {} };
+    let result = null;
+    try { result = JSON.parse(localStorage.getItem(storageKey())); } catch (e) { /* abaikan */ }
+    result = result || { source: "idx.co.id (XBRL instance & pengumuman)", since, fundamentals: {}, announcements: {} };
     for (const [i, code] of codes.entries()) {
+      if (result.fundamentals[code] && !result.fundamentals[code].error && result.announcements[code]) continue;
       try {
         result.fundamentals[code] = await fundamentals(code);
-        result.announcements[code] = await announcements(code, since);
+        result.announcements[code] = await announcements(code, result.since);
       } catch (e) {
         result.fundamentals[code] = { code, error: String(e) };
       }
+      try { localStorage.setItem(storageKey(), JSON.stringify(result)); } catch (e) { /* kuota penuh: lanjut tanpa simpan */ }
       onProgress(`${i + 1}/${codes.length} ${code}`);
       await sleep(DELAY_MS);
     }
+    result.generated = new Date().toISOString();
     return result;
   }
 
@@ -172,6 +181,7 @@
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
     a.download = name;
     a.click();
+    try { localStorage.removeItem(storageKey()); } catch (e) { /* abaikan */ }
     return `Tersimpan: ${name} (${codes.length} saham)`;
   }
 

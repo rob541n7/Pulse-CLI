@@ -96,6 +96,14 @@ def test_profit_not_backed_by_cash_flagged():
     assert any("belum jadi kas" in f for f in m["flags"])
 
 
+def test_turnaround_to_profit_flagged():
+    # MDKA TW2 2026: laba YTD USD 101,6 jt vs rugi USD 15,8 jt setahun lalu
+    item = _item()
+    item["latest"]["prior"]["ProfitLossAttributableToParentEntity"] = -15.0
+    m = compute(item, market_cap=1000.0, fx_usd=16_000)
+    assert "Berbalik laba YTD" in m["flags"] and m["ni_growth"] is None
+
+
 def test_negative_equity_flagged_not_ratioed():
     # SINI TW2 2026: ekuitas induk negatif walau laba YTD positif
     item = _item()
