@@ -16,6 +16,7 @@ from pulse.core.idx import swing
 from pulse.core.idx.benchmark import build_ihsg_ex_hsc, format_benchmark
 from pulse.core.idx.dashboard import build_dashboard
 from pulse.core.idx.ownership import fetch_ownership
+from pulse.core.idx.prices import PriceDownloadError
 from pulse.core.idx.summary import update_history
 from pulse.core.idx.universe import UniverseRules, build_universe, format_universe
 
@@ -62,4 +63,8 @@ def main(argv: list[str]) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    try:
+        main(sys.argv[1:])
+    except PriceDownloadError as e:
+        print(f"\nGAGAL mengambil harga: {e}")
+        sys.exit(1)

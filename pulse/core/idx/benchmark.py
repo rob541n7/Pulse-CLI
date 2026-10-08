@@ -14,7 +14,7 @@ and r_hsc is the cap-weighted HSC return.
 import pandas as pd
 
 from pulse.core.idx.hsc import load_hsc
-from pulse.core.idx.prices import fetch_panel
+from pulse.core.idx.prices import PriceDownloadError, fetch_panel
 from pulse.core.idx.summary import latest_summary
 from pulse.utils.logger import get_logger
 
@@ -52,6 +52,8 @@ def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.Da
     )
     close = panel["close"]
     ihsg = close.pop(IHSG_SYMBOL).dropna()
+    if ihsg.empty:
+        raise PriceDownloadError("Data IHSG (^JKSE) kosong dari Yahoo. Coba lagi 15-60 menit lagi.")
     close = close.reindex(ihsg.index).ffill(limit=5)
     ret = close.pct_change(fill_method=None).clip(-MAX_DAILY_MOVE, MAX_DAILY_MOVE)
     mcap_prev = close.shift(1) * shares.reindex(close.columns)
