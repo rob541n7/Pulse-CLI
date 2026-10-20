@@ -242,6 +242,7 @@ const FACTORS = [
   ["vwap", "VWAP 20", "Harga vs VWAP 20 hari (konteks)"],
   ["foreign", "Asing 20d", "Net asing % nilai transaksi (±2%), min 5 hari data"],
   ["big_lot", "Lot besar", "Nilai per transaksi reguler vs rata-rata 20 hari (>1,3×), arah dari harga hari itu"],
+  ["broker", "Broker 20h", "Status Top 5 broker 20 hari (Stockbit): Normal/Big Acc = bull, Normal/Big Dist = bear, Small = netral"],
 ];
 
 /* ---------- theme ---------- */
@@ -422,6 +423,8 @@ function factorValue(r, k) {
     case "vwap": return r.vwap == null ? "–" : `${pct(r.vwap)} <span class="d">${r.vwap > 3 ? "premium" : r.vwap < -3 ? "diskon" : "wajar"}</span>`;
     case "foreign": return r.foreign_days >= 5 ? `${pct(r.foreign_pct)}<div class="d">5h Rp ${fmt(r.foreign_net5_bn, nf1)} M</div>`
       : `<span class="mut">${r.foreign_days}/5 hari</span>` + (isNum(r.foreign_today_bn) ? `<div class="d">hari ini Rp ${fmt(r.foreign_today_bn, nf1)} M</div>` : "");
+    case "broker": return r.broker_top5_20d ? `${esc(r.broker_top5_20d)} <span class="d">${pct(r.broker_pct_20d)}</span><div class="d">hari ini: ${esc(r.broker_top5_1d || "–")}</div>
+      <div class="d">Beli: ${(r.broker_buyers || []).map((x) => esc(x.code)).join(", ") || "–"} · Jual: ${(r.broker_sellers || []).map((x) => esc(x.code)).join(", ") || "–"}</div>` : `<span class="mut">belum ada data</span>`;
     case "big_lot": return isNum(r.big_lot)
       ? `${r.big_lot > 10 ? "≥10" : fmt(r.big_lot, nf2)}× <span class="d">${r.labels.big_lot === "bull" ? "harga naik" : r.labels.big_lot === "bear" ? "harga turun" : ""}</span>`
       : `<span class="mut">butuh ≥6 hari</span>`;
@@ -469,6 +472,9 @@ function selectRow(code) {
       <div><div class="n">Stop (2 ATR)</div><div class="v neg">${fmt(r.stop)}</div></div>
       <div><div class="n">TP1 · 2R</div><div class="v pos">${fmt(r.tp1)}</div></div>
       <div><div class="n">TP2 · 3R</div><div class="v pos">${fmt(r.tp2)}</div></div></div>
+    <div class="levels" style="margin-top:8px">
+      <div><div class="n">ARA ${esc(M.next_session || "")}</div><div class="v">${fmt(r.ara_next)}</div></div>
+      <div><div class="n">ARB ${esc(M.next_session || "")}</div><div class="v neg">${fmt(r.arb_next)}</div></div></div>
     ${fundBlock(r)}
     ${eventBlock(r)}
     <div class="note">RS 4w ${pct(r.rs4)} · RSI ${fmt(r.rsi)} · Vol 5d/50d ${fmt(r.vol_ratio, nf2)}× · ke high 55h ${pct(r.to_hh55)} · ATR ${fmt(r.atr_pct, nf1)}%
@@ -565,6 +571,7 @@ $("#footer").innerHTML = `
   <b>Universe:</b> ${DATA.rows.length} big cap (data ${esc(M.universe_as_of)}), bukan HSC, free float riil KSEI ≥ ${R.min_ff_ksei}% (snapshot ${esc(M.ksei_snapshot)}), likuiditas ≥ Rp ${R.min_avg_value_bn} M/hari.<br>
   <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: ${FACTORS.map(([, n, d]) => `${n} (${esc(d)})`).join("; ")}.<br>
   <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler hari itu (cek suspensi), harga basi.<br>
+  <b>Broker:</b> Top 5 broker Stockbit ${esc(M.broker_window || "–")} (token milik pengguna). <b>ARB</b> ${M.arb_pct_next ?? "–"}% sejak 19 Okt 2026 (siaran pers BEI 095 & 096, berlaku s/d 31 Des 2026).<br>
   <b>Fundamental:</b> XBRL laporan keuangan idx.co.id (data ${esc(M.fund_generated || "–")}). Laba TTM = tahun buku terakhir + YTD berjalan − YTD tahun lalu; laporan USD dikonversi kurs ${fmt(M.usd_idr)} per USD. Fundamental adalah konteks, bukan sinyal timing.<br>
   <b>Sumber:</b> Yahoo Finance (OHLCV), Ringkasan Saham & XBRL & pengumuman idx.co.id, ff/1pct.klinikpenyesalan.com (free float BEI & KSEI), pengumuman HSC BEI.<br>
   Bukan rekomendasi beli/jual. Lakukan riset sendiri dan kelola risiko Anda.`;

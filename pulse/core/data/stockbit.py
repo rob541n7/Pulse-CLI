@@ -349,9 +349,11 @@ class StockbitClient:
         end_date = end_date or today
 
         url = f"{self.base_url}/marketdetectors/{ticker}"
+        # The API reads the range from `from`/`to`; `start_date`/`end_date` are ignored by it
+        # (it then silently returns only the latest session).
         params = {
-            "start_date": start_date,
-            "end_date": end_date,
+            "from": start_date,
+            "to": end_date,
             "transaction_type": "TRANSACTION_TYPE_NET",
             "market_board": "MARKET_BOARD_REGULER",
             "investor_type": "INVESTOR_TYPE_ALL",

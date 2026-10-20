@@ -223,8 +223,10 @@
     <b>Universe:</b> big cap non-HSC, free float riil KSEI ≥ <span data-source="market" data-field="min_ff_ksei" data-row="0">—</span>%
     (snapshot <span data-source="market" data-field="ksei_snapshot" data-row="0">—</span>), likuiditas ≥ Rp
     <span data-source="market" data-field="min_avg_value_bn" data-row="0">—</span> M/hari.<br>
-    <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: Fase (stage MA150), RS 13w vs IHSG ex-HSC, CMF 20, VWAP 20, Asing 20d, Lot besar.<br>
+    <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: Fase (stage MA150), RS 13w vs IHSG ex-HSC, CMF 20, VWAP 20, Asing 20d, Lot besar, Broker 20h.<br>
     <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler.<br>
+    <b>Broker:</b> status Top 5 broker Stockbit <span data-source="market" data-field="broker_window" data-row="0">—</span>.
+    <b>ARB</b> <span data-source="market" data-field="arb_pct_next" data-row="0">—</span>% sejak 19 Okt 2026 (siaran pers BEI 095 & 096, s/d 31 Des 2026).<br>
     <b>Fundamental:</b> XBRL idx.co.id (data <span data-source="market" data-field="fund_generated" data-row="0">—</span>), laba TTM, laporan USD dikonversi kurs
     <span data-source="market" data-field="usd_idr" data-row="0">—</span>.<br>
     <b>Sumber:</b> salinan dashboard lokal Pulse: Yahoo Finance (OHLCV), Ringkasan Saham, XBRL & pengumuman idx.co.id, data free float BEI & KSEI, daftar HSC BEI.<br>
@@ -246,7 +248,7 @@
   const STAGE_SHORT = { MARKUP: "Markup", MARKDOWN: "Markdown", AKUMULASI: "Akum", DISTRIBUSI: "Distr" };
   const EV_CLS = { dividen: "bull", buyback: "bull", tender_offer: "accent", rights_issue: "amber", transaksi_material: "accent",
     afiliasi: "amber", kepemilikan: "accent", penjelasan_bursa: "amber", suspensi: "bear", stock_split: "teal" };
-  const FACTORS = [["stage", "Fase"], ["rs13", "RS 13w"], ["cmf", "CMF 20"], ["vwap", "VWAP 20"], ["foreign", "Asing 20d"], ["big_lot", "Lot besar"]];
+  const FACTORS = [["stage", "Fase"], ["rs13", "RS 13w"], ["cmf", "CMF 20"], ["vwap", "VWAP 20"], ["foreign", "Asing 20d"], ["big_lot", "Lot besar"], ["broker", "Broker 20h"]];
   const SETUPS = ["BREAKOUT", "PULLBACK", "TREND", "NETRAL", "HINDARI", "TIDAK AKTIF"];
   const col = (i) => dash.colors[i];
   const css = (name) => getComputedStyle(document.querySelector(".pl")).getPropertyValue(name).trim();
@@ -419,15 +421,19 @@
     el.querySelector(".su").textContent = r.setup;
     el.querySelector(".dn").textContent = `${r.name || ""} · ${r.sector || "–"} · Rp ${fmt(r.mcap_t, f1)} T`;
     const fv = { stage: r.stage ? `${r.stage} · ${r.stage_days} hari` : "–", rs13: pct(r.rs13), cmf: fmt(r.cmf, f2), vwap: pct(r.vwap),
-      foreign: r.foreign_days >= 5 ? pct(r.foreign_pct) : `${r.foreign_days}/5 hari`, big_lot: isNum(r.big_lot) ? (r.big_lot > 10 ? "≥10×" : f2(r.big_lot) + "×") : "–" };
-    const ff = { stage: "stage", rs13: "rs13", cmf: "cmf", vwap: "vwap", foreign: "foreign_pct", big_lot: "big_lot" };
+      foreign: r.foreign_days >= 5 ? pct(r.foreign_pct) : `${r.foreign_days}/5 hari`, big_lot: isNum(r.big_lot) ? (r.big_lot > 10 ? "≥10×" : f2(r.big_lot) + "×") : "–",
+      broker: r.broker_top5_20d ? `${r.broker_top5_20d} ${pct(r.broker_pct_20d)}` : "–" };
+    const ff = { stage: "stage", rs13: "rs13", cmf: "cmf", vwap: "vwap", foreign: "foreign_pct", big_lot: "big_lot", broker: "broker_top5_20d" };
     el.querySelector(".facs").replaceChildren(...FACTORS.map(([k, n]) => {
       const d = document.createElement("div"); d.className = `fac ${r["lb_" + k] || ""}`;
       const a = document.createElement("div"); a.className = "n"; a.textContent = n;
       const b = document.createElement("div"); b.className = "v"; b.textContent = fv[k]; if (k !== "foreign" || r.foreign_days >= 5) mark(b, ff[k], r.code);
-      d.append(a, b); return d; }));
+      d.append(a, b);
+      if (k === "broker" && r.broker_top5_20d) { const x = document.createElement("div"); x.className = "d";
+        x.textContent = `hari ini: ${r.broker_top5_1d || "–"} · beli: ${r.broker_buyers || "–"} · jual: ${r.broker_sellers || "–"}`; d.append(x); }
+      return d; }));
     el.querySelector(".lv").replaceChildren(...[["Entry", "close", fmt(r.close), ""], ["Stop (2 ATR)", "stop", fmt(r.stop), "neg"],
-      ["TP1 · 2R", "tp1", fmt(r.tp1), "pos"], ["TP2 · 3R", "tp2", fmt(r.tp2), "pos"]].map(([n, k, v, c]) => {
+      ["TP1 · 2R", "tp1", fmt(r.tp1), "pos"], ["TP2 · 3R", "tp2", fmt(r.tp2), "pos"], ["ARA besok", "ara_next", fmt(r.ara_next), ""], ["ARB besok", "arb_next", fmt(r.arb_next), "neg"]].map(([n, k, v, c]) => {
       const d = document.createElement("div"); const a = document.createElement("div"); a.className = "n"; a.textContent = n;
       const b = document.createElement("div"); b.className = "v " + c; b.textContent = v; mark(b, k, r.code); d.append(a, b); return d; }));
     const fund = el.querySelector(".fund");

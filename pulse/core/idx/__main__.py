@@ -8,6 +8,7 @@ python -m pulse.core.idx swing [TICKER]  # screener swing / analisa satu saham
 python -m pulse.core.idx backtest [--nofilter]
 python -m pulse.core.idx dashboard [--open]  # bangun data/reports/dashboard.html
 python -m pulse.core.idx daily [--open]  # update + ihsgx + swing + dashboard
+python -m pulse.core.idx broker             # broker flow 70 big cap (token Stockbit milik pengguna)
 python -m pulse.core.idx artifact-export   # salin dashboard lokal -> data/reports/artifact/*.json
 """
 
@@ -30,6 +31,18 @@ def _swing(args: list[str]) -> str:
     snap = swing.screen(ind, swing.current_universe(), params)
     tickers = [a for a in args if not a.startswith("-")]
     return swing.format_ticker(tickers[0].upper(), snap) if tickers else swing.format_screen(snap)
+
+
+def _broker() -> str:
+    from pulse.core.idx.brokerflow import collect
+    from pulse.core.idx.summary import latest_summary
+    from pulse.core.idx.universe import load_universe
+
+    try:
+        path = collect(load_universe()["tickers"], latest_summary().date.iloc[0].date())
+        return f"Broker flow: {path}"
+    except Exception as e:  # noqa: BLE001 - token habis / jaringan: dashboard tetap dibangun
+        return f"Broker flow dilewati: {e}"
 
 
 def main(argv: list[str]) -> None:
@@ -61,7 +74,10 @@ def main(argv: list[str]) -> None:
             print(f"  {k:<10} {v['rows']:>6} baris  {v['kb']:>7} KB")
     elif cmd == "dashboard":
         print(f"Dashboard: {build_dashboard(open_browser='--open' in args)}")
+    elif cmd == "broker":
+        print(_broker())
     elif cmd == "daily":
+        print(_broker())
         print(format_benchmark(build_ihsg_ex_hsc(refresh=True)))
         print()
         print(_swing([]))

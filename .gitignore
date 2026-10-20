@@ -167,6 +167,7 @@ data/idx/*.xlsx
 data/idx/history.csv.gz
 data/ownership/
 data/fundamentals/
+data/brokerflow/
 charts/
 *.png
 !docs/*.png

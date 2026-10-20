@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from pulse.core.idx import DATA_DIR, factors, fundamentals, swing
+from pulse.core.idx import DATA_DIR, brokerflow, factors, fundamentals, rules, swing
 from pulse.core.idx.benchmark import performance_table
 from pulse.core.idx.hsc import load_hsc
 from pulse.core.idx.ownership import load_ownership
@@ -69,6 +69,10 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
     cmf = factors.cmf(h, lo, c, v).iloc[-1]
     vwap = factors.vwap_premium(h, lo, c, v).iloc[-1]
     chg1d = (c.iloc[-1] / c.iloc[-2] - 1) * 100
+    price_date = ind["close"].index[-1].date()
+    next_session = price_date + pd.Timedelta(days=3 if price_date.weekday() == 4 else 1)
+    bf = brokerflow.load(str(price_date)) or {}
+    brokers = bf.get("brokers", {})
 
     rows = []
     for code in snap.index:
@@ -85,6 +89,9 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
         labels = {k: factors.label(k, val) for k, val in vals.items()}
         vals["big_lot"] = f.get("big_lot")
         labels["big_lot"] = factors.big_lot_label(vals["big_lot"], chg1d.get(code))
+        b = brokers.get(code) or {}
+        labels["broker"] = b.get("label", "na")
+        ara, arb = rules.auto_rejection(float(r.close), next_session)
         closes = ind["close"][code].tail(SPARK_DAYS)
         rows.append(
             {
@@ -117,6 +124,14 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
                 "foreign_net5_bn": _num(f.get("net5_bn"), 1),
                 "big_lot": _num(vals["big_lot"]),
                 "nonreg_pct": _num(f.get("nonreg_pct"), 1),
+                "broker_top5_20d": b.get("top5_d20"),
+                "broker_pct_20d": _num(b.get("top5_pct_d20"), 1),
+                "broker_top5_1d": b.get("top5_d1"),
+                "broker_pct_1d": _num(b.get("top5_pct_d1"), 1),
+                "broker_buyers": b.get("buyers_20d") or [],
+                "broker_sellers": b.get("sellers_20d") or [],
+                "ara_next": _num(ara, 0),
+                "arb_next": _num(arb, 0),
                 "labels": labels,
                 "bull": sum(v == "bull" for v in labels.values()),
                 "bear": sum(v == "bear" for v in labels.values()),
@@ -170,6 +185,10 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             "exhsc": _num(bench.IHSG_exHSC.iloc[-1]),
             "exhsc_ma50": _num(bench.IHSG_exHSC.rolling(50).mean().iloc[-1]),
             "fund_generated": (raw_fund or {}).get("generated", "")[:10] or None,
+            "broker_window": f"{bf['start_20d']} s/d {bf['end']}" if bf else None,
+            "broker_d1_date": bf.get("d1_date"),
+            "next_session": str(next_session),
+            "arb_pct_next": _num(rules.arb_pct(6300, next_session), 1),
             "usd_idr": _num(fund.attrs.get("usd_idr"), 0),
         },
         "events": [e for e in events if e["code"] in set(tickers)][:250],

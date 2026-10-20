@@ -18,7 +18,7 @@ from pulse.core.idx.dashboard import DASHBOARD_FILE
 EXPORT_DIR = DATA_DIR / "reports" / "artifact"
 PAGE_FILE = Path(__file__).with_name("artifact_page.html")
 
-FACTORS = ("stage", "rs13", "cmf", "vwap", "foreign", "big_lot")
+FACTORS = ("stage", "rs13", "cmf", "vwap", "foreign", "big_lot", "broker")
 
 
 def read_local_dashboard(path: Path = DASHBOARD_FILE) -> dict:
@@ -87,6 +87,21 @@ def _screener_row(r: dict) -> dict:
     row["fund_currency"] = f.get("currency")
     row["bank"] = f.get("bank")
     row["flags"] = "; ".join(f.get("flags") or [])
+    for k in (
+        "broker_top5_20d",
+        "broker_pct_20d",
+        "broker_top5_1d",
+        "broker_pct_1d",
+        "ara_next",
+        "arb_next",
+    ):
+        row[k] = r.get(k)
+    row["broker_buyers"] = ", ".join(
+        x["code"] for x in r.get("broker_buyers") or [] if x.get("code")
+    )
+    row["broker_sellers"] = ", ".join(
+        x["code"] for x in r.get("broker_sellers") or [] if x.get("code")
+    )
     return row
 
 
@@ -113,6 +128,9 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
             "min_avg_value_bn": rules.get("min_avg_value_bn"),
             "fund_generated": m.get("fund_generated"),
             "usd_idr": m.get("usd_idr"),
+            "broker_window": m.get("broker_window"),
+            "next_session": m.get("next_session"),
+            "arb_pct_next": m.get("arb_pct_next"),
         }
     ]
     perf = [
