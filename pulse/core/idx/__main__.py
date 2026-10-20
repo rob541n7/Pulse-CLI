@@ -8,6 +8,7 @@ python -m pulse.core.idx swing [TICKER]  # screener swing / analisa satu saham
 python -m pulse.core.idx backtest [--nofilter]
 python -m pulse.core.idx dashboard [--open]  # bangun data/reports/dashboard.html
 python -m pulse.core.idx daily [--open]  # update + ihsgx + swing + dashboard
+python -m pulse.core.idx artifact-export   # salin dashboard lokal -> data/reports/artifact/*.json
 """
 
 import sys
@@ -51,6 +52,13 @@ def main(argv: list[str]) -> None:
         print(_swing(args))
     elif cmd == "backtest":
         print(_swing(["backtest", *args]))
+    elif cmd == "artifact-export":
+        from pulse.core.idx.artifact_export import export
+
+        m = export()
+        print(f"Ekspor dari dashboard lokal (harga s/d {m['price_date']}):")
+        for k, v in m["datasets"].items():
+            print(f"  {k:<10} {v['rows']:>6} baris  {v['kb']:>7} KB")
     elif cmd == "dashboard":
         print(f"Dashboard: {build_dashboard(open_browser='--open' in args)}")
     elif cmd == "daily":
