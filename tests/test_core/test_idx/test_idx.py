@@ -238,3 +238,23 @@ def test_backtest_trending_stock_is_bought_and_fees_applied():
     t = res.trades.iloc[0]
     assert t.reason == "waktu"
     assert t.ret < t.exit / t.entry - 1
+
+
+def test_cap_weights_redistributes_excess():
+    from pulse.core.idx.benchmark import cap_weights
+
+    mcap = pd.DataFrame([[50.0] + [2.5] * 20])  # 50% dan 20 x 2,5%
+    w = cap_weights(mcap, cap=0.09).iloc[0]
+    assert w.sum() == pytest.approx(1.0)
+    assert w.max() == pytest.approx(0.09)
+    assert w.iloc[1] == pytest.approx(0.0455)  # kelebihan 41% dibagi proporsional
+
+
+def test_ex_hsc_follows_official_ihsg_after_method_change():
+    idx = pd.to_datetime(["2026-10-30", "2026-11-02"])
+    ret = pd.DataFrame({"HSC1": [0.10, 0.10], "OTHER": [0.0, 0.0]}, index=idx)
+    mcap = pd.DataFrame({"HSC1": [100.0, 100.0], "OTHER": [100.0, 100.0]}, index=idx)
+    ihsg = pd.Series([0.05, 0.01], index=idx)
+    r_ex, _ = ex_hsc_returns(ihsg, ret, mcap, {"HSC1"}, cap=None)
+    assert r_ex.iloc[0] == pytest.approx(0.0)
+    assert r_ex.iloc[1] == pytest.approx(0.01)  # IHSG resmi sudah tanpa HSC

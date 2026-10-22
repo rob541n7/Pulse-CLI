@@ -165,6 +165,7 @@ data/reports/
 # IDX raw files (unduh sendiri dari idx.co.id) & data pihak ketiga hasil fetch
 data/idx/*.xlsx
 data/idx/history.csv.gz
+data/idx/pengumuman/
 data/ownership/
 data/fundamentals/
 data/brokerflow/

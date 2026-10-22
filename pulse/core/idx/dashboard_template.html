@@ -333,7 +333,7 @@ DATA.rows.forEach((r) => (counts[r.setup] = (counts[r.setup] || 0) + 1));
 $("#kpis").innerHTML = `
   <div class="kpi"><div class="label">IHSG ex-HSC</div><div class="val">${fmt(M.exhsc, nf2)}</div>
     <div class="small">MA50 ${fmt(M.exhsc_ma50, nf2)}</div></div>
-  <div class="kpi"><div class="label">Bobot HSC di IHSG</div><div class="val">${fmt(M.hsc_weight * 100, nf1)}%</div>
+  <div class="kpi"><div class="label">Bobot HSC di IHSG (free float, cap 9%)</div><div class="val">${fmt(M.hsc_weight * 100, nf1)}%</div>
     <div class="small">${M.hsc_count} saham · daftar ${esc(M.hsc_as_of)}</div></div>
   <div class="kpi"><div class="label">Setup Breakout</div><div class="val">${counts.BREAKOUT || 0}</div>
     <div class="small">dari ${DATA.rows.length} big cap</div></div>`;
