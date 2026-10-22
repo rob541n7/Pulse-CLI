@@ -1,0 +1,519 @@
+{
+  "as_of": "2026-10-20",
+  "source": "idx.co.id > Perusahaan Tercatat > Kepemilikan Saham Terkonsentrasi Tinggi (pengenaan & pencabutan 2026)",
+  "notes": "Sejak 9 Okt 2026 cakupan review HSC diperluas ke saham market cap > Rp5 T (siaran pers BEI No. 090/BEI.SPR/10-2026).",
+  "tickers": [
+    "ADES",
+    "AGAR",
+    "AGII",
+    "ALII",
+    "ALKA",
+    "BAJA",
+    "BALI",
+    "BBHI",
+    "BBMD",
+    "BBSI",
+    "BDKR",
+    "BELI",
+    "BIKE",
+    "BINA",
+    "BKDP",
+    "BMAS",
+    "BNII",
+    "BNLI",
+    "BREN",
+    "BSWD",
+    "BTPN",
+    "BYAN",
+    "CITA",
+    "CLAY",
+    "CMNP",
+    "CMNT",
+    "DCII",
+    "DGWG",
+    "DMND",
+    "DNET",
+    "DSSA",
+    "DUTI",
+    "ELPI",
+    "EPMT",
+    "FAPA",
+    "FITT",
+    "GEMS",
+    "HATM",
+    "IFSH",
+    "INDO",
+    "INPP",
+    "KING",
+    "KONI",
+    "LIFE",
+    "MAYA",
+    "MCOL",
+    "MDIA",
+    "MEGA",
+    "MGRO",
+    "MKPI",
+    "MLPT",
+    "MORA",
+    "MPRO",
+    "MSJA",
+    "MTEL",
+    "NICK",
+    "PGUN",
+    "POLU",
+    "PRAY",
+    "PSAB",
+    "RISE",
+    "RLCO",
+    "ROCK",
+    "SAFE",
+    "SAME",
+    "SATU",
+    "SHIP",
+    "SILO",
+    "SMAR",
+    "SMMT",
+    "SOHO",
+    "SOTS",
+    "SRAJ",
+    "SSMS",
+    "STTP",
+    "TBIG",
+    "TCPI",
+    "TMAS",
+    "WBSA",
+    "YUPI"
+  ],
+  "events": [
+    {
+      "code": "SSMS",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "SMMT",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "BMAS",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "TBIG",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "CITA",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "PSAB",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "BALI",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "MAYA",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "MGLV",
+      "action": "pencabutan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "FILM",
+      "action": "pencabutan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "CLAY",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "ADES",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "TMAS",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "BBMD",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "INPP",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "SAME",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "DMND",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "MTEL",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "EPMT",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "SHIP",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "DUTI",
+      "action": "pengenaan",
+      "date": "2026-10-12"
+    },
+    {
+      "code": "BSWD",
+      "action": "pengenaan",
+      "date": "2026-10-06"
+    },
+    {
+      "code": "INDO",
+      "action": "pengenaan",
+      "date": "2026-10-02"
+    },
+    {
+      "code": "BIKE",
+      "action": "pengenaan",
+      "date": "2026-09-30"
+    },
+    {
+      "code": "MSJA",
+      "action": "pengenaan",
+      "date": "2026-09-29"
+    },
+    {
+      "code": "NICK",
+      "action": "pengenaan",
+      "date": "2026-09-22"
+    },
+    {
+      "code": "SAFE",
+      "action": "pengenaan",
+      "date": "2026-09-04"
+    },
+    {
+      "code": "BDKR",
+      "action": "pengenaan",
+      "date": "2026-08-26"
+    },
+    {
+      "code": "MDIA",
+      "action": "pengenaan",
+      "date": "2026-08-14"
+    },
+    {
+      "code": "BAJA",
+      "action": "pengenaan",
+      "date": "2026-08-10"
+    },
+    {
+      "code": "BKDP",
+      "action": "pengenaan",
+      "date": "2026-08-05"
+    },
+    {
+      "code": "ALKA",
+      "action": "pengenaan",
+      "date": "2026-08-04"
+    },
+    {
+      "code": "AGAR",
+      "action": "pengenaan",
+      "date": "2026-08-04"
+    },
+    {
+      "code": "BNII",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "MCOL",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "LIFE",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "POLU",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "ELPI",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "FILM",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "KING",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "ALII",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "FITT",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "YUPI",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "KONI",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "MKPI",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "CMNT",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "SMAR",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "CMNP",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "PRAY",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "MPRO",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "BELI",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "MEGA",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "GEMS",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "MLPT",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "STTP",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "BTPN",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "BBSI",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "SILO",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "FAPA",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "RISE",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "SOHO",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "BBHI",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "PGUN",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "BINA",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "BNLI",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "SRAJ",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "MORA",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "DNET",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "BYAN",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "DCII",
+      "action": "pengenaan",
+      "date": "2026-07-14"
+    },
+    {
+      "code": "LUCY",
+      "action": "pencabutan",
+      "date": "2026-07-02"
+    },
+    {
+      "code": "HATM",
+      "action": "pengenaan",
+      "date": "2026-07-01"
+    },
+    {
+      "code": "DGWG",
+      "action": "pengenaan",
+      "date": "2026-06-30"
+    },
+    {
+      "code": "SATU",
+      "action": "pengenaan",
+      "date": "2026-06-04"
+    },
+    {
+      "code": "MGRO",
+      "action": "pengenaan",
+      "date": "2026-05-29"
+    },
+    {
+      "code": "TCPI",
+      "action": "pengenaan",
+      "date": "2026-05-29"
+    },
+    {
+      "code": "WBSA",
+      "action": "pengenaan",
+      "date": "2026-05-08"
+    },
+    {
+      "code": "SOTS",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    },
+    {
+      "code": "ROCK",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    },
+    {
+      "code": "RLCO",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    },
+    {
+      "code": "MGLV",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    },
+    {
+      "code": "LUCY",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    },
+    {
+      "code": "IFSH",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    },
+    {
+      "code": "DSSA",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    },
+    {
+      "code": "BREN",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    },
+    {
+      "code": "AGII",
+      "action": "pengenaan",
+      "date": "2026-04-02"
+    }
+  ]
+}

@@ -46,20 +46,56 @@ class StockbitClient:
         self._token: str | None = None
         self._token_loaded_at: float | None = None
 
+    @staticmethod
+    def _env_value(key: str) -> str | None:
+        """Value from the process environment, else from the project's .env file."""
+        if os.getenv(key):
+            return os.getenv(key)
+        env_file = settings.base_dir / ".env"
+        if env_file.exists():
+            from dotenv import dotenv_values
+
+            return dotenv_values(env_file).get(key) or None
+        return None
+
+    @staticmethod
+    def _read_token_file(path: Path) -> str | None:
+        """Extract a JWT from a text file the user saved (tolerates 'Bearer ' or KEY= prefixes)."""
+        import re
+
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        match = re.search(r"eyJ[\w-]+\.[\w-]+\.[\w-]+", text)
+        return match.group(0) if match else None
+
     def _load_token(self) -> str | None:
-        """Load access token from environment variable or secrets file.
+        """Load access token. The token value is never logged.
 
         Priority:
-        1. STOCKBIT_TOKEN environment variable (recommended)
-        2. secrets.json file
+        1. STOCKBIT_TOKEN (environment or .env)
+        2. STOCKBIT_TOKEN_FILE (environment or .env): path to a text file holding the token
+        3. secrets.json file
         """
-        # Priority 1: Environment variable
-        env_token = os.getenv("STOCKBIT_TOKEN")
+        env_token = self._env_value("STOCKBIT_TOKEN")
         if env_token:
-            log.debug("Using token from STOCKBIT_TOKEN environment variable")
-            self._token = env_token
+            log.debug("Using token from STOCKBIT_TOKEN")
+            self._token = env_token.removeprefix("Bearer ").strip()
             self._token_loaded_at = time.time()
             return self._token
+
+        token_file = self._env_value("STOCKBIT_TOKEN_FILE")
+        if token_file:
+            path = Path(token_file)
+            path = path if path.is_absolute() else settings.base_dir / path
+            if path.exists():
+                token = self._read_token_file(path)
+                if token:
+                    log.debug(f"Using token from file {path.name}")
+                    self._token = token
+                    self._token_loaded_at = path.stat().st_mtime
+                    return self._token
+                log.warning(f"No token found in {path.name}")
+            else:
+                log.warning(f"STOCKBIT_TOKEN_FILE not found: {path}")
 
         # Priority 2: Secrets file
         if not self.secrets_file.exists():
@@ -313,9 +349,11 @@ class StockbitClient:
         end_date = end_date or today
 
         url = f"{self.base_url}/marketdetectors/{ticker}"
+        # The API reads the range from `from`/`to`; `start_date`/`end_date` are ignored by it
+        # (it then silently returns only the latest session).
         params = {
-            "start_date": start_date,
-            "end_date": end_date,
+            "from": start_date,
+            "to": end_date,
             "transaction_type": "TRANSACTION_TYPE_NET",
             "market_board": "MARKET_BOARD_REGULER",
             "investor_type": "INVESTOR_TYPE_ALL",

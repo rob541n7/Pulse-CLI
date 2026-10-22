@@ -1,0 +1,579 @@
+<style>
+.pl { --bg: var(--color-bg); --panel: var(--color-panel); --border: var(--color-border-line);
+  --text: var(--color-fg); --muted: var(--color-fg-muted); --bull: var(--color-ok); --bear: var(--color-bad);
+  --amber: var(--color-warn); --accent: var(--color-fg); --line2: var(--cds-chart-muted);
+  font-family: var(--font-anthropic-sans); color: var(--text); font-size: var(--cds-font-size-body);
+  display: grid; gap: var(--cds-gap-md); }
+.pl * { box-sizing: border-box; }
+.pl .hdr { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cds-gap-sm) var(--cds-gap-md); }
+.pl .hdr h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; }
+.pl .sub { color: var(--muted); font-size: var(--cds-font-size-caption); }
+.pl .takeaway { margin: 0; }
+.pl .spacer { flex: 1; }
+.pl .chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px;
+  font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); white-space: nowrap;
+  color: var(--muted); background: color-mix(in srgb, var(--muted) 14%, transparent); border: 1px solid transparent; }
+.pl .chip.bull { color: var(--bull); background: color-mix(in srgb, var(--bull) 14%, transparent); }
+.pl .chip.bear { color: var(--bear); background: color-mix(in srgb, var(--bear) 14%, transparent); }
+.pl .chip.amber { color: var(--amber); background: color-mix(in srgb, var(--amber) 16%, transparent); }
+.pl .chip.teal, .pl .chip.accent { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.pl .chip.na { background: transparent; border: 1px dashed var(--border); }
+.pl .warn { color: var(--amber); background: color-mix(in srgb, var(--amber) 12%, transparent);
+  border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); font-size: var(--cds-font-size-caption); }
+.pl .grid2 { display: grid; gap: var(--cds-gap-md); grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.pl .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--cds-radius);
+  padding: var(--cds-pad-lg); min-width: 0; }
+.pl .card h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0 0 4px; }
+.pl .card .note { color: var(--muted); font-size: var(--cds-font-size-caption); margin: 0 0 var(--cds-gap-sm); }
+.pl .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--cds-gap-md); margin-bottom: var(--cds-gap-md); }
+.pl .kpi .lab { font-size: var(--cds-font-size-caption); color: var(--muted); }
+.pl .kpi .val { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title);
+  font-variant-numeric: tabular-nums; }
+.pl .kpi .sm { font-size: var(--cds-font-size-caption); color: var(--muted); }
+.pl table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: var(--cds-font-size-caption); }
+.pl th, .pl td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.pl th:first-child, .pl td:first-child { text-align: left; }
+.pl th { color: var(--muted); font-weight: var(--cds-font-weight-medium); position: sticky; top: 0; background: var(--panel); }
+.pl .pos { color: var(--bull); } .pl .neg { color: var(--bear); } .pl .mut { color: var(--muted); }
+.pl .box { max-height: 34rem; overflow: auto; }
+.pl .toolbar { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; margin-bottom: var(--cds-gap-sm); }
+.pl .toolbar input, .pl .toolbar select { background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: var(--cds-radius); padding: 6px 10px; font: inherit; font-size: var(--cds-font-size-caption); min-width: 0; }
+.pl .toolbar input { flex: 1 1 10rem; max-width: 16rem; }
+.pl .setups .chip, .pl .evf .chip { cursor: pointer; }
+.pl .setups .chip.active, .pl .evf .chip.active { border-color: currentColor; }
+.pl .scr th { cursor: pointer; user-select: none; }
+.pl .scr th[aria-sort="ascending"]::after { content: " ▴"; }
+.pl .scr th[aria-sort="descending"]::after { content: " ▾"; }
+.pl .scr tbody tr { cursor: pointer; }
+.pl .scr tbody tr:hover { background: color-mix(in srgb, var(--muted) 8%, transparent); }
+.pl .scr tbody tr.sel { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.pl td.code { font-weight: var(--cds-font-weight-medium); }
+.pl .nm { display: block; font-weight: 400; color: var(--muted); max-width: 12rem; overflow: hidden; text-overflow: ellipsis; }
+.pl .dots { display: inline-flex; gap: 3px; margin-left: 6px; vertical-align: middle; }
+.pl .dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--border); }
+.pl .dot.bull { background: var(--bull); border-color: var(--bull); }
+.pl .dot.bear { background: var(--bear); border-color: var(--bear); }
+.pl .dot.neutral { background: var(--muted); border-color: var(--muted); opacity: .45; }
+.pl .evdot { color: var(--accent); margin-left: 4px; }
+.pl .main { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); align-items: flex-start; }
+.pl .main .tablecol { flex: 2 1 34rem; min-width: 0; }
+.pl .main .det { flex: 1 1 20rem; min-width: 0; }
+.pl .det .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--cds-gap-sm); }
+.pl .det .t { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); }
+.pl .det .p { font-size: var(--cds-font-size-heading); font-variant-numeric: tabular-nums; }
+.pl .facs { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--cds-gap-sm); margin: var(--cds-gap-sm) 0; }
+.pl .fac { border: 1px solid var(--border); border-radius: var(--cds-radius); padding: 6px 8px; }
+.pl .fac.bull { border-color: color-mix(in srgb, var(--bull) 50%, var(--border)); }
+.pl .fac.bear { border-color: color-mix(in srgb, var(--bear) 50%, var(--border)); }
+.pl .fac .n { font-size: var(--cds-font-size-caption); color: var(--muted); }
+.pl .fac .v { font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
+.pl .fac .d { font-size: var(--cds-font-size-caption); color: var(--muted); }
+.pl .lv { display: grid; grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr)); gap: var(--cds-gap-sm); }
+.pl .lv > div { background: color-mix(in srgb, var(--muted) 8%, transparent); border-radius: var(--cds-radius); padding: 6px 8px; }
+.pl .lv .n { font-size: var(--cds-font-size-caption); color: var(--muted); }
+.pl .lv .v { font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
+.pl .subh { font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); margin: var(--cds-gap-md) 0 var(--cds-gap-xs); }
+.pl .flags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--cds-gap-xs); }
+.pl ul.ev { list-style: none; margin: 0; padding: 0; font-size: var(--cds-font-size-caption); }
+.pl ul.ev li { padding: 4px 0; border-bottom: 1px solid var(--border); }
+.pl a { color: var(--text); text-decoration: none; }
+.pl a:hover { text-decoration: underline; }
+.pl .chart { position: relative; min-height: 220px; }
+.pl .chart.sm { min-height: 170px; }
+.pl .chart.rrg { min-height: 320px; }
+.pl .legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--muted); margin-bottom: 4px; }
+.pl .legend i { display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 5px; }
+.pl svg text { fill: var(--color-fg-muted); font-size: 10px; }
+.pl .tip { position: absolute; pointer-events: none; display: none; z-index: 2; background: var(--cds-surface-popover);
+  border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover);
+  padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pl .tip .h { color: var(--cds-text-secondary); }
+.pl .bars .row { display: grid; grid-template-columns: 3.2rem 1fr 4rem; gap: 8px; align-items: center; margin: 4px 0; font-size: var(--cds-font-size-caption); }
+.pl .bars .track { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--muted) 12%, transparent); overflow: hidden; }
+.pl .bars .fill { height: 100%; border-radius: 4px; }
+.pl .bars table td, .pl .bars table th { padding: 4px 6px; }
+.pl .foot { color: var(--muted); font-size: var(--cds-font-size-caption); line-height: 1.6; }
+.pl .failed { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); min-height: inherit; }
+.pl .failed::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+.pl [data-dash-source-state=empty] { color: transparent; }
+.pl [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+</style>
+
+<div class="pl">
+  <div class="hdr" id="ringkasan">
+    <div>
+      <h1>Pulse · Big Cap Swing 2–8 Minggu</h1>
+      <div class="sub">Harga s/d <span data-source="market" data-field="price_date" data-row="0" class="dash-skeleton">—</span>
+        · File IDX <span data-source="market" data-field="idx_file_date" data-row="0">—</span>
+        · dibuat <span data-source="market" data-field="generated" data-row="0">—</span></div>
+    </div>
+    <div class="spacer"></div>
+    <span class="chip" id="regime">—</span>
+  </div>
+  <p class="takeaway" id="takeaway"></p>
+  <div id="warnings"></div>
+
+  <div class="grid2">
+    <section class="card" id="pasar">
+      <h2>Pasar</h2>
+      <p class="note">IHSG ex-HSC sebagai pembanding · return dalam %</p>
+      <div class="kpis">
+        <div class="kpi"><div class="lab">IHSG ex-HSC</div>
+          <div class="val" data-source="market" data-field="exhsc" data-row="0">—</div>
+          <div class="sm">MA50 <span data-source="market" data-field="exhsc_ma50" data-row="0">—</span></div></div>
+        <div class="kpi"><div class="lab">Bobot HSC di IHSG (free float, cap 9%)</div>
+          <div class="val" data-source="market" data-field="hsc_weight" data-row="0">—</div>
+          <div class="sm"><span data-source="market" data-field="hsc_count" data-row="0">—</span> saham · daftar
+            <span data-source="market" data-field="hsc_as_of" data-row="0">—</span></div></div>
+        <div class="kpi"><div class="lab">Setup Breakout</div>
+          <div class="val" id="kpiBreakout">—</div>
+          <div class="sm">dari <span data-source="market" data-field="universe_n" data-row="0">—</span> big cap</div></div>
+      </div>
+      <div class="box"><table id="perfTable" data-source="perf" data-row-key="period">
+        <thead><tr><th data-field="period">Periode</th><th data-field="ihsg">IHSG</th><th data-field="exhsc">ex-HSC</th><th data-field="diff">Selisih</th></tr></thead>
+        <tbody></tbody></table></div>
+    </section>
+    <section class="card" id="ihsg-chart">
+      <h2>IHSG vs IHSG ex-HSC</h2>
+      <p class="note">1 tahun, basis 100</p>
+      <div class="legend"><span><i class="lg0"></i>IHSG ex-HSC</span><span><i class="lg1"></i>IHSG</span></div>
+      <div class="chart" id="benchChart" data-source="bench"></div>
+    </section>
+  </div>
+
+  <section class="card" id="screener">
+    <h2>Screener 70 big cap</h2>
+    <p class="note">Klik baris untuk detail · klik judul kolom untuk urutkan · BREAKOUT = aturan yang di-backtest, hanya berlaku saat pasar "entry diizinkan"</p>
+    <div class="toolbar">
+      <div class="setups" id="setupFilter"></div>
+      <select id="sectorFilter" aria-label="Sektor"></select>
+      <input id="search" type="search" placeholder="Cari kode / nama…" aria-label="Cari">
+    </div>
+    <div class="main">
+      <div class="tablecol"><div class="box"><table class="scr" id="scrTable" data-source="screener" data-row-key="code">
+        <thead><tr>
+          <th data-field="code" data-k="code">Kode</th><th data-field="setup" data-k="setup">Setup</th>
+          <th data-field="close" data-k="close">Harga</th><th data-field="chg1d" data-k="chg1d">1H %</th>
+          <th data-field="rs4" data-k="rs4">RS 4w</th><th data-field="rs13" data-k="rs13">RS 13w</th>
+          <th data-field="stage" data-k="stage">Fase</th><th data-field="bull" data-k="bull">Faktor bull</th>
+          <th data-field="cmf" data-k="cmf">CMF</th><th data-field="vwap" data-k="vwap">VWAP %</th>
+          <th data-field="foreign_pct" data-k="foreign_pct">Asing %</th><th data-field="vol_ratio" data-k="vol_ratio">Vol ×</th>
+          <th data-field="rsi" data-k="rsi">RSI</th><th data-field="risk_pct" data-k="risk_pct">SL %</th>
+          <th data-field="pe" data-k="pe">PE</th><th data-field="roe" data-k="roe">ROE %</th>
+          <th data-field="mcap_t" data-k="mcap_t">Mcap T</th>
+        </tr></thead><tbody></tbody></table></div></div>
+      <aside class="card det" id="detail"></aside>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <section class="card" id="rotasi-sektor">
+      <h2>Rotasi sektor</h2>
+      <p class="note">RS-Ratio (sumbu X) dan RS-Momentum (sumbu Y) vs IHSG ex-HSC, jejak 5 minggu</p>
+      <div class="chart rrg" id="rrg" data-source="sectors"></div>
+    </section>
+    <section class="card" id="asing">
+      <h2>Asing hari ini</h2>
+      <p class="note">Net beli / jual terbesar di universe, Rp miliar (lembar × harga penutupan)</p>
+      <div class="grid2">
+        <div class="bars"><table id="fBuy" data-source="foreign" data-row-key="side,code">
+          <thead><tr><th data-field="code">Beli</th><th data-field="net_bn">Rp M</th></tr></thead><tbody></tbody></table></div>
+        <div class="bars"><table id="fSell" data-source="foreign" data-row-key="side,code">
+          <thead><tr><th data-field="code">Jual</th><th data-field="net_bn">Rp M</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" id="keterbukaan">
+    <h2>Keterbukaan informasi penting</h2>
+    <p class="note">45 hari terakhir · tanggal = tanggal terbit, bukan tanggal transaksi · laporan rutin disaring · klik judul untuk PDF di idx.co.id</p>
+    <div class="toolbar"><div class="evf" id="evFilter"></div></div>
+    <div class="box"><table id="evTable" data-source="events" data-row-key="n">
+      <thead><tr><th data-field="date">Tanggal</th><th data-field="code">Kode</th><th data-field="label">Kategori</th><th data-field="title">Judul</th></tr></thead>
+      <tbody></tbody></table></div>
+  </section>
+
+  <section class="card" id="backtest">
+    <h2>Backtest Relative-Strength Breakout</h2>
+    <p class="note"><span data-source="bt_stats" data-field="start" data-row="0">—</span> s/d
+      <span data-source="bt_stats" data-field="end" data-row="0">—</span> · universe dinamis top 70 market cap · hasil cenderung optimistis</p>
+    <div class="kpis">
+      <div class="kpi"><div class="lab">Total strategi</div><div class="val" data-source="bt_stats" data-field="total" data-row="0">—</div>
+        <div class="sm">IHSG ex-HSC <span data-source="bt_stats" data-field="exhsc_total" data-row="0">—</span></div></div>
+      <div class="kpi"><div class="lab">CAGR</div><div class="val" data-source="bt_stats" data-field="cagr" data-row="0">—</div>
+        <div class="sm">Max DD <span data-source="bt_stats" data-field="max_dd" data-row="0">—</span></div></div>
+      <div class="kpi"><div class="lab">Win rate</div><div class="val" data-source="bt_stats" data-field="win_rate" data-row="0">—</div>
+        <div class="sm"><span data-source="bt_stats" data-field="trades" data-row="0">—</span> trade · menang
+          <span data-source="bt_stats" data-field="avg_win" data-row="0">—</span> / kalah
+          <span data-source="bt_stats" data-field="avg_loss" data-row="0">—</span></div></div>
+    </div>
+    <div class="grid2">
+      <div class="box"><table id="btTable" data-source="bt_trades" data-row-key="n">
+        <thead><tr><th data-field="code">Trade</th><th data-field="entry_date">Masuk</th><th data-field="exit_date">Keluar</th>
+          <th data-field="days">Hari</th><th data-field="reason">Alasan</th><th data-field="ret">Return</th></tr></thead><tbody></tbody></table></div>
+      <div>
+        <div class="legend"><span><i class="lg2"></i>Strategi</span><span><i class="lg0"></i>IHSG ex-HSC</span><span><i class="lg1"></i>IHSG</span></div>
+        <div class="chart" id="btChart" data-source="bt_equity"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot" id="footer">
+    <b>Universe:</b> big cap non-HSC, free float riil KSEI ≥ <span data-source="market" data-field="min_ff_ksei" data-row="0">—</span>%
+    (snapshot <span data-source="market" data-field="ksei_snapshot" data-row="0">—</span>), likuiditas ≥ Rp
+    <span data-source="market" data-field="min_avg_value_bn" data-row="0">—</span> M/hari.<br>
+    <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: Fase (stage MA150), RS 13w vs IHSG ex-HSC, CMF 20, VWAP 20, Asing 20d, Lot besar, Broker 20h.<br>
+    <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler.<br>
+    <b>Broker:</b> status Top 5 broker Stockbit <span data-source="market" data-field="broker_window" data-row="0">—</span>.
+    <b>ARB</b> <span data-source="market" data-field="arb_pct_next" data-row="0">—</span>% sejak 19 Okt 2026 (siaran pers BEI 095 & 096, s/d 31 Des 2026).<br>
+    <b>Fundamental:</b> XBRL idx.co.id (data <span data-source="market" data-field="fund_generated" data-row="0">—</span>), laba TTM, laporan USD dikonversi kurs
+    <span data-source="market" data-field="usd_idr" data-row="0">—</span>.<br>
+    <b>Sumber:</b> salinan dashboard lokal Pulse: Yahoo Finance (OHLCV), Ringkasan Saham, XBRL & pengumuman idx.co.id, data free float BEI & KSEI, daftar HSC BEI.<br>
+    Bukan rekomendasi beli/jual. Lakukan riset sendiri dan kelola risiko Anda.
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const isNum = (v) => typeof v === "number" && isFinite(v);
+  const f0 = d3.format(",.0f"), f1 = d3.format(",.1f"), f2 = d3.format(",.2f");
+  const fmt = (v, f = f0) => isNum(v) ? f(v) : "–";
+  const pct = (v, f = f1) => isNum(v) ? (v > 0 ? "+" : "") + f(v) + "%" : "–";
+  const pctFrac = (v) => isNum(v) ? (v > 0 ? "+" : "") + d3.format(".1%")(v) : "–";
+  const cls = (v) => !isNum(v) ? "mut" : v > 0 ? "pos" : v < 0 ? "neg" : "";
+  const SETUP_CLS = { BREAKOUT: "bull", PULLBACK: "amber", TREND: "teal", NETRAL: "", HINDARI: "bear", "TIDAK AKTIF": "na" };
+  const STAGE_CLS = { MARKUP: "bull", MARKDOWN: "bear", AKUMULASI: "teal", DISTRIBUSI: "amber" };
+  const STAGE_SHORT = { MARKUP: "Markup", MARKDOWN: "Markdown", AKUMULASI: "Akum", DISTRIBUSI: "Distr" };
+  const EV_CLS = { dividen: "bull", buyback: "bull", tender_offer: "accent", rights_issue: "amber", transaksi_material: "accent",
+    afiliasi: "amber", kepemilikan: "accent", penjelasan_bursa: "amber", suspensi: "bear", stock_split: "teal" };
+  const FACTORS = [["stage", "Fase"], ["rs13", "RS 13w"], ["cmf", "CMF 20"], ["vwap", "VWAP 20"], ["foreign", "Asing 20d"], ["big_lot", "Lot besar"], ["broker", "Broker 20h"]];
+  const SETUPS = ["BREAKOUT", "PULLBACK", "TREND", "NETRAL", "HINDARI", "TIDAK AKTIF"];
+  const col = (i) => dash.colors[i];
+  const css = (name) => getComputedStyle(document.querySelector(".pl")).getPropertyValue(name).trim();
+  const state = { setup: null, sector: "", q: "", sort: "score", asc: false, sel: null, ev: null };
+
+  const get = (id) => { const d = dash.data(id); return d.status === "ok" ? d.data : null; };
+  const failed = (el, id) => { const d = dash.data(id); if (d.status === "error") { el.innerHTML = '<div class="failed">Failed to load</div>'; return true; } return false; };
+  const setText = (el, t) => { el.textContent = t; el.classList.remove("dash-skeleton"); };
+
+  // ---------- line chart with in-box tooltip ----------
+  function lineChart(el, { dates, series, hlines = [], height = 220, fmtY = (v) => f0(v) }) {
+    el.innerHTML = "";
+    const W = Math.max(el.clientWidth || 600, 260), H = height, pad = { l: 44, r: 44, t: 8, b: 22 };
+    const all = series.flatMap((s) => s.values).concat(hlines.map((h) => h.y)).filter(isNum);
+    if (!all.length || !dates.length) return;
+    let lo = d3.min(all), hi = d3.max(all); const span = hi - lo || Math.abs(hi) || 1; lo -= span * .06; hi += span * .06;
+    const n = dates.length;
+    const x = d3.scaleLinear([0, n - 1], [pad.l, W - pad.r]), y = d3.scaleLinear([lo, hi], [H - pad.b, pad.t]);
+    const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("width", "100%").attr("height", H);
+    y.ticks(4).forEach((v) => {
+      svg.append("line").attr("x1", pad.l).attr("x2", W - pad.r).attr("y1", y(v)).attr("y2", y(v)).style("stroke", "var(--cds-chart-grid)");
+      svg.append("text").attr("x", pad.l - 6).attr("y", y(v) + 3).attr("text-anchor", "end").text(fmtY(v));
+    });
+    const tickN = W < 420 ? 3 : 5;
+    d3.range(tickN).forEach((k) => {
+      const i = Math.round(k / (tickN - 1) * (n - 1));
+      svg.append("text").attr("x", x(i)).attr("y", H - 6).attr("text-anchor", k === 0 ? "start" : k === tickN - 1 ? "end" : "middle").text(String(dates[i]).slice(2));
+    });
+    hlines.forEach((h) => {
+      if (!isNum(h.y)) return;
+      svg.append("line").attr("x1", pad.l).attr("x2", W - pad.r).attr("y1", y(h.y)).attr("y2", y(h.y)).style("stroke", h.color).attr("stroke-dasharray", "4 3");
+      svg.append("text").attr("x", W - pad.r + 4).attr("y", y(h.y) + 3).text(h.label).style("fill", h.color);
+    });
+    const line = d3.line().defined(isNum).x((_, i) => x(i)).y((v) => y(v));
+    series.forEach((s) => svg.append("path").attr("d", line(s.values)).attr("fill", "none").style("stroke", s.color)
+      .attr("stroke-width", s.width || 2).attr("stroke-linejoin", "round").attr("stroke-linecap", "round"));
+    const xh = svg.append("line").attr("y1", pad.t).attr("y2", H - pad.b).style("stroke", "var(--cds-chart-axis)").style("display", "none");
+    const tip = d3.select(el).append("div").attr("class", "tip");
+    svg.append("rect").attr("x", pad.l).attr("y", pad.t).attr("width", W - pad.l - pad.r).attr("height", H - pad.t - pad.b).attr("fill", "transparent")
+      .on("mousemove", (ev) => {
+        const [px] = d3.pointer(ev); const i = Math.max(0, Math.min(n - 1, Math.round(x.invert(px))));
+        xh.attr("x1", x(i)).attr("x2", x(i)).style("display", null);
+        tip.style("display", "block").html("");
+        tip.append("div").attr("class", "h").text(dates[i]);
+        series.forEach((s) => { const r = tip.append("div"); r.append("span").style("color", s.color).text("● "); r.append("span").text(`${s.name}: ${isNum(s.values[i]) ? fmtY(s.values[i]) : "–"}`); });
+        const box = el.getBoundingClientRect(), tw = tip.node().offsetWidth;
+        const left = Math.min(ev.clientX - box.left + 12, el.clientWidth - tw - 4);
+        tip.style("left", Math.max(0, left) + "px").style("top", Math.max(0, ev.clientY - box.top - 10) + "px");
+      })
+      .on("mouseleave", () => { xh.style("display", "none"); tip.style("display", "none"); });
+  }
+
+  // ---------- header / market ----------
+  function drawMarket(screener) {
+    const m = get("market")?.[0]; const reg = $("#regime");
+    if (!m) { reg.textContent = "—"; return; }
+    setText(document.querySelector('[data-field="price_date"]'), m.price_date);
+    document.querySelectorAll('[data-source="market"][data-row="0"]').forEach((el) => {
+      const k = el.dataset.field, v = m[k];
+      if (k === "price_date") return;
+      el.textContent = k === "exhsc" || k === "exhsc_ma50" ? fmt(v, f2) : k === "hsc_weight" ? (isNum(v) ? d3.format(".1%")(v) : "–")
+        : k === "usd_idr" ? fmt(v) : v ?? "–";
+    });
+    reg.className = "chip " + (m.market_ok ? "bull" : "bear");
+    reg.textContent = m.market_ok ? "Pasar: entry diizinkan" : "Pasar: tahan entry baru";
+    const nb = screener ? screener.filter((r) => r.setup === "BREAKOUT").length : null;
+    $("#kpiBreakout").textContent = nb ?? "—";
+    const gap = isNum(m.exhsc) && isNum(m.exhsc_ma50) ? m.exhsc / m.exhsc_ma50 - 1 : null;
+    $("#takeaway").textContent = m.market_ok
+      ? `IHSG ex-HSC di atas MA50: aturan strategi mengizinkan entry pada setup BREAKOUT (${nb ?? 0} saham).`
+      : `IHSG ex-HSC ${gap === null ? "" : d3.format(".1%")(Math.abs(gap)) + " "}di bawah MA50: menurut aturan strategi tidak ada entry baru minggu ini.`;
+    const warns = [];
+    if (m.idx_file_date !== m.price_date) warns.push(`File Ringkasan Saham (${m.idx_file_date}) berbeda dengan tanggal harga (${m.price_date}).`);
+    if (m.idx_days < 5) warns.push(`Histori asing baru ${m.idx_days} hari; faktor "Asing 20d" aktif setelah minimal 5 hari.`);
+    const w = $("#warnings"); w.replaceChildren(...warns.map((t) => { const d = document.createElement("div"); d.className = "warn"; d.textContent = t; return d; }));
+  }
+
+  function drawPerf() {
+    const rows = get("perf"), tb = $("#perfTable tbody");
+    if (!rows) { tb.innerHTML = ""; return; }
+    tb.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement("tr");
+      [[r.period, ""], [pct(r.ihsg, f2), cls(r.ihsg)], [pct(r.exhsc, f2), cls(r.exhsc)], [pct(r.diff, f2), cls(r.diff)]].forEach(([t, c]) => {
+        const td = document.createElement("td"); td.textContent = t; if (c) td.className = c; tr.append(td); });
+      return tr;
+    }));
+  }
+
+  function drawBench() {
+    const el = $("#benchChart"); if (failed(el, "bench")) return;
+    const rows = get("bench"); if (!rows) { el.innerHTML = ""; return; }
+    lineChart(el, { dates: rows.map((r) => r.date), series: [
+      { name: "IHSG", values: rows.map((r) => r.ihsg), color: col(1), width: 1.5 },
+      { name: "IHSG ex-HSC", values: rows.map((r) => r.exhsc), color: col(0) }] });
+  }
+
+  // ---------- screener ----------
+  let filtersBuilt = false;
+  function buildFilters(rows) {
+    const counts = d3.rollup(rows, (v) => v.length, (r) => r.setup);
+    const sf = $("#setupFilter");
+    sf.replaceChildren(...SETUPS.filter((s) => counts.get(s)).map((s) => {
+      const c = document.createElement("span"); c.className = `chip ${SETUP_CLS[s]}${state.setup === s ? " active" : ""}`;
+      c.dataset.s = s; c.textContent = `${s} ${counts.get(s)}`; return c; }));
+    if (!filtersBuilt) {
+      sf.addEventListener("click", (e) => { const s = e.target.closest("[data-s]")?.dataset.s; if (!s) return; state.setup = state.setup === s ? null : s; drawScreener(); });
+      const sectors = [...new Set(rows.map((r) => r.sector).filter(Boolean))].sort();
+      $("#sectorFilter").replaceChildren(new Option("Semua sektor", ""), ...sectors.map((s) => new Option(s, s)));
+      $("#sectorFilter").addEventListener("change", (e) => { state.sector = e.target.value; drawScreener(); });
+      $("#search").addEventListener("input", (e) => { state.q = e.target.value.trim().toUpperCase(); drawScreener(); });
+      document.querySelector("#scrTable thead").addEventListener("click", (e) => {
+        const k = e.target.closest("th")?.dataset.k; if (!k) return;
+        if (state.sort === k) state.asc = !state.asc; else { state.sort = k; state.asc = k === "code" || k === "risk_pct" || k === "pe"; }
+        drawScreener(); });
+      document.querySelector("#scrTable tbody").addEventListener("click", (e) => { const c = e.target.closest("tr")?.dataset.key; if (c) { state.sel = c; drawScreener(); } });
+      filtersBuilt = true;
+    }
+  }
+  const sortVal = (r, k) => k === "setup" ? -SETUPS.indexOf(r.setup) : k === "bull" ? r.bull - r.bear : r[k];
+  function drawScreener() {
+    const all = get("screener"), tb = $("#scrTable tbody");
+    if (!all) { tb.innerHTML = ""; $("#detail").textContent = ""; return; }
+    buildFilters(all);
+    const events = get("events") || [];
+    const recent = new Set(events.filter((e) => e.category !== "laporan_keuangan" && daysAgo(e.date) <= 14).map((e) => e.code));
+    let rows = all.filter((r) => (!state.setup || r.setup === state.setup) && (!state.sector || r.sector === state.sector)
+      && (!state.q || r.code.includes(state.q) || (r.name || "").toUpperCase().includes(state.q)));
+    rows.sort((a, b) => { const va = sortVal(a, state.sort), vb = sortVal(b, state.sort);
+      if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
+      return (va > vb ? 1 : va < vb ? -1 : 0) * (state.asc ? 1 : -1); });
+    document.querySelectorAll("#scrTable th").forEach((th) => th.setAttribute("aria-sort", th.dataset.k === state.sort ? (state.asc ? "ascending" : "descending") : "none"));
+    if (!state.sel || !rows.some((r) => r.code === state.sel)) state.sel = rows[0]?.code ?? null;
+    tb.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement("tr"); tr.dataset.key = r.code; if (r.code === state.sel) tr.className = "sel";
+      const td = (text, c) => { const x = document.createElement("td"); x.textContent = text; if (c) x.className = c; tr.append(x); return x; };
+      const c0 = td(r.code, "code");
+      if (recent.has(r.code)) { const s = document.createElement("span"); s.className = "evdot"; s.textContent = "●"; s.title = "Ada pengumuman penting ≤14 hari"; c0.append(s); }
+      const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = r.name || ""; c0.append(nm);
+      const cs = td(""); const chip = document.createElement("span"); chip.className = `chip ${SETUP_CLS[r.setup] || ""}`; chip.textContent = r.setup; cs.append(chip);
+      td(fmt(r.close)); td(pct(r.chg1d), cls(r.chg1d)); td(pct(r.rs4), cls(r.rs4)); td(pct(r.rs13), cls(r.rs13));
+      const cst = td(""); const sc = document.createElement("span"); sc.className = `chip ${STAGE_CLS[r.stage] || ""}`; sc.textContent = r.stage ? `${STAGE_SHORT[r.stage]} ${r.stage_days}h` : "–"; cst.append(sc);
+      const cf = td(String(r.bull ?? "–")); const dots = document.createElement("span"); dots.className = "dots";
+      FACTORS.forEach(([k, n]) => { const d = document.createElement("span"); d.className = `dot ${r["lb_" + k] || ""}`; d.title = `${n}: ${r["lb_" + k]}`; dots.append(d); }); cf.append(dots);
+      td(fmt(r.cmf, f2), cls(r.cmf)); td(pct(r.vwap), cls(r.vwap));
+      td(r.foreign_days >= 5 ? pct(r.foreign_pct) : "–", r.foreign_days >= 5 ? cls(r.foreign_pct) : "mut");
+      td(fmt(r.vol_ratio, f2)); td(fmt(r.rsi)); td(isNum(r.risk_pct) ? "−" + f1(r.risk_pct) + "%" : "–", "neg");
+      td(isNum(r.pe) ? f1(r.pe) : "–"); td(isNum(r.roe) ? f1(r.roe) + "%" : "–", cls(r.roe)); td(fmt(r.mcap_t, f1));
+      return tr;
+    }));
+    drawDetail(all.find((r) => r.code === state.sel), events);
+  }
+  const daysAgo = (d) => { const m = get("market")?.[0]; return m ? Math.round((new Date(m.price_date) - new Date(d)) / 864e5) : 999; };
+
+  function mark(el, field, code) { el.dataset.source = "screener"; el.dataset.field = field; el.dataset.where = "code=" + encodeURIComponent(code); }
+  function drawDetail(r, events) {
+    const el = $("#detail");
+    if (!r) { el.textContent = ""; return; }
+    el.innerHTML = `
+      <div class="head"><span class="t"></span><span class="p"></span><span class="c1"></span><span class="chip ${SETUP_CLS[r.setup] || ""} su"></span></div>
+      <div class="sub dn"></div>
+      <div class="legend" style="margin-top:8px"><span><i class="lg0"></i>Close</span><span><i class="lg1"></i>MA50</span></div>
+      <div class="chart sm" id="spark" data-source="spark"></div>
+      <div class="facs"></div>
+      <div class="lv"></div>
+      <div class="fund"></div>
+      <div class="evs"></div>`;
+    const t = el.querySelector(".t"); t.textContent = r.code; mark(t, "code", r.code);
+    const p = el.querySelector(".p"); p.textContent = fmt(r.close); mark(p, "close", r.code);
+    const c1 = el.querySelector(".c1"); c1.textContent = pct(r.chg1d); c1.className = cls(r.chg1d); mark(c1, "chg1d", r.code);
+    el.querySelector(".su").textContent = r.setup;
+    el.querySelector(".dn").textContent = `${r.name || ""} · ${r.sector || "–"} · Rp ${fmt(r.mcap_t, f1)} T`;
+    const fv = { stage: r.stage ? `${r.stage} · ${r.stage_days} hari` : "–", rs13: pct(r.rs13), cmf: fmt(r.cmf, f2), vwap: pct(r.vwap),
+      foreign: r.foreign_days >= 5 ? pct(r.foreign_pct) : `${r.foreign_days}/5 hari`, big_lot: isNum(r.big_lot) ? (r.big_lot > 10 ? "≥10×" : f2(r.big_lot) + "×") : "–",
+      broker: r.broker_top5_20d ? `${r.broker_top5_20d} ${pct(r.broker_pct_20d)}` : "–" };
+    const ff = { stage: "stage", rs13: "rs13", cmf: "cmf", vwap: "vwap", foreign: "foreign_pct", big_lot: "big_lot", broker: "broker_top5_20d" };
+    el.querySelector(".facs").replaceChildren(...FACTORS.map(([k, n]) => {
+      const d = document.createElement("div"); d.className = `fac ${r["lb_" + k] || ""}`;
+      const a = document.createElement("div"); a.className = "n"; a.textContent = n;
+      const b = document.createElement("div"); b.className = "v"; b.textContent = fv[k]; if (k !== "foreign" || r.foreign_days >= 5) mark(b, ff[k], r.code);
+      d.append(a, b);
+      if (k === "broker" && r.broker_top5_20d) { const x = document.createElement("div"); x.className = "d";
+        x.textContent = `hari ini: ${r.broker_top5_1d || "–"} · beli: ${r.broker_buyers || "–"} · jual: ${r.broker_sellers || "–"}`; d.append(x); }
+      return d; }));
+    el.querySelector(".lv").replaceChildren(...[["Entry", "close", fmt(r.close), ""], ["Stop (2 ATR)", "stop", fmt(r.stop), "neg"],
+      ["TP1 · 2R", "tp1", fmt(r.tp1), "pos"], ["TP2 · 3R", "tp2", fmt(r.tp2), "pos"], ["ARA besok", "ara_next", fmt(r.ara_next), ""], ["ARB besok", "arb_next", fmt(r.arb_next), "neg"]].map(([n, k, v, c]) => {
+      const d = document.createElement("div"); const a = document.createElement("div"); a.className = "n"; a.textContent = n;
+      const b = document.createElement("div"); b.className = "v " + c; b.textContent = v; mark(b, k, r.code); d.append(a, b); return d; }));
+    const fund = el.querySelector(".fund");
+    if (r.fund_report) {
+      const h = document.createElement("div"); h.className = "subh"; h.textContent = `Fundamental · ${r.fund_report} · ${r.fund_type || ""}${r.fund_currency === "USD" ? " · lapor USD" : ""}`;
+      const g = document.createElement("div"); g.className = "lv";
+      [["PE (TTM)", "pe", isNum(r.pe) ? f1(r.pe) + "×" : "–"], ["PBV", "pbv", isNum(r.pbv) ? f2(r.pbv) + "×" : "–"],
+       ["ROE", "roe", isNum(r.roe) ? f1(r.roe) + "%" : "–"], ["Laba YTD YoY", "ni_growth", pct(r.ni_growth)],
+       [r.bank ? "Pend. bunga YoY" : "Pendapatan YoY", "rev_growth", pct(r.rev_growth)], ["Net margin", "net_margin", isNum(r.net_margin) ? f1(r.net_margin) + "%" : "–"],
+       r.bank ? ["Laba TTM", "ni_ttm_bn", isNum(r.ni_ttm_bn) ? "Rp " + f1(r.ni_ttm_bn / 1000) + " T" : "–"] : ["DER", "der", isNum(r.der) ? f2(r.der) + "×" : "–"],
+       ...(r.bank ? [] : [["OCF / laba", "ocf_ni", isNum(r.ocf_ni) ? f2(r.ocf_ni) + "×" : "–"]])].forEach(([n, k, v]) => {
+        const d = document.createElement("div"); const a = document.createElement("div"); a.className = "n"; a.textContent = n;
+        const b = document.createElement("div"); b.className = "v"; b.textContent = v; if (v !== "–") mark(b, k, r.code); d.append(a, b); g.append(d); });
+      fund.append(h, g);
+      if (r.flags) { const fl = document.createElement("div"); fl.className = "flags";
+        r.flags.split("; ").forEach((t) => { const c = document.createElement("span"); c.className = "chip bear"; c.textContent = t; fl.append(c); }); fund.append(fl); }
+    }
+    const evs = events.filter((e) => e.code === r.code).slice(0, 6);
+    if (evs.length) {
+      const h = document.createElement("div"); h.className = "subh"; h.textContent = "Keterbukaan informasi (45 hari)";
+      const ul = document.createElement("ul"); ul.className = "ev";
+      evs.forEach((e) => { const li = document.createElement("li"); const d = document.createElement("span"); d.className = "mut"; d.textContent = e.date.slice(5) + " ";
+        const c = document.createElement("span"); c.className = `chip ${EV_CLS[e.category] || ""}`; c.textContent = e.label; li.append(d, c, " ");
+        if (e.url) { const a = document.createElement("a"); a.href = e.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = e.title; li.append(a); } else li.append(e.title);
+        ul.append(li); });
+      el.querySelector(".evs").append(h, ul);
+    }
+    const sp = el.querySelector("#spark");
+    if (failed(sp, "spark")) return;
+    const pts = (get("spark") || []).filter((x) => x.code === r.code);
+    if (pts.length) lineChart(sp, { dates: pts.map((x) => x.date), height: 170, series: [
+      { name: "Close", values: pts.map((x) => x.close), color: col(0) },
+      { name: "MA50", values: pts.map((x) => x.ma50), color: col(1), width: 1.5 }],
+      hlines: [{ y: r.stop, label: "SL", color: "var(--color-bad)" }, { y: r.tp1, label: "TP1", color: "var(--color-ok)" }] });
+  }
+
+  // ---------- sectors ----------
+  function drawRRG() {
+    const el = $("#rrg"); if (failed(el, "sectors")) return;
+    const rows = get("sectors"); el.innerHTML = ""; if (!rows || !rows.length) return;
+    const W = Math.max(el.clientWidth || 500, 260), H = 320, pad = 34;
+    const dx = Math.max(d3.max(rows, (p) => Math.abs(p.x - 100)), 2) * 1.15, dy = Math.max(d3.max(rows, (p) => Math.abs(p.y - 100)), 2) * 1.15;
+    const x = d3.scaleLinear([100 - dx, 100 + dx], [pad, W - pad]), y = d3.scaleLinear([100 - dy, 100 + dy], [H - pad, pad]);
+    const QC = { LEADING: "var(--color-ok)", WEAKENING: "var(--color-warn)", LAGGING: "var(--color-bad)", IMPROVING: col(0) };
+    const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("width", "100%").attr("height", H);
+    svg.append("line").attr("x1", x(100)).attr("x2", x(100)).attr("y1", pad).attr("y2", H - pad).style("stroke", "var(--cds-chart-axis)");
+    svg.append("line").attr("x1", pad).attr("x2", W - pad).attr("y1", y(100)).attr("y2", y(100)).style("stroke", "var(--cds-chart-axis)");
+    [["LEADING", W - pad, pad - 10, "end"], ["WEAKENING", W - pad, H - pad + 20, "end"], ["LAGGING", pad, H - pad + 20, "start"], ["IMPROVING", pad, pad - 10, "start"]]
+      .forEach(([t, xx, yy, a]) => svg.append("text").attr("x", xx).attr("y", yy).attr("text-anchor", a).style("fill", QC[t]).text(t));
+    const tip = d3.select(el).append("div").attr("class", "tip");
+    const placed = [];
+    d3.groups(rows, (r) => r.sector).forEach(([sector, pts]) => {
+      pts.sort((a, b) => a.step - b.step); const last = pts[pts.length - 1]; const c = QC[last.quadrant];
+      svg.append("path").attr("d", d3.line().x((p) => x(p.x)).y((p) => y(p.y))(pts)).attr("fill", "none").style("stroke", c).attr("stroke-opacity", .45).attr("stroke-width", 1.5);
+      svg.append("circle").attr("cx", x(last.x)).attr("cy", y(last.y)).attr("r", 5).style("fill", c)
+        .on("mousemove", (ev) => { const b = el.getBoundingClientRect(); tip.style("display", "block").html("");
+          tip.append("div").attr("class", "h").text(sector); tip.append("div").text(`${last.quadrant} · ${last.n} saham · 20h ${pct(last.ret20)}`);
+          tip.style("left", Math.min(ev.clientX - b.left + 10, el.clientWidth - tip.node().offsetWidth - 4) + "px").style("top", (ev.clientY - b.top - 10) + "px"); })
+        .on("mouseleave", () => tip.style("display", "none"));
+      let ly = y(last.y) + 3; while (placed.some((p) => Math.abs(p.y - ly) < 11 && Math.abs(p.x - x(last.x)) < 90)) ly += 11;
+      placed.push({ x: x(last.x), y: ly });
+      const right = x(last.x) > W - 110;
+      svg.append("text").attr("x", x(last.x) + (right ? -8 : 8)).attr("y", ly).attr("text-anchor", right ? "end" : "start").style("fill", "var(--color-fg)").text(sector);
+    });
+  }
+
+  // ---------- foreign ----------
+  function drawForeign() {
+    const rows = get("foreign");
+    const fill = (sel, side, color) => {
+      const tb = document.querySelector(sel + " tbody"); if (!rows) { tb.innerHTML = ""; return; }
+      const list = rows.filter((r) => r.side === side && (side === "buy" ? r.net_bn > 0 : r.net_bn < 0));
+      const mx = d3.max(rows, (r) => Math.abs(r.net_bn || 0)) || 1;
+      tb.replaceChildren(...list.map((r) => { const tr = document.createElement("tr"); tr.dataset.key = `${side},${r.code}`;
+        const a = document.createElement("td"); a.textContent = r.code;
+        const b = document.createElement("td"); b.textContent = (r.net_bn > 0 ? "+" : "") + f1(r.net_bn); b.className = cls(r.net_bn);
+        const bar = document.createElement("div"); bar.className = "track"; const fl = document.createElement("div"); fl.className = "fill";
+        fl.style.width = Math.abs(r.net_bn) / mx * 100 + "%"; fl.style.background = color; bar.append(fl); a.append(bar);
+        tr.append(a, b); return tr; }));
+    };
+    fill("#fBuy", "buy", "var(--color-ok)"); fill("#fSell", "sell", "var(--color-bad)");
+  }
+
+  // ---------- events ----------
+  let evBuilt = false;
+  function drawEvents() {
+    const rows = get("events"), tb = $("#evTable tbody");
+    if (!rows) { tb.innerHTML = ""; return; }
+    const counts = d3.rollup(rows, (v) => v.length, (r) => r.category);
+    const labels = new Map(rows.map((r) => [r.category, r.label]));
+    $("#evFilter").replaceChildren(...[...counts.keys()].map((c) => { const s = document.createElement("span");
+      s.className = `chip ${EV_CLS[c] || ""}${state.ev === c ? " active" : ""}`; s.dataset.c = c; s.textContent = `${labels.get(c)} ${counts.get(c)}`; return s; }));
+    if (!evBuilt) { $("#evFilter").addEventListener("click", (e) => { const c = e.target.closest("[data-c]")?.dataset.c; if (!c) return; state.ev = state.ev === c ? null : c; drawEvents(); }); evBuilt = true; }
+    tb.replaceChildren(...rows.filter((r) => !state.ev || r.category === state.ev).map((r) => {
+      const tr = document.createElement("tr"); tr.dataset.key = r.n;
+      const a = document.createElement("td"); a.textContent = r.date; a.className = "mut";
+      const b = document.createElement("td"); b.textContent = r.code; b.className = "code";
+      const c = document.createElement("td"); const ch = document.createElement("span"); ch.className = `chip ${EV_CLS[r.category] || ""}`; ch.textContent = r.label; c.append(ch);
+      const d = document.createElement("td"); d.style.whiteSpace = "normal"; d.style.textAlign = "left";
+      if (r.url) { const l = document.createElement("a"); l.href = r.url; l.target = "_blank"; l.rel = "noopener"; l.textContent = r.title; d.append(l); } else d.textContent = r.title;
+      tr.append(a, b, c, d); return tr; }));
+  }
+
+  // ---------- backtest ----------
+  function drawBacktest() {
+    const s = get("bt_stats")?.[0];
+    document.querySelectorAll('[data-source="bt_stats"][data-row="0"]').forEach((el) => {
+      const k = el.dataset.field, v = s?.[k];
+      if (!s) { el.textContent = "—"; return; }
+      el.textContent = ["total", "cagr", "max_dd", "avg_win", "avg_loss", "exhsc_total"].includes(k) ? pctFrac(v)
+        : k === "win_rate" ? (isNum(v) ? d3.format(".0%")(v) : "–") : v ?? "–";
+      if (["total", "cagr", "exhsc_total"].includes(k)) el.className = (el.className.replace(/ ?(pos|neg|mut)/g, "") + " " + cls(v)).trim();
+    });
+    const tb = $("#btTable tbody"); const tr0 = get("bt_trades");
+    tb.replaceChildren(...(tr0 || []).map((t) => { const tr = document.createElement("tr"); tr.dataset.key = t.n;
+      [[t.code, "code"], [t.entry_date, ""], [t.exit_date, ""], [fmt(t.days), ""], [t.reason, "mut"], [pctFrac(t.ret), cls(t.ret)]]
+        .forEach(([v, c]) => { const td = document.createElement("td"); td.textContent = v; if (c) td.className = c; tr.append(td); });
+      return tr; }));
+    const el = $("#btChart"); if (failed(el, "bt_equity")) return;
+    const q = get("bt_equity"); if (!q) { el.innerHTML = ""; return; }
+    lineChart(el, { dates: q.map((r) => r.date), series: [
+      { name: "IHSG", values: q.map((r) => r.ihsg), color: col(1), width: 1.5 },
+      { name: "IHSG ex-HSC", values: q.map((r) => r.exhsc), color: col(2), width: 1.5 },
+      { name: "Strategi", values: q.map((r) => r.equity), color: col(0) }] });
+  }
+
+  function legendColors() {
+    document.querySelectorAll(".pl .lg0").forEach((i) => i.style.background = col(0));
+    document.querySelectorAll(".pl .lg1").forEach((i) => i.style.background = col(1));
+    document.querySelectorAll(".pl .lg2").forEach((i) => i.style.background = col(0));
+    document.querySelectorAll("#backtest .legend .lg0").forEach((i) => i.style.background = col(2));
+  }
+
+  dash.onData(() => {
+    legendColors();
+    const screener = get("screener");
+    drawMarket(screener); drawPerf(); drawBench(); drawScreener(); drawRRG(); drawForeign(); drawEvents(); drawBacktest();
+  });
+
+  const named = document.getElementById(location.hash.slice(1));
+  if (named) named.scrollIntoView();
+})();
+</script>
