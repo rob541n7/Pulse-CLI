@@ -76,6 +76,9 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: v
 #screener th { cursor: pointer; user-select: none; position: sticky; top: 0; background: var(--panel); }
 #screener th.sorted::after { content: " ▾"; }
 #screener th.sorted.asc::after { content: " ▴"; }
+#btTrades th { cursor: pointer; user-select: none; }
+#btTrades th.sorted::after { content: " ▾"; }
+#btTrades th.sorted.asc::after { content: " ▴"; }
 #screener tbody tr { cursor: pointer; }
 #screener tbody tr:hover { background: var(--panel-2); }
 #screener tbody tr.sel { background: color-mix(in srgb, var(--accent) 10%, transparent); }
@@ -540,8 +543,21 @@ function drawBacktestStatic() {
     <div class="kpi"><div class="label">Total strategi</div><div class="val ${cls(s.total)}">${pct(s.total * 100)}</div><div class="small">IHSG ex-HSC ${pct(bx)}</div></div>
     <div class="kpi"><div class="label">CAGR · Max DD</div><div class="val">${pct(s.cagr * 100)}</div><div class="small">DD ${pct(s.max_dd * 100)}</div></div>
     <div class="kpi"><div class="label">Win rate</div><div class="val">${fmt(s.win_rate * 100)}%</div><div class="small">${s.trades} trade · menang ${pct(s.avg_win * 100)} / kalah ${pct(s.avg_loss * 100)}</div></div>`;
-  $("#btTrades").innerHTML = `<thead><tr><th>Trade terakhir</th><th>Masuk</th><th>Keluar</th><th>Hari</th><th>Alasan</th><th>Return</th></tr></thead><tbody>` +
-    B.recent.map((t) => `<tr><td><b>${esc(t.code)}</b></td><td>${esc(t.entry_date)}</td><td>${esc(t.exit_date)}</td><td>${fmt(t.days)}</td>
+  drawBtTrades();
+}
+
+// Tabel trade backtest: klik judul kolom untuk mengurutkan (klik lagi = balik arah)
+const btSort = { k: null, asc: false };
+const BT_COLS = [["code", "Trade terakhir"], ["entry_date", "Masuk"], ["exit_date", "Keluar"], ["days", "Hari"], ["reason", "Alasan"], ["ret", "Return"]];
+function drawBtTrades() {
+  const rows = [...DATA.backtest.recent];
+  if (btSort.k) rows.sort((a, b) => {
+    const va = a[btSort.k], vb = b[btSort.k];
+    const c = typeof va === "number" && typeof vb === "number" ? va - vb : String(va ?? "").localeCompare(String(vb ?? ""));
+    return btSort.asc ? c : -c;
+  });
+  $("#btTrades").innerHTML = `<thead><tr>${BT_COLS.map(([k, l]) => `<th data-k="${k}" class="${btSort.k === k ? "sorted" + (btSort.asc ? " asc" : "") : ""}">${l}</th>`).join("")}</tr></thead><tbody>` +
+    rows.map((t) => `<tr><td><b>${esc(t.code)}</b></td><td>${esc(t.entry_date)}</td><td>${esc(t.exit_date)}</td><td>${fmt(t.days)}</td>
       <td class="mut">${esc(t.reason)}</td><td class="${cls(t.ret)}">${pct(t.ret * 100)}</td></tr>`).join("") + "</tbody>";
 }
 
@@ -592,6 +608,11 @@ function renderCharts() {
 drawForeign();
 drawEvents();
 drawBacktestStatic();
+$("#btTrades").addEventListener("click", (e) => {
+  const k = e.target.closest("th")?.dataset.k; if (!k) return;
+  if (btSort.k === k) btSort.asc = !btSort.asc; else { btSort.k = k; btSort.asc = k === "code" || k === "reason"; }
+  drawBtTrades();
+});
 renderTable();
 renderCharts();
 let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderCharts, 150); });

@@ -46,6 +46,9 @@
 .pl .scr th[aria-sort="ascending"]::after { content: " ▴"; }
 .pl .scr th[aria-sort="descending"]::after { content: " ▾"; }
 .pl .scr tbody tr { cursor: pointer; }
+.pl #btTable th { cursor: pointer; user-select: none; }
+.pl #btTable th[aria-sort="ascending"]::after { content: " ▴"; }
+.pl #btTable th[aria-sort="descending"]::after { content: " ▾"; }
 .pl .scr tbody tr:hover { background: color-mix(in srgb, var(--muted) 8%, transparent); }
 .pl .scr tbody tr.sel { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .pl td.code { font-weight: var(--cds-font-weight-medium); }
@@ -210,8 +213,8 @@
     </div>
     <div class="grid2">
       <div class="box"><table id="btTable" data-source="bt_trades" data-row-key="n">
-        <thead><tr><th data-field="code">Trade</th><th data-field="entry_date">Masuk</th><th data-field="exit_date">Keluar</th>
-          <th data-field="days">Hari</th><th data-field="reason">Alasan</th><th data-field="ret">Return</th></tr></thead><tbody></tbody></table></div>
+        <thead><tr><th data-field="code" data-k="code">Trade</th><th data-field="entry_date" data-k="entry_date">Masuk</th><th data-field="exit_date" data-k="exit_date">Keluar</th>
+          <th data-field="days" data-k="days">Hari</th><th data-field="reason" data-k="reason">Alasan</th><th data-field="ret" data-k="ret">Return</th></tr></thead><tbody></tbody></table></div>
       <div>
         <div class="legend"><span><i class="lg2"></i>Strategi</span><span><i class="lg0"></i>IHSG ex-HSC</span><span><i class="lg1"></i>IHSG</span></div>
         <div class="chart" id="btChart" data-source="bt_equity"></div>
@@ -538,6 +541,8 @@
   }
 
   // ---------- backtest ----------
+  // Tabel trade backtest: klik judul kolom untuk mengurutkan (klik lagi = balik arah)
+  const btSort = { k: null, asc: false }; let btSortBound = false;
   function drawBacktest() {
     const s = get("bt_stats")?.[0];
     document.querySelectorAll('[data-source="bt_stats"][data-row="0"]').forEach((el) => {
@@ -547,8 +552,14 @@
         : k === "win_rate" ? (isNum(v) ? d3.format(".0%")(v) : "–") : v ?? "–";
       if (["total", "cagr", "exhsc_total"].includes(k)) el.className = (el.className.replace(/ ?(pos|neg|mut)/g, "") + " " + cls(v)).trim();
     });
-    const tb = $("#btTable tbody"); const tr0 = get("bt_trades");
-    tb.replaceChildren(...(tr0 || []).map((t) => { const tr = document.createElement("tr"); tr.dataset.key = t.n;
+    const tb = $("#btTable tbody"); const tr0 = [...(get("bt_trades") || [])];
+    if (btSort.k) tr0.sort((a, b) => { const va = a[btSort.k], vb = b[btSort.k];
+      const c = isNum(va) && isNum(vb) ? va - vb : String(va ?? "").localeCompare(String(vb ?? "")); return btSort.asc ? c : -c; });
+    document.querySelectorAll("#btTable th").forEach((th) => th.setAttribute("aria-sort", th.dataset.k === btSort.k ? (btSort.asc ? "ascending" : "descending") : "none"));
+    if (!btSortBound) { btSortBound = true;
+      document.querySelector("#btTable thead").addEventListener("click", (e) => { const k = e.target.closest("th")?.dataset.k; if (!k) return;
+        if (btSort.k === k) btSort.asc = !btSort.asc; else { btSort.k = k; btSort.asc = k === "code" || k === "reason"; } drawBacktest(); }); }
+    tb.replaceChildren(...tr0.map((t) => { const tr = document.createElement("tr"); tr.dataset.key = t.n;
       [[t.code, "code"], [t.entry_date, ""], [t.exit_date, ""], [fmt(t.days), ""], [t.reason, "mut"], [pctFrac(t.ret), cls(t.ret)]]
         .forEach(([v, c]) => { const td = document.createElement("td"); td.textContent = v; if (c) td.className = c; tr.append(td); });
       return tr; }));
