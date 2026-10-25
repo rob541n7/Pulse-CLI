@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-10-20",
+  "as_of": "2026-10-22",
   "source": "idx.co.id > Perusahaan Tercatat > Kepemilikan Saham Terkonsentrasi Tinggi (pengenaan & pencabutan 2026)",
   "notes": "Sejak 9 Okt 2026 cakupan review HSC diperluas ke saham market cap > Rp5 T (siaran pers BEI No. 090/BEI.SPR/10-2026).",
   "tickers": [
@@ -38,6 +38,7 @@
     "ELPI",
     "EPMT",
     "FAPA",
+    "FILM",
     "FITT",
     "GEMS",
     "HATM",
@@ -80,11 +81,22 @@
     "STTP",
     "TBIG",
     "TCPI",
+    "TFCO",
     "TMAS",
     "WBSA",
     "YUPI"
   ],
   "events": [
+    {
+      "code": "FILM",
+      "action": "pengenaan",
+      "date": "2026-10-22"
+    },
+    {
+      "code": "TFCO",
+      "action": "pengenaan",
+      "date": "2026-10-21"
+    },
     {
       "code": "SSMS",
       "action": "pengenaan",
