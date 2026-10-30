@@ -32,6 +32,9 @@ IHSG_SYMBOL = "^JKSE"
 # Penutupan IHSG resmi dari idx.co.id (GetIndexSummary, COMPOSITE) untuk menambal hari yang
 # kosong di Yahoo; kolom: date,close
 IHSG_OFFICIAL_FILE = DATA_DIR / "idx" / "ihsg_official.csv"
+# Konstituen IHSG + rasio free float resmi dari pengumuman evaluasi indeks BEI
+# (Peng-00204/BEI.POP/10-2026, lampiran 9); kolom: code,free_float_pct,index_shares
+IHSG_CONSTITUENTS_FILE = DATA_DIR / "idx" / "ihsg_constituents.csv"
 MAX_DAILY_MOVE = 0.35  # batas ARA/ARB; lebih dari ini dianggap data rusak
 IHSG_CAP = 0.09  # bobot maksimum per saham di IHSG
 NEW_METHOD_FROM = pd.Timestamp("2026-11-02")  # IHSG resmi tanpa HSC (Peng-00201/BEI.POP/10-2026)
@@ -87,10 +90,17 @@ def official_ihsg() -> pd.Series:
 
 
 def free_float() -> pd.Series:
-    """Free float fraction per code (BEI, else KSEI); NaN for Papan Akselerasi (not in IHSG)."""
+    """Free float fraction per code; NaN for Papan Akselerasi (not in IHSG).
+
+    Official IHSG free float ratio from the latest index evaluation where available,
+    else BEI free float, else KSEI.
+    """
     own = load_ownership().set_index("code")
     ff = own["ff_bei"].fillna(own["ff_ksei"]) / 100
-    return ff.where(own["board"] != "Akselerasi")
+    if IHSG_CONSTITUENTS_FILE.exists():
+        official = pd.read_csv(IHSG_CONSTITUENTS_FILE).set_index("code")["free_float_pct"] / 100
+        ff = official.combine_first(ff)
+    return ff.where(own["board"].reindex(ff.index) != "Akselerasi")
 
 
 def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.DataFrame:
