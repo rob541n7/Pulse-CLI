@@ -1,0 +1,1291 @@
+{
+  "as_of": "2026-09-23",
+  "hsc_as_of": "2026-09-24",
+  "ksei_snapshot": "2026-08-31",
+  "rules": {
+    "size": 70,
+    "min_ff_ksei": 12.5,
+    "min_avg_value_bn": 5.0,
+    "candidates": 250
+  },
+  "tickers": [
+    "BBCA",
+    "BBRI",
+    "BMRI",
+    "TLKM",
+    "ASII",
+    "TPIA",
+    "BRPT",
+    "BBNI",
+    "EMAS",
+    "CUAN",
+    "BRMS",
+    "UNTR",
+    "AADI",
+    "IMPC",
+    "ICBP",
+    "ANTM",
+    "MDKA",
+    "ADRO",
+    "BUMI",
+    "UNVR",
+    "INDF",
+    "MBMA",
+    "PTRO",
+    "AMRT",
+    "CPIN",
+    "INCO",
+    "INKP",
+    "EXCL",
+    "TAPG",
+    "MEDC",
+    "CMRY",
+    "TINS",
+    "KLBF",
+    "PTBA",
+    "PGAS",
+    "GGRM",
+    "ENRG",
+    "AKRA",
+    "ITMG",
+    "EMTK",
+    "JPFA",
+    "TOWR",
+    "BNBR",
+    "SINI",
+    "CBDK",
+    "JSMR",
+    "MAPA",
+    "PACK",
+    "INTP",
+    "BUVA",
+    "AUTO",
+    "DSNG",
+    "BBTN",
+    "DEWA",
+    "AALI",
+    "RAJA",
+    "INDY",
+    "BFIN",
+    "PWON",
+    "CARE",
+    "COIN",
+    "BSDE",
+    "ARTO",
+    "HRUM",
+    "ARKO",
+    "BKSL",
+    "SCMA",
+    "RATU",
+    "BUKA",
+    "SMGR"
+  ],
+  "members": [
+    {
+      "code": "BBCA",
+      "name": "Bank Central Asia Tbk.",
+      "market_cap": 768866486850000,
+      "avg_value_bn": 811.05,
+      "ff_bei": 42.4,
+      "ff_ksei": 41.82,
+      "sector": "Financial Services"
+    },
+    {
+      "code": "BBRI",
+      "name": "Bank Rakyat Indonesia (Persero) Tbk.",
+      "market_cap": 478638482962530,
+      "avg_value_bn": 666.23,
+      "ff_bei": 46.2,
+      "ff_ksei": 41.37,
+      "sector": "Financial Services"
+    },
+    {
+      "code": "BMRI",
+      "name": "Bank Mandiri (Persero) Tbk.",
+      "market_cap": 387155999983240,
+      "avg_value_bn": 588.35,
+      "ff_bei": 39.1,
+      "ff_ksei": 37.9,
+      "sector": "Financial Services"
+    },
+    {
+      "code": "TLKM",
+      "name": "Telkom Indonesia (Persero) Tbk.",
+      "market_cap": 241711808504000,
+      "avg_value_bn": 291.45,
+      "ff_bei": 46.7,
+      "ff_ksei": 36.71,
+      "sector": "Communication Services"
+    },
+    {
+      "code": "ASII",
+      "name": "Astra International Tbk.",
+      "market_cap": 192296877415000,
+      "avg_value_bn": 225.02,
+      "ff_bei": 43.9,
+      "ff_ksei": 38.34,
+      "sector": "Industrials"
+    },
+    {
+      "code": "TPIA",
+      "name": "Chandra Asri Pacific Tbk.",
+      "market_cap": 161776589322040,
+      "avg_value_bn": 311.43,
+      "ff_bei": 10.6,
+      "ff_ksei": 20.72,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "BRPT",
+      "name": "Barito Pacific Tbk.",
+      "market_cap": 151870493231280,
+      "avg_value_bn": 118.23,
+      "ff_bei": 26.7,
+      "ff_ksei": 22.33,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "BBNI",
+      "name": "Bank Negara Indonesia (Persero) Tbk.",
+      "market_cap": 132558379831740,
+      "avg_value_bn": 157.42,
+      "ff_bei": 38.9,
+      "ff_ksei": 32.24,
+      "sector": "Financial Services"
+    },
+    {
+      "code": "EMAS",
+      "name": "Merdeka Gold Resources Tbk.",
+      "market_cap": 114904655268000,
+      "avg_value_bn": 215.9,
+      "ff_bei": 31.2,
+      "ff_ksei": 14.91,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "CUAN",
+      "name": "Petrindo Jaya Kreasi Tbk.",
+      "market_cap": 107922144000000,
+      "avg_value_bn": 446.05,
+      "ff_bei": 14.9,
+      "ff_ksei": 17.85,
+      "sector": "Energy"
+    },
+    {
+      "code": "BRMS",
+      "name": "Bumi Resources Minerals Tbk.",
+      "market_cap": 98539908034910,
+      "avg_value_bn": 236.39,
+      "ff_bei": 47.2,
+      "ff_ksei": 22.76,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "UNTR",
+      "name": "United Tractors Tbk.",
+      "market_cap": 91015297318400,
+      "avg_value_bn": 108.76,
+      "ff_bei": 34.9,
+      "ff_ksei": 28.72,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "AADI",
+      "name": "Adaro Andalan Indonesia Tbk.",
+      "market_cap": 87797204594000,
+      "avg_value_bn": 143.49,
+      "ff_bei": 19.3,
+      "ff_ksei": 20.3,
+      "sector": "Energy"
+    },
+    {
+      "code": "IMPC",
+      "name": "Impack Pratama Industri Tbk.",
+      "market_cap": 86203990000000,
+      "avg_value_bn": 41.62,
+      "ff_bei": 24.4,
+      "ff_ksei": 17.02,
+      "sector": "Industrials"
+    },
+    {
+      "code": "ICBP",
+      "name": "Indofood CBP Sukses Makmur Tbk.",
+      "market_cap": 80175617500000,
+      "avg_value_bn": 44.03,
+      "ff_bei": 19.4,
+      "ff_ksei": 15.27,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "ANTM",
+      "name": "ANTAM (Persero) Tbk.",
+      "market_cap": 78820908298000,
+      "avg_value_bn": 368.47,
+      "ff_bei": 34.6,
+      "ff_ksei": 30.29,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "MDKA",
+      "name": "Merdeka Copper Gold Tbk.",
+      "market_cap": 75376790014680,
+      "avg_value_bn": 117.22,
+      "ff_bei": 47.8,
+      "ff_ksei": 33.2,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "ADRO",
+      "name": "Alamtri Resources Indonesia Tbk.",
+      "market_cap": 74881284920000,
+      "avg_value_bn": 139.94,
+      "ff_bei": 28.3,
+      "ff_ksei": 27.69,
+      "sector": "Energy"
+    },
+    {
+      "code": "BUMI",
+      "name": "Bumi Resources Tbk.",
+      "market_cap": 71667730669124,
+      "avg_value_bn": 701.22,
+      "ff_bei": 41.4,
+      "ff_ksei": 39.82,
+      "sector": "Energy"
+    },
+    {
+      "code": "UNVR",
+      "name": "Unilever Indonesia Tbk.",
+      "market_cap": 62184500000000,
+      "avg_value_bn": 34.73,
+      "ff_bei": 14.0,
+      "ff_ksei": 13.95,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "INDF",
+      "name": "Indofood Sukses Makmur Tbk.",
+      "market_cap": 60804453512500,
+      "avg_value_bn": 43.39,
+      "ff_bei": 48.2,
+      "ff_ksei": 34.65,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "MBMA",
+      "name": "Merdeka Battery Materials Tbk.",
+      "market_cap": 56697595447500,
+      "avg_value_bn": 74.81,
+      "ff_bei": 26.7,
+      "ff_ksei": 14.06,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "PTRO",
+      "name": "Petrosea Tbk.",
+      "market_cap": 54464670000000,
+      "avg_value_bn": 239.83,
+      "ff_bei": 27.7,
+      "ff_ksei": 24.6,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "AMRT",
+      "name": "Sumber Alfaria Trijaya Tbk.",
+      "market_cap": 54397097227000,
+      "avg_value_bn": 45.36,
+      "ff_bei": 41.0,
+      "ff_ksei": 24.93,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "CPIN",
+      "name": "Charoen Pokphand Indonesia Tbk",
+      "market_cap": 50505840000000,
+      "avg_value_bn": 194.0,
+      "ff_bei": 34.1,
+      "ff_ksei": 13.83,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "INCO",
+      "name": "Vale Indonesia Tbk.",
+      "market_cap": 50485567917860,
+      "avg_value_bn": 78.64,
+      "ff_bei": 20.4,
+      "ff_ksei": 13.1,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "INKP",
+      "name": "Indah Kiat Pulp & Paper Tbk.",
+      "market_cap": 46229805851450,
+      "avg_value_bn": 42.75,
+      "ff_bei": 40.1,
+      "ff_ksei": 22.18,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "EXCL",
+      "name": "XLSMART Telecom Sejahtera Tbk.",
+      "market_cap": 44407664380440,
+      "avg_value_bn": 18.94,
+      "ff_bei": 30.1,
+      "ff_ksei": 15.58,
+      "sector": "Communication Services"
+    },
+    {
+      "code": "TAPG",
+      "name": "Triputra Agro Persada Tbk.",
+      "market_cap": 39308029200000,
+      "avg_value_bn": 64.8,
+      "ff_bei": 11.3,
+      "ff_ksei": 14.36,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "MEDC",
+      "name": "Medco Energi Internasional Tbk.",
+      "market_cap": 36824578784180,
+      "avg_value_bn": 96.8,
+      "ff_bei": 24.3,
+      "ff_ksei": 20.56,
+      "sector": "Energy"
+    },
+    {
+      "code": "CMRY",
+      "name": "Cisarua Mountain Dairy Tbk.",
+      "market_cap": 36102807650000,
+      "avg_value_bn": 20.26,
+      "ff_bei": 17.9,
+      "ff_ksei": 16.79,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "TINS",
+      "name": "TIMAH (Persero) Tbk.",
+      "market_cap": 35749216579200,
+      "avg_value_bn": 217.32,
+      "ff_bei": 34.9,
+      "ff_ksei": 31.41,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "KLBF",
+      "name": "Kalbe Farma Tbk.",
+      "market_cap": 35344110612700,
+      "avg_value_bn": 58.24,
+      "ff_bei": 38.3,
+      "ff_ksei": 30.78,
+      "sector": "Healthcare"
+    },
+    {
+      "code": "PTBA",
+      "name": "Bukit Asam (Persero) Tbk.",
+      "market_cap": 35138010712500,
+      "avg_value_bn": 156.96,
+      "ff_bei": 32.7,
+      "ff_ksei": 32.53,
+      "sector": "Energy"
+    },
+    {
+      "code": "PGAS",
+      "name": "Perusahaan Gas Negara (Persero) Tbk.",
+      "market_cap": 34907771802240,
+      "avg_value_bn": 56.73,
+      "ff_bei": 42.5,
+      "ff_ksei": 35.96,
+      "sector": "Utilities"
+    },
+    {
+      "code": "GGRM",
+      "name": "Gudang Garam Tbk.",
+      "market_cap": 34056357600000,
+      "avg_value_bn": 22.35,
+      "ff_bei": 17.1,
+      "ff_ksei": 22.0,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "ENRG",
+      "name": "Energi Mega Persada Tbk.",
+      "market_cap": 33471325125000,
+      "avg_value_bn": 123.8,
+      "ff_bei": 43.7,
+      "ff_ksei": 25.22,
+      "sector": "Energy"
+    },
+    {
+      "code": "AKRA",
+      "name": "AKR Corporindo Tbk.",
+      "market_cap": 29307272916000,
+      "avg_value_bn": 30.66,
+      "ff_bei": 32.7,
+      "ff_ksei": 25.13,
+      "sector": "Energy"
+    },
+    {
+      "code": "ITMG",
+      "name": "Indo Tambangraya Megah Tbk.",
+      "market_cap": 28474110000000,
+      "avg_value_bn": 42.03,
+      "ff_bei": 33.4,
+      "ff_ksei": 27.38,
+      "sector": "Energy"
+    },
+    {
+      "code": "EMTK",
+      "name": "Elang Mahkota Teknologi Tbk.",
+      "market_cap": 27396197361418,
+      "avg_value_bn": 20.36,
+      "ff_bei": 26.9,
+      "ff_ksei": 15.69,
+      "sector": "Communication Services"
+    },
+    {
+      "code": "JPFA",
+      "name": "Japfa Comfeed Indonesia Tbk.",
+      "market_cap": 26502059954260,
+      "avg_value_bn": 31.55,
+      "ff_bei": 41.0,
+      "ff_ksei": 23.33,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "TOWR",
+      "name": "Sarana Menara Nusantara Tbk.",
+      "market_cap": 23875633907324,
+      "avg_value_bn": 29.81,
+      "ff_bei": 32.6,
+      "ff_ksei": 20.21,
+      "sector": "Real Estate"
+    },
+    {
+      "code": "BNBR",
+      "name": "Bakrie & Brothers Tbk",
+      "market_cap": 22383617084895,
+      "avg_value_bn": 88.32,
+      "ff_bei": 30.9,
+      "ff_ksei": 18.93,
+      "sector": "Industrials"
+    },
+    {
+      "code": "SINI",
+      "name": "Singaraja Putra Tbk.",
+      "market_cap": 22005750000000,
+      "avg_value_bn": 212.54,
+      "ff_bei": 23.8,
+      "ff_ksei": 31.45,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "CBDK",
+      "name": "Bangun Kosambi Sukses Tbk.",
+      "market_cap": 20805026315000,
+      "avg_value_bn": 11.62,
+      "ff_bei": 12.3,
+      "ff_ksei": 12.73,
+      "sector": "Real Estate"
+    },
+    {
+      "code": "JSMR",
+      "name": "Jasa Marga (Persero) Tbk.",
+      "market_cap": 20322039360000,
+      "avg_value_bn": 9.71,
+      "ff_bei": 25.1,
+      "ff_ksei": 19.67,
+      "sector": "Industrials"
+    },
+    {
+      "code": "MAPA",
+      "name": "Map Aktif Adiperkasa Tbk.",
+      "market_cap": 19382720000000,
+      "avg_value_bn": 10.17,
+      "ff_bei": 29.6,
+      "ff_ksei": 25.52,
+      "sector": "Consumer Cyclical"
+    },
+    {
+      "code": "PACK",
+      "name": "Abadi Nusantara Hijau Investama Tbk.",
+      "market_cap": 19104081903760,
+      "avg_value_bn": 60.58,
+      "ff_bei": 53.4,
+      "ff_ksei": 34.28,
+      "sector": "Consumer Cyclical"
+    },
+    {
+      "code": "INTP",
+      "name": "Indocement Tunggal Prakarsa Tbk.",
+      "market_cap": 18013135344750,
+      "avg_value_bn": 6.83,
+      "ff_bei": 39.8,
+      "ff_ksei": 22.97,
+      "sector": "Basic Materials"
+    },
+    {
+      "code": "BUVA",
+      "name": "Bukit Uluwatu Villa Tbk.",
+      "market_cap": 17108852976190,
+      "avg_value_bn": 58.48,
+      "ff_bei": 34.0,
+      "ff_ksei": 21.34,
+      "sector": "Consumer Cyclical"
+    },
+    {
+      "code": "AUTO",
+      "name": "Astra Otoparts Tbk.",
+      "market_cap": 16338894870000,
+      "avg_value_bn": 15.4,
+      "ff_bei": 20.0,
+      "ff_ksei": 12.93,
+      "sector": "Consumer Cyclical"
+    },
+    {
+      "code": "DSNG",
+      "name": "Dharma Satya Nusantara Tbk.",
+      "market_cap": 16058761236000,
+      "avg_value_bn": 10.12,
+      "ff_bei": 32.4,
+      "ff_ksei": 13.21,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "BBTN",
+      "name": "Bank Tabungan Negara (Persero) Tbk.",
+      "market_cap": 15839273964660,
+      "avg_value_bn": 21.13,
+      "ff_bei": 35.2,
+      "ff_ksei": 30.65,
+      "sector": "Financial Services"
+    },
+    {
+      "code": "DEWA",
+      "name": "Darma Henwa Tbk",
+      "market_cap": 15461225012720,
+      "avg_value_bn": 194.98,
+      "ff_bei": 62.2,
+      "ff_ksei": 48.35,
+      "sector": "Energy"
+    },
+    {
+      "code": "AALI",
+      "name": "Astra Agro Lestari Tbk.",
+      "market_cap": 15108803414050,
+      "avg_value_bn": 18.07,
+      "ff_bei": 20.3,
+      "ff_ksei": 18.14,
+      "sector": "Consumer Defensive"
+    },
+    {
+      "code": "RAJA",
+      "name": "Rukun Raharja Tbk.",
+      "market_cap": 15006142875000,
+      "avg_value_bn": 55.03,
+      "ff_bei": 22.3,
+      "ff_ksei": 22.29,
+      "sector": "Utilities"
+    },
+    {
+      "code": "INDY",
+      "name": "Indika Energy Tbk.",
+      "market_cap": 14849047200000,
+      "avg_value_bn": 73.78,
+      "ff_bei": 27.6,
+      "ff_ksei": 22.74,
+      "sector": "Energy"
+    },
+    {
+      "code": "BFIN",
+      "name": "BFI Finance  Indonesia Tbk.",
+      "market_cap": 14362611357100,
+      "avg_value_bn": 22.19,
+      "ff_bei": 39.2,
+      "ff_ksei": 26.54,
+      "sector": "Financial Services"
+    },
+    {
+      "code": "PWON",
+      "name": "Pakuwon Jati Tbk.",
+      "market_cap": 13388369467200,
+      "avg_value_bn": 10.44,
+      "ff_bei": 30.9,
+      "ff_ksei": 27.79,
+      "sector": "Real Estate"
+    },
+    {
+      "code": "CARE",
+      "name": "Metro Healthcare Indonesia Tbk.",
+      "market_cap": 13034000000000,
+      "avg_value_bn": 18.01,
+      "ff_bei": 33.1,
+      "ff_ksei": 14.43,
+      "sector": "Healthcare"
+    },
+    {
+      "code": "COIN",
+      "name": "Indokripto Koin Semesta Tbk.",
+      "market_cap": 12794117688000,
+      "avg_value_bn": 57.18,
+      "ff_bei": 41.7,
+      "ff_ksei": 12.79,
+      "sector": "Financial Services"
+    },
+    {
+      "code": "BSDE",
+      "name": "Bumi Serpong Damai Tbk.",
+      "market_cap": 12385249000020,
+      "avg_value_bn": 19.62,
+      "ff_bei": 27.4,
+      "ff_ksei": 16.57,
+      "sector": "Real Estate"
+    },
+    {
+      "code": "ARTO",
+      "name": "Bank Jago Tbk.",
+      "market_cap": 12213263876000,
+      "avg_value_bn": 28.1,
+      "ff_bei": 27.9,
+      "ff_ksei": 20.32,
+      "sector": "Financial Services"
+    },
+    {
+      "code": "HRUM",
+      "name": "Harum Energy Tbk.",
+      "market_cap": 11963518500000,
+      "avg_value_bn": 13.91,
+      "ff_bei": 17.2,
+      "ff_ksei": 15.01,
+      "sector": "Energy"
+    },
+    {
+      "code": "ARKO",
+      "name": "Arkora Hydro Tbk.",
+      "market_cap": 11421130500000,
+      "avg_value_bn": 16.9,
+      "ff_bei": 32.5,
+      "ff_ksei": 14.88,
+      "sector": "Utilities"
+    },
+    {
+      "code": "BKSL",
+      "name": "Sentul City Tbk.",
+      "market_cap": 11404205383940,
+      "avg_value_bn": 10.73,
+      "ff_bei": 18.1,
+      "ff_ksei": 18.0,
+      "sector": "Real Estate"
+    },
+    {
+      "code": "SCMA",
+      "name": "Surya Citra Media Tbk.",
+      "market_cap": 11378081887120,
+      "avg_value_bn": 12.52,
+      "ff_bei": 10.6,
+      "ff_ksei": 13.37,
+      "sector": "Communication Services"
+    },
+    {
+      "code": "RATU",
+      "name": "Raharja Energi Cepu Tbk.",
+      "market_cap": 11321774346000,
+      "avg_value_bn": 46.67,
+      "ff_bei": 31.2,
+      "ff_ksei": 23.09,
+      "sector": "Energy"
+    },
+    {
+      "code": "BUKA",
+      "name": "Bukalapak.com Tbk.",
+      "market_cap": 11038878712069,
+      "avg_value_bn": 22.37,
+      "ff_bei": 29.8,
+      "ff_ksei": 28.09,
+      "sector": "Consumer Cyclical"
+    },
+    {
+      "code": "SMGR",
+      "name": "Semen Indonesia (Persero) Tbk.",
+      "market_cap": 10903737243735,
+      "avg_value_bn": 53.93,
+      "ff_bei": 48.1,
+      "ff_ksei": 37.29,
+      "sector": "Basic Materials"
+    }
+  ],
+  "excluded": [
+    {
+      "code": "DCII",
+      "market_cap": 471981688200000,
+      "ff_ksei": 0.15,
+      "avg_value_bn": 0.13,
+      "excluded": "HSC"
+    },
+    {
+      "code": "BREN",
+      "market_cap": 418750868600000,
+      "ff_ksei": 6.8,
+      "avg_value_bn": 45.5,
+      "excluded": "HSC"
+    },
+    {
+      "code": "BYAN",
+      "market_cap": 410000020500000,
+      "ff_ksei": 1.51,
+      "avg_value_bn": 37.22,
+      "excluded": "HSC"
+    },
+    {
+      "code": "AMMN",
+      "market_cap": 353163719984720,
+      "ff_ksei": 11.25,
+      "avg_value_bn": 406.28,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MORA",
+      "market_cap": 238870963680000,
+      "ff_ksei": 4.34,
+      "avg_value_bn": 2.32,
+      "excluded": "HSC"
+    },
+    {
+      "code": "DSSA",
+      "market_cap": 206122745600000,
+      "ff_ksei": 12.31,
+      "avg_value_bn": 477.56,
+      "excluded": "HSC"
+    },
+    {
+      "code": "SRAJ",
+      "market_cap": 159106479870000,
+      "ff_ksei": 4.17,
+      "avg_value_bn": 0.05,
+      "excluded": "HSC"
+    },
+    {
+      "code": "DNET",
+      "market_cap": 137939400000000,
+      "ff_ksei": 2.31,
+      "avg_value_bn": 0.09,
+      "excluded": "HSC"
+    },
+    {
+      "code": "SMMA",
+      "market_cap": 127512485957925,
+      "ff_ksei": 30.33,
+      "avg_value_bn": 0.25,
+      "excluded": "likuiditas < Rp 5 M"
+    },
+    {
+      "code": "MPRO",
+      "market_cap": 121298500000000,
+      "ff_ksei": 1.17,
+      "avg_value_bn": 0.03,
+      "excluded": "HSC"
+    },
+    {
+      "code": "CASA",
+      "market_cap": 98329666994415,
+      "ff_ksei": 9.11,
+      "avg_value_bn": 0.07,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "PANI",
+      "market_cap": 92311723654850,
+      "ff_ksei": 9.28,
+      "avg_value_bn": 40.6,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "CDIA",
+      "market_cap": 79266652934500,
+      "ff_ksei": 9.0,
+      "avg_value_bn": 41.29,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "ISAT",
+      "market_cap": 78046962515940,
+      "ff_ksei": 11.18,
+      "avg_value_bn": 169.21,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "HMSP",
+      "market_cap": 75025159600500,
+      "ff_ksei": 7.56,
+      "avg_value_bn": 15.42,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "BNLI",
+      "market_cap": 74504655524000,
+      "ff_ksei": 0.29,
+      "avg_value_bn": 0.12,
+      "excluded": "HSC"
+    },
+    {
+      "code": "BRIS",
+      "market_cap": 73753622386985,
+      "ff_ksei": 8.97,
+      "avg_value_bn": 34.55,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "ADMR",
+      "market_cap": 63776437140000,
+      "ff_ksei": 12.18,
+      "avg_value_bn": 62.3,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "NCKL",
+      "market_cap": 59943670000000,
+      "ff_ksei": 11.57,
+      "avg_value_bn": 48.24,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "GOTO",
+      "market_cap": 57028663361000,
+      "ff_ksei": 48.17,
+      "avg_value_bn": 0.63,
+      "excluded": "likuiditas < Rp 5 M"
+    },
+    {
+      "code": "PGUN",
+      "market_cap": 53935779490800,
+      "ff_ksei": 0.07,
+      "avg_value_bn": 1.28,
+      "excluded": "HSC"
+    },
+    {
+      "code": "MLPT",
+      "market_cap": 51328125000000,
+      "ff_ksei": 2.23,
+      "avg_value_bn": 3.39,
+      "excluded": "HSC"
+    },
+    {
+      "code": "SUPR",
+      "market_cap": 49882869757300,
+      "ff_ksei": 0.08,
+      "avg_value_bn": 0.0,
+      "excluded": "delisting"
+    },
+    {
+      "code": "PGEO",
+      "market_cap": 45696832960760,
+      "ff_ksei": 6.16,
+      "avg_value_bn": 13.93,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MEGA",
+      "market_cap": 45215469969590,
+      "ff_ksei": 1.5,
+      "avg_value_bn": 0.11,
+      "excluded": "HSC"
+    },
+    {
+      "code": "BNGA",
+      "market_cap": 43807779459840,
+      "ff_ksei": 7.53,
+      "avg_value_bn": 6.12,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "GEMS",
+      "market_cap": 43382353375000,
+      "ff_ksei": 1.85,
+      "avg_value_bn": 1.14,
+      "excluded": "HSC"
+    },
+    {
+      "code": "BDMN",
+      "market_cap": 42960628994040,
+      "ff_ksei": 6.91,
+      "avg_value_bn": 10.6,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MTEL",
+      "market_cap": 40777122592672,
+      "ff_ksei": 7.04,
+      "avg_value_bn": 18.04,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "BELI",
+      "market_cap": 39793505849810,
+      "ff_ksei": 9.19,
+      "avg_value_bn": 1.11,
+      "excluded": "HSC"
+    },
+    {
+      "code": "VKTR",
+      "market_cap": 36531250000000,
+      "ff_ksei": 9.67,
+      "avg_value_bn": 77.76,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "ARCI",
+      "market_cap": 34067250000000,
+      "ff_ksei": 12.46,
+      "avg_value_bn": 59.1,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MYOR",
+      "market_cap": 33538049587500,
+      "ff_ksei": 11.31,
+      "avg_value_bn": 30.48,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "TBIG",
+      "market_cap": 33192504186925,
+      "ff_ksei": 7.21,
+      "avg_value_bn": 0.76,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "JARR",
+      "market_cap": 30645807966000,
+      "ff_ksei": 2.76,
+      "avg_value_bn": 87.34,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MGLV",
+      "market_cap": 29716181211600,
+      "ff_ksei": 13.36,
+      "avg_value_bn": 20.34,
+      "excluded": "HSC"
+    },
+    {
+      "code": "NISP",
+      "market_cap": 28735456680480,
+      "ff_ksei": 11.59,
+      "avg_value_bn": 7.75,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "SILO",
+      "market_cap": 27182801250000,
+      "ff_ksei": 6.93,
+      "avg_value_bn": 2.98,
+      "excluded": "HSC"
+    },
+    {
+      "code": "FAPA",
+      "market_cap": 26857647320000,
+      "ff_ksei": 1.71,
+      "avg_value_bn": 0.15,
+      "excluded": "HSC"
+    },
+    {
+      "code": "LIFE",
+      "market_cap": 26250000000000,
+      "ff_ksei": 2.48,
+      "avg_value_bn": 0.48,
+      "excluded": "HSC"
+    },
+    {
+      "code": "MAPI",
+      "market_cap": 25066000000000,
+      "ff_ksei": 5.16,
+      "avg_value_bn": 10.75,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "BINA",
+      "market_cap": 24657880161880,
+      "ff_ksei": 4.2,
+      "avg_value_bn": 1.79,
+      "excluded": "HSC"
+    },
+    {
+      "code": "BTPN",
+      "market_cap": 24443992560800,
+      "ff_ksei": 0.4,
+      "avg_value_bn": 0.09,
+      "excluded": "HSC"
+    },
+    {
+      "code": "GIAA",
+      "market_cap": 24425502230220,
+      "ff_ksei": 7.09,
+      "avg_value_bn": 6.45,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "SRTG",
+      "market_cap": 24416703000000,
+      "ff_ksei": 10.44,
+      "avg_value_bn": 7.36,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MIKA",
+      "market_cap": 24199017810000,
+      "ff_ksei": 12.41,
+      "avg_value_bn": 7.73,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MDIY",
+      "market_cap": 24056824360000,
+      "ff_ksei": 15.69,
+      "avg_value_bn": 0.69,
+      "excluded": "likuiditas < Rp 5 M"
+    },
+    {
+      "code": "TKIM",
+      "market_cap": 23193515596500,
+      "ff_ksei": 10.43,
+      "avg_value_bn": 23.95,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "ULTJ",
+      "market_cap": 21420240912000,
+      "ff_ksei": 10.44,
+      "avg_value_bn": 37.82,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "AVIA",
+      "market_cap": 21312023126400,
+      "ff_ksei": 12.33,
+      "avg_value_bn": 4.9,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "PNBN",
+      "market_cap": 20619563788270,
+      "ff_ksei": 11.59,
+      "avg_value_bn": 2.65,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MKPI",
+      "market_cap": 20362466150000,
+      "ff_ksei": 6.94,
+      "avg_value_bn": 0.89,
+      "excluded": "HSC"
+    },
+    {
+      "code": "BSIM",
+      "market_cap": 19322742623580,
+      "ff_ksei": 5.07,
+      "avg_value_bn": 0.92,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "ADES",
+      "market_cap": 18758718240000,
+      "ff_ksei": 7.61,
+      "avg_value_bn": 0.35,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "BBHI",
+      "market_cap": 18716269872990,
+      "ff_ksei": 8.86,
+      "avg_value_bn": 12.81,
+      "excluded": "HSC"
+    },
+    {
+      "code": "NSSS",
+      "market_cap": 18684231386325,
+      "ff_ksei": 12.86,
+      "avg_value_bn": 4.69,
+      "excluded": "likuiditas < Rp 5 M"
+    },
+    {
+      "code": "SOHO",
+      "market_cap": 18149105817700,
+      "ff_ksei": 0.33,
+      "avg_value_bn": 0.79,
+      "excluded": "HSC"
+    },
+    {
+      "code": "SMAR",
+      "market_cap": 18094818205800,
+      "ff_ksei": 0.84,
+      "avg_value_bn": 0.79,
+      "excluded": "HSC"
+    },
+    {
+      "code": "FASW",
+      "market_cap": 16992122356325,
+      "ff_ksei": 0.22,
+      "avg_value_bn": 0.0,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "SUPA",
+      "market_cap": 16577675440300,
+      "ff_ksei": 9.95,
+      "avg_value_bn": 7.1,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "BBSI",
+      "market_cap": 16443651827360,
+      "ff_ksei": 1.43,
+      "avg_value_bn": 0.01,
+      "excluded": "HSC"
+    },
+    {
+      "code": "POWR",
+      "market_cap": 15524105540000,
+      "ff_ksei": 9.84,
+      "avg_value_bn": 12.27,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "JRPT",
+      "market_cap": 14847326965000,
+      "ff_ksei": 6.95,
+      "avg_value_bn": 0.61,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MSIN",
+      "market_cap": 14683635125610,
+      "ff_ksei": 10.79,
+      "avg_value_bn": 20.09,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "PSAB",
+      "market_cap": 14553000000000,
+      "ff_ksei": 5.83,
+      "avg_value_bn": 40.74,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "BNII",
+      "market_cap": 14468627310912,
+      "ff_ksei": 1.48,
+      "avg_value_bn": 0.37,
+      "excluded": "HSC"
+    },
+    {
+      "code": "MLBI",
+      "market_cap": 14432950000000,
+      "ff_ksei": 9.6,
+      "avg_value_bn": 0.78,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "BSSR",
+      "market_cap": 14390750000000,
+      "ff_ksei": 9.26,
+      "avg_value_bn": 10.45,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "CITA",
+      "market_cap": 13782057150000,
+      "ff_ksei": 1.4,
+      "avg_value_bn": 0.48,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "POLU",
+      "market_cap": 13425000000000,
+      "ff_ksei": 3.92,
+      "avg_value_bn": 0.55,
+      "excluded": "HSC"
+    },
+    {
+      "code": "STAA",
+      "market_cap": 12920496531000,
+      "ff_ksei": 3.93,
+      "avg_value_bn": 7.02,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "MCOL",
+      "market_cap": 12800016000000,
+      "ff_ksei": 5.49,
+      "avg_value_bn": 0.13,
+      "excluded": "HSC"
+    },
+    {
+      "code": "RLCO",
+      "market_cap": 12750000000000,
+      "ff_ksei": 5.45,
+      "avg_value_bn": 2.08,
+      "excluded": "HSC"
+    },
+    {
+      "code": "CMNT",
+      "market_cap": 12672872960000,
+      "ff_ksei": 1.65,
+      "avg_value_bn": 18.05,
+      "excluded": "HSC"
+    },
+    {
+      "code": "STTP",
+      "market_cap": 12314000000000,
+      "ff_ksei": 5.11,
+      "avg_value_bn": 0.01,
+      "excluded": "HSC"
+    },
+    {
+      "code": "TSPC",
+      "market_cap": 12086436324000,
+      "ff_ksei": 8.94,
+      "avg_value_bn": 1.5,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "RISE",
+      "market_cap": 11824977992700,
+      "ff_ksei": 4.86,
+      "avg_value_bn": 2.04,
+      "excluded": "HSC"
+    },
+    {
+      "code": "SGER",
+      "market_cap": 11612247531310,
+      "ff_ksei": 8.49,
+      "avg_value_bn": 40.86,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "IBST",
+      "market_cap": 11448919256325,
+      "ff_ksei": 0.04,
+      "avg_value_bn": 0.0,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "GOOD",
+      "market_cap": 11438349451050,
+      "ff_ksei": 6.56,
+      "avg_value_bn": 0.07,
+      "excluded": "free float < 12.5%"
+    },
+    {
+      "code": "ALII",
+      "market_cap": 11394576000000,
+      "ff_ksei": 2.33,
+      "avg_value_bn": 0.53,
+      "excluded": "HSC"
+    },
+    {
+      "code": "TRIO",
+      "market_cap": 11079192718770,
+      "ff_ksei": 1.99,
+      "avg_value_bn": NaN,
+      "excluded": "free float < 12.5%"
+    }
+  ]
+}

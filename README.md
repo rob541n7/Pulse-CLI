@@ -214,6 +214,10 @@ You'll see the TUI interface:
 | `/plan` | `/tp`, `/sl` | Trading plan generator |
 | `/sapta` | `/premarkup` | SAPTA pre-markup detection |
 | `/ihsg` | `/index`, `/market` | Market index status |
+| `/ihsgx` | `/exhsc`, `/hsc` | **IHSG vs IHSG ex-HSC** |
+| `/universe` | `/bigcap`, `/uni` | **Big cap universe (free float riil, non-HSC)** |
+| `/swing` | `/sw` | **Swing 2-8 minggu: screener, analisa, backtest** |
+| `/dashboard` | `/dash` | **Update data IDX & buka dashboard HTML** |
 | `/models` | `/model`, `/m` | Switch AI model |
 | `/auth` | `/login` | Stockbit authentication (set token) |
 | `/clear` | `/cls` | Clear chat history |
@@ -647,6 +651,108 @@ Signals
   - Bollinger squeeze active
   - Wave 3 position confirmed
   - Near Fibonacci time cluster
+```
+
+---
+
+## Big Cap Swing (IDX data, IHSG ex-HSC)
+
+Fokus ke saham besar yang benar-benar diperdagangkan publik, dengan pembanding yang tidak terdistorsi saham HSC.
+
+### Sumber Data
+
+| Data | Sumber | Frekuensi |
+|------|--------|-----------|
+| OHLCV harian | Yahoo Finance (close & volume identik dengan IDX untuk 100/100 big cap) | Harian |
+| Foreign buy/sell, nilai, frekuensi, listed shares | File Excel **Ringkasan Saham** idx.co.id, taruh di `data/idx/` | Harian (±17:00 WIB) |
+| Free float resmi BEI | [ff.klinikpenyesalan.com](https://ff.klinikpenyesalan.com/) | Bulanan |
+| Kepemilikan >=1% (free float riil) | [1pct.klinikpenyesalan.com](https://1pct.klinikpenyesalan.com/) (data KSEI) | Bulanan |
+| Daftar HSC | Pengumuman BEI, disimpan di `data/hsc.json` (update manual) | Saat ada pengumuman |
+
+> API JSON idx.co.id dilindungi Cloudflare bot detection, jadi Pulse tidak melakukan scraping ke sana. Unduh file Excel harian lewat browser (tombol unduh di halaman Ringkasan Saham) lalu simpan ke `data/idx/` dengan nama aslinya (`Ringkasan Saham-YYYYMMDD.xlsx`).
+
+### Universe Big Cap
+
+`/universe rebuild [size]` memilih N saham (default 70) dengan market cap terbesar yang lolos:
+
+- **Bukan HSC** (`data/hsc.json`)
+- **Free float riil KSEI >= 12,5%** (100% - total pemegang >=1%). Free float resmi BEI menghitung pemegang 1-5% sebagai publik, sehingga saham seperti BYAN (BEI 21,3% vs KSEI 1,5%), MORA dan DSSA tampak lolos padahal tidak.
+- **Likuid**: rata-rata nilai transaksi 20 hari >= Rp 5 miliar
+- Tidak sedang proses delisting
+
+### IHSG ex-HSC
+
+`/ihsgx` menghitung IHSG tanpa saham HSC: return IHSG resmi dikurangi kontribusi saham HSC (bobot = market cap kemarin). Per September 2026 bobot HSC ~26% IHSG, dan IHSG YTD -28% vs ex-HSC -19%.
+
+### Swing 2-8 Minggu
+
+```
+/swing              # screener universe: BREAKOUT / PULLBACK / TREND / HINDARI + SL/TP
+/swing MDKA         # analisa satu saham
+/swing backtest     # backtest Relative-Strength Breakout (filter pasar ON)
+/swing backtest --nofilter
+```
+
+Aturan strategi (sinyal mingguan, eksekusi open hari berikutnya):
+- Entry: close > MA50 > MA100, return 13 minggu > IHSG ex-HSC, close <= 5% dari high 55 hari, volume 5d >= 50d, IHSG ex-HSC > MA50
+- Exit: stop 2 ATR, trailing 2,5 ATR dari puncak close, atau 40 hari bursa
+- Maks 5 posisi, fee beli 0,15% / jual 0,25%, fraksi harga IDX
+
+Backtest memakai universe dinamis (top 70 market cap pada tiap tanggal) untuk menghindari survivorship bias. Free float & HSC tetap memakai data terkini, jadi hasil cenderung optimistis.
+
+### Dashboard
+
+Alur harian (setelah ±17:00 WIB):
+
+1. Unduh **Ringkasan Saham** dari idx.co.id, simpan ke `data/idx/` (nama asli `Ringkasan Saham-YYYYMMDD.xlsx`)
+2. Klik dua kali **`update_dashboard.bat`** (atau `/dashboard` di TUI)
+3. `data/reports/dashboard.html` terbuka di browser: satu file mandiri, bisa dibuka offline
+
+Isi dashboard: status pasar (IHSG ex-HSC vs MA50), IHSG vs ex-HSC, screener 70 big cap dengan filter setup/sektor dan panel detail (grafik, SL/TP), rotasi sektor (RRG), asing hari ini, dan backtest.
+
+Faktor per saham ditampilkan **terpisah, tidak dijumlahkan** (supaya tidak ada satu skor yang menyembunyikan konflik antar sinyal):
+
+| Faktor | Cara hitung | Bull / Bear |
+|--------|-------------|-------------|
+| Fase | Stage MA150 (30 minggu), debounce 5 hari: Markup / Markdown / Akumulasi / Distribusi | Markup / Markdown |
+| RS 13w | Return 13 minggu vs IHSG ex-HSC | > +5% / < -5% |
+| CMF 20 | Chaikin Money Flow 20 hari | > 0,05 / < -0,05 |
+| VWAP 20 | Close vs VWAP 20 hari | konteks (premium/diskon) |
+| Asing 20d | Net asing (lembar × close) % nilai transaksi, dari histori Excel IDX | > +2% / < -2% (min 5 hari data) |
+| Lot besar | Nilai per transaksi reguler hari ini vs rata-rata 20 hari | > 1,3× dengan harga naik / turun |
+
+Catatan data IDX: kolom Volume/Nilai/Frekuensi hanya mencakup **pasar reguler**; transaksi nego tercatat di kolom Non Regular.
+
+Faktor asing & lot besar aktif setelah histori Excel IDX terkumpul (≥5 hari). Semakin rutin file diunduh, semakin lengkap.
+
+### Fundamental & Keterbukaan Informasi (idx.co.id)
+
+idx.co.id memblokir klien non-browser, jadi data diambil **di browser Anda sendiri** dengan `scripts/idx_browser_extract.js`:
+
+1. Buka https://www.idx.co.id/id/perusahaan-tercatat/laporan-keuangan-dan-tahunan/ di Chrome
+2. F12 → Console, tempel isi `scripts/idx_browser_extract.js`, Enter
+3. `await pulseIdx.run()` (±5 menit untuk 70 saham, request berurutan dengan jeda)
+4. Pindahkan `pulse_idx_YYYYMMDD.json` dari Downloads ke `data/fundamentals/`, lalu jalankan `update_dashboard.bat`
+
+Cukup diulang setelah musim laporan keuangan (akhir Apr, Jul/Agu, Okt, Mar) dan sesekali untuk pengumuman terbaru.
+
+Yang diambil:
+- **XBRL laporan keuangan** terbaru (TW3/TW2/TW1/tahunan) + laporan tahunan sebelumnya. Laba TTM = tahun buku terakhir + YTD berjalan − YTD tahun lalu. Laporan dalam USD (19 dari 70 big cap per Sep 2026) dikonversi kurs USD/IDR terkini.
+- Metrik: PE, PBV, ROE, pertumbuhan laba & pendapatan YoY, net margin, DER, OCF/laba. Bank memakai pendapatan bunga, tanpa DER.
+- Peringatan otomatis: ekuitas negatif, rugi TTM, berbalik rugi, laba turun >20%, laba naik dari basis kecil, arus kas operasi negatif, laba belum jadi kas.
+- **Pengumuman penting** 90 hari: dividen, RUPS, buyback, rights issue, transaksi material/afiliasi, perubahan kepemilikan/pengendali, tender offer, penjelasan ke Bursa, suspensi, stock split, laporan keuangan. Laporan rutin disaring.
+
+Fundamental ditampilkan sebagai **konteks** di dashboard (kolom PE/ROE, panel detail, daftar keterbukaan informasi), bukan sinyal timing swing.
+
+### Update Harian Tanpa TUI
+
+```bash
+python -m pulse.core.idx daily --open # gabung Excel IDX baru + IHSG ex-HSC + screener + dashboard
+python -m pulse.core.idx dashboard --open
+python -m pulse.core.idx ownership    # bulanan: free float BEI & KSEI
+python -m pulse.core.idx universe 70  # bulanan: bangun ulang universe
+python -m pulse.core.idx swing BBRI
+python -m pulse.core.idx backtest
 ```
 
 ---
