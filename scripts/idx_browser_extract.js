@@ -48,11 +48,11 @@
   ];
   const NOISE = /registrasi pemegang efek|aktivitas eksplorasi|rencana penyampaian|laporan tahunan|keberlanjutan|esg|public expose|kurs konversi|pengalihan kembali saham/i;
   const DEFAULT_TICKERS = [
-    "BBCA", "BBRI", "BMRI", "TLKM", "ASII", "TPIA", "BRPT", "BBNI", "EMAS", "CUAN", "BRMS", "UNTR", "AADI", "IMPC",
-    "ICBP", "ANTM", "MDKA", "ADRO", "BUMI", "UNVR", "INDF", "MBMA", "PTRO", "AMRT", "CPIN", "INCO", "INKP", "EXCL",
-    "TAPG", "MEDC", "CMRY", "TINS", "KLBF", "PTBA", "PGAS", "GGRM", "ENRG", "AKRA", "ITMG", "EMTK", "JPFA", "TOWR",
-    "BNBR", "SINI", "CBDK", "JSMR", "MAPA", "PACK", "INTP", "BUVA", "AUTO", "DSNG", "BBTN", "DEWA", "AALI", "RAJA",
-    "INDY", "BFIN", "PWON", "CARE", "COIN", "BSDE", "ARTO", "HRUM", "ARKO", "BKSL", "SCMA", "RATU", "BUKA", "SMGR",
+    "BBCA", "BBRI", "BMRI", "TLKM", "ASII", "BBNI", "TPIA", "BRPT", "UNTR", "AADI", "EMAS", "ADRO", "ICBP", "ANTM",
+    "INDF", "UNVR", "BRMS", "MDKA", "BUMI", "ISAT", "CUAN", "CPIN", "IMPC", "AMRT", "TAPG", "PTBA", "INCO", "INKP",
+    "MEDC", "KLBF", "CMRY", "MBMA", "PGAS", "GGRM", "EXCL", "ITMG", "AKRA", "GOTO", "TINS", "ENRG", "PTRO", "ARCI",
+    "TOWR", "JSMR", "JPFA", "INTP", "AALI", "MIKA", "EMTK", "MGLV", "CBDK", "DSNG", "MAPA", "AUTO", "PWON", "CARE",
+    "BBTN", "BFIN", "BNBR", "PACK", "SINI", "CTRA", "BSDE", "BUKA", "SIDO", "LSIP", "BUVA", "INDY", "HRUM", "SMSM",
   ];
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
