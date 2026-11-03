@@ -258,3 +258,15 @@ def test_ex_hsc_follows_official_ihsg_after_method_change():
     r_ex, _ = ex_hsc_returns(ihsg, ret, mcap, {"HSC1"}, cap=None)
     assert r_ex.iloc[0] == pytest.approx(0.0)
     assert r_ex.iloc[1] == pytest.approx(0.01)  # IHSG resmi sudah tanpa HSC
+
+
+def test_ex_hsc_level_meets_official_ihsg_after_method_change():
+    from pulse.core.idx.benchmark import chain_level
+
+    idx = pd.to_datetime(["2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03"])
+    ihsg = pd.Series([5098.0, 5057.0, 5096.8, 4904.3], index=idx)
+    growth = pd.Series([0.92, 0.90, 0.90 * 5096.8 / 5057.0, 0.90 * 4904.3 / 5057.0], index=idx)
+    level = chain_level(growth, ihsg)
+    assert level.loc["2026-10-30"] == pytest.approx(5057.0)
+    assert level.loc["2026-11-03"] == pytest.approx(4904.3)
+    assert level.loc["2026-10-29"] / level.loc["2026-10-30"] == pytest.approx(0.92 / 0.90)

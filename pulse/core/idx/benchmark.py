@@ -18,7 +18,8 @@ follows the official IHSG return (chained on returns, like IDX chains its diviso
 Output columns:
     IHSG        official IHSG close (includes HSC up to 30 Oct 2026, excludes it after)
     IHSG_lama   official IHSG including HSC; stops on the last session before 2 Nov 2026
-    IHSG_exHSC  Pulse estimate before 2 Nov 2026, official IHSG return from then on
+    IHSG_exHSC  Pulse estimate before 2 Nov 2026, official IHSG from then on; the level is
+                anchored to the official IHSG on 30 Oct 2026, so it equals IHSG since 2 Nov
     w_hsc       HSC weight inside the old IHSG; NaN once IHSG no longer contains HSC
 """
 
@@ -140,11 +141,23 @@ def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.Da
         {
             "IHSG": ihsg,
             "IHSG_lama": ihsg.where(old),
-            "IHSG_exHSC": (1 + r_ex.fillna(0)).cumprod() * ihsg.iloc[0],
+            "IHSG_exHSC": chain_level((1 + r_ex.fillna(0)).cumprod(), ihsg),
             "w_hsc": w_hsc.where(old),
         }
     )
     return out
+
+
+def chain_level(growth: pd.Series, ihsg: pd.Series) -> pd.Series:
+    """Scale a cumulative ex-HSC growth path so it meets the official IHSG level.
+
+    Anchored on the last session before the new IHSG (like IDX keeps the index level
+    continuous when the constituents change): from 2 Nov 2026 the level then equals the
+    official IHSG exactly. Ratios (MA50 filter, RS, returns) are unaffected.
+    """
+    pre = growth.index[growth.index < NEW_METHOD_FROM]
+    anchor = pre[-1] if len(pre) else growth.index[-1]
+    return growth * (ihsg.loc[anchor] / growth.loc[anchor])
 
 
 def hsc_weight_last(bench: pd.DataFrame) -> tuple[float | None, str | None]:
