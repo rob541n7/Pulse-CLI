@@ -119,6 +119,8 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
             "exhsc": m["exhsc"],
             "exhsc_ma50": m["exhsc_ma50"],
             "hsc_weight": m["hsc_weight"],
+            "hsc_weight_date": m.get("hsc_weight_date"),
+            "ihsg_new_from": m.get("ihsg_new_from"),
             "hsc_count": m["hsc_count"],
             "hsc_as_of": m["hsc_as_of"],
             "ksei_snapshot": m.get("ksei_snapshot"),
@@ -136,16 +138,18 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
     perf = [
         {
             "period": p,
-            "ihsg": v["ihsg"],
             "exhsc": v["exhsc"],
+            "hsc": v["hsc"],
             "diff": None
-            if v["ihsg"] is None or v["exhsc"] is None
-            else round(v["exhsc"] - v["ihsg"], 2),
+            if v["hsc"] is None or v["exhsc"] is None
+            else round(v["hsc"] - v["exhsc"], 2),
         }
         for p, v in b["perf"].items()
     ]
+    # ihsg = IHSG lama (dengan HSC), kosong sejak IHSG baru berlaku
     bench = [
-        {"date": d, "ihsg": i, "exhsc": e} for d, i, e in zip(b["dates"], b["ihsg"], b["exhsc"])
+        {"date": d, "ihsg": i, "exhsc": e, "hsc": h}
+        for d, i, e, h in zip(b["dates"], b["ihsg"], b["exhsc"], b["hsc"])
     ]
     spark = [
         {"code": r["code"], "date": d, "close": c, "ma50": a}
@@ -207,13 +211,15 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
         ),
         "perf": (
             perf,
-            "IHSG vs ex-HSC per periode",
-            "Return IHSG dan IHSG ex-HSC (%) per periode. " + src,
+            "IHSG ex-HSC vs keranjang HSC per periode",
+            "Return IHSG ex-HSC (sejak 2 Nov 2026 = IHSG resmi) dan keranjang saham HSC (%) per periode. "
+            + src,
         ),
         "bench": (
             bench,
-            "IHSG vs ex-HSC 1 tahun",
-            "IHSG dan IHSG ex-HSC harian, basis 100. " + src,
+            "IHSG ex-HSC, keranjang HSC, IHSG lama 1 tahun",
+            "Harian, basis 100. IHSG lama (dengan HSC) berhenti dihitung IDX per 2 Nov 2026. "
+            + src,
         ),
         "screener": (
             [_screener_row(r) for r in data["rows"]],

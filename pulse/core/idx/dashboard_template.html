@@ -159,10 +159,12 @@ footer { margin-top: 22px; color: var(--muted); font-size: 12px; line-height: 1.
       <div class="scroll"><table class="perf" id="perf"></table></div>
     </section>
     <section class="card">
-      <h2>IHSG vs IHSG ex-HSC <span class="hint">1 tahun, basis 100</span></h2>
-      <div class="legend"><span><i style="background:var(--accent)"></i>IHSG ex-HSC</span>
-        <span><i style="background:var(--line-2)"></i>IHSG</span></div>
+      <h2>IHSG ex-HSC vs keranjang HSC <span class="hint">1 tahun, basis 100</span></h2>
+      <div class="legend"><span><i style="background:var(--accent)"></i>IHSG ex-HSC → IHSG resmi baru</span>
+        <span><i style="background:var(--bear)"></i>Keranjang HSC</span>
+        <span><i style="background:var(--line-2)"></i>IHSG lama (dengan HSC)</span></div>
       <div id="benchChart"></div>
+      <div class="note" id="benchNote"></div>
     </section>
   </div>
 
@@ -265,7 +267,7 @@ const FACTORS = [
 
 /* ---------- SVG line chart ---------- */
 const tip = $("#tip");
-function lineChart(el, { dates, series, hlines = [], height = 220, fmtY = (v) => nf0.format(v) }) {
+function lineChart(el, { dates, series, hlines = [], vlines = [], height = 220, fmtY = (v) => nf0.format(v) }) {
   const W = Math.max(el.clientWidth || 600, 280), H = height, pad = { l: 44, r: 10, t: 8, b: 22 };
   const all = series.flatMap((s) => s.values).concat(hlines.map((h) => h.y)).filter(isNum);
   if (!all.length) { el.innerHTML = '<div class="note">Data tidak tersedia</div>'; return; }
@@ -290,6 +292,11 @@ function lineChart(el, { dates, series, hlines = [], height = 220, fmtY = (v) =>
     if (!isNum(h.y)) return;
     g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(h.y)}" y2="${y(h.y)}" stroke="${col(h.color)}" stroke-dasharray="4 3" />`;
     g += `<text x="${W - pad.r - 2}" y="${y(h.y) - 3}" text-anchor="end" style="fill:${col(h.color)}">${esc(h.label)}</text>`;
+  });
+  vlines.forEach((v) => {
+    const i = dates.indexOf(v.date); if (i < 0) return;
+    g += `<line x1="${x(i)}" x2="${x(i)}" y1="${pad.t}" y2="${H - pad.b}" stroke="${col("var(--faint)")}" stroke-dasharray="3 3" />`;
+    g += `<text x="${x(i) - 4}" y="${pad.t + 10}" text-anchor="end">${esc(v.label)}</text>`;
   });
   series.forEach((s) => {
     let d = "", pen = false;
@@ -336,15 +343,15 @@ DATA.rows.forEach((r) => (counts[r.setup] = (counts[r.setup] || 0) + 1));
 $("#kpis").innerHTML = `
   <div class="kpi"><div class="label">IHSG ex-HSC</div><div class="val">${fmt(M.exhsc, nf2)}</div>
     <div class="small">MA50 ${fmt(M.exhsc_ma50, nf2)}</div></div>
-  <div class="kpi"><div class="label">Bobot HSC di IHSG (free float, cap 9%)</div><div class="val">${fmt(M.hsc_weight * 100, nf1)}%</div>
+  <div class="kpi"><div class="label">Bobot HSC di IHSG lama${M.hsc_weight_date ? " (per " + esc(M.hsc_weight_date) + ")" : ""}</div><div class="val">${fmt(M.hsc_weight * 100, nf1)}%</div>
     <div class="small">${M.hsc_count} saham · daftar ${esc(M.hsc_as_of)}</div></div>
   <div class="kpi"><div class="label">Setup Breakout</div><div class="val">${counts.BREAKOUT || 0}</div>
     <div class="small">dari ${DATA.rows.length} big cap</div></div>`;
 const P = DATA.bench.perf, periods = Object.keys(P);
 $("#perf").innerHTML = `<thead><tr><th></th>${periods.map((p) => `<th>${esc(p)}</th>`).join("")}</tr></thead><tbody>
-  <tr><td>IHSG</td>${periods.map((p) => `<td class="${cls(P[p].ihsg)}">${pct(P[p].ihsg)}</td>`).join("")}</tr>
-  <tr><td><b>ex-HSC</b></td>${periods.map((p) => `<td class="${cls(P[p].exhsc)}"><b>${pct(P[p].exhsc)}</b></td>`).join("")}</tr>
-  <tr><td class="mut">Selisih</td>${periods.map((p) => { const d = P[p].exhsc - P[p].ihsg; return `<td class="${cls(d)}">${pct(d)}</td>`; }).join("")}</tr></tbody>`;
+  <tr><td><b>IHSG ex-HSC</b></td>${periods.map((p) => `<td class="${cls(P[p].exhsc)}"><b>${pct(P[p].exhsc)}</b></td>`).join("")}</tr>
+  <tr><td>Keranjang HSC</td>${periods.map((p) => `<td class="${cls(P[p].hsc)}">${pct(P[p].hsc)}</td>`).join("")}</tr>
+  <tr><td class="mut">HSC − ex-HSC</td>${periods.map((p) => { const d = P[p].hsc - P[p].exhsc; return `<td class="${cls(d)}">${pct(d)}</td>`; }).join("")}</tr></tbody>`;
 
 /* ---------- screener ---------- */
 const COLS = [
@@ -595,8 +602,14 @@ $("#footer").innerHTML = `
 /* ---------- render ---------- */
 function renderCharts() {
   lineChart($("#benchChart"), { dates: DATA.bench.dates, fmtY: (v) => nf0.format(v),
-    series: [{ name: "IHSG", values: DATA.bench.ihsg, color: "var(--line-2)", width: 1.4 },
+    vlines: [{ date: DATA.bench.split, label: "IHSG baru" }],
+    series: [{ name: "IHSG lama", values: DATA.bench.ihsg, color: "var(--line-2)", width: 1.4 },
+             { name: "Keranjang HSC", values: DATA.bench.hsc, color: "var(--bear)", width: 1.4 },
              { name: "IHSG ex-HSC", values: DATA.bench.exhsc, color: "var(--accent)" }] });
+  $("#benchNote").textContent = `Sebelum ${DATA.bench.split}: IHSG ex-HSC = estimasi Pulse (IHSG resmi dikurangi kontribusi HSC). ` +
+    `Sejak ${DATA.bench.split}: mengikuti IHSG resmi, yang tidak lagi memuat HSC; IHSG lama berhenti dihitung IDX. ` +
+    `Keranjang HSC = ${M.hsc_count} saham HSC (daftar ${M.hsc_as_of}) berbobot free float, hitungan Pulse. ` +
+    `Daftar HSC terbaru dipakai untuk seluruh periode.`;
   const B = DATA.backtest;
   lineChart($("#btChart"), { dates: B.dates, fmtY: (v) => nf0.format(v),
     series: [{ name: "IHSG", values: B.ihsg, color: "var(--line-2)", width: 1.2 },

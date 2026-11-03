@@ -13,7 +13,14 @@ w_hsc is HSC's share of that and r_hsc the weighted HSC return.
 
 From 2 Nov 2026 (Peng-00201/BEI.POP/10-2026) the official IHSG itself excludes HSC stocks
 (and adjusts at once when a stock enters/leaves HSC), so from then on ex-HSC simply
-follows the official IHSG return.
+follows the official IHSG return (chained on returns, like IDX chains its divisor).
+
+Output columns:
+    IHSG        official IHSG close (includes HSC up to 30 Oct 2026, excludes it after)
+    IHSG_lama   official IHSG including HSC; stops on the last session before 2 Nov 2026
+    IHSG_exHSC  Pulse estimate before 2 Nov 2026, official IHSG return from then on
+    HSC         free-float weighted basket of the current HSC list (own calculation)
+    w_hsc       HSC weight inside the old IHSG; NaN once IHSG no longer contains HSC
 """
 
 import numpy as np
@@ -104,7 +111,7 @@ def free_float() -> pd.Series:
 
 
 def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.DataFrame:
-    """DataFrame with columns IHSG, IHSG_exHSC, w_hsc (index = trading date)."""
+    """DataFrame with columns IHSG, IHSG_lama, IHSG_exHSC, HSC, w_hsc (index = trading date)."""
     summary = latest_summary()
     if summary is None:
         raise FileNotFoundError(
@@ -129,19 +136,35 @@ def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.Da
     mcap_prev = close.shift(1) * shares.reindex(close.columns) * ff
 
     r_ex, w_hsc = ex_hsc_returns(ihsg.pct_change(), ret, mcap_prev, hsc)
+    old = ihsg.index < NEW_METHOD_FROM
     out = pd.DataFrame(
         {
             "IHSG": ihsg,
+            "IHSG_lama": ihsg.where(old),
             "IHSG_exHSC": (1 + r_ex.fillna(0)).cumprod() * ihsg.iloc[0],
-            "w_hsc": w_hsc,
+            "HSC": (1 + hsc_basket_returns(ret, mcap_prev, hsc).fillna(0)).cumprod() * ihsg.iloc[0],
+            "w_hsc": w_hsc.where(old),
         }
     )
     return out
 
 
-def performance_table(bench: pd.DataFrame) -> pd.DataFrame:
-    """Returns (%) over standard lookbacks for IHSG and IHSG ex-HSC."""
-    s = bench[["IHSG", "IHSG_exHSC"]]
+def hsc_basket_returns(stock_ret: pd.DataFrame, mcap_prev: pd.DataFrame, hsc) -> pd.Series:
+    """Daily return of the HSC stocks weighted by previous-day free float market cap."""
+    cols = [c for c in stock_ret.columns if c in hsc]
+    w = mcap_prev[cols].where(stock_ret[cols].notna())
+    return (stock_ret[cols] * w).sum(axis=1) / w.sum(axis=1)
+
+
+def hsc_weight_last(bench: pd.DataFrame) -> tuple[float | None, str | None]:
+    """Last known HSC weight inside the old IHSG and its date."""
+    w = bench["w_hsc"].dropna()
+    return (float(w.iloc[-1]), str(w.index[-1].date())) if len(w) else (None, None)
+
+
+def performance_table(bench: pd.DataFrame, cols=("IHSG_exHSC", "HSC")) -> pd.DataFrame:
+    """Returns (%) over standard lookbacks, default ex-HSC (= IHSG resmi baru) and HSC basket."""
+    s = bench[list(cols)]
     last = s.iloc[-1]
     ytd_base = s[s.index.year == s.index[-1].year].iloc[0]
     periods = {"1 minggu": 5, "1 bulan": 21, "3 bulan": 63, "6 bulan": 126, "1 tahun": 250}
@@ -153,16 +176,19 @@ def performance_table(bench: pd.DataFrame) -> pd.DataFrame:
 def format_benchmark(bench: pd.DataFrame) -> str:
     perf = performance_table(bench)
     hsc_as_of, hsc = load_hsc()
+    w, w_date = hsc_weight_last(bench)
     lines = [
-        f"IHSG vs IHSG ex-HSC (data s/d {bench.index[-1].date()})",
-        f"Bobot {len(hsc)} saham HSC di IHSG: {bench.w_hsc.iloc[-1]:.1%} (free float, cap 9%; "
-        f"daftar HSC {hsc_as_of})",
-        f"Mulai {NEW_METHOD_FROM.date()} IHSG resmi sudah tanpa HSC: ex-HSC = IHSG resmi",
+        f"IHSG ex-HSC vs keranjang HSC (data s/d {bench.index[-1].date()})",
+        f"Sebelum {NEW_METHOD_FROM.date()}: ex-HSC = estimasi Pulse; sejak itu = IHSG resmi "
+        "(IDX tidak lagi menghitung IHSG dengan HSC)",
+        f"Bobot {len(hsc)} saham HSC di IHSG lama: "
+        + (f"{w:.1%} per {w_date}" if w is not None else "-")
+        + f" (free float, cap 9%; daftar HSC {hsc_as_of})",
         "",
-        f"{'Periode':<10} {'IHSG':>9} {'ex-HSC':>9} {'Selisih':>9}",
+        f"{'Periode':<10} {'ex-HSC':>9} {'HSC':>9} {'Selisih':>9}",
     ]
     for p in perf.columns:
-        a, b = perf.at["IHSG", p], perf.at["IHSG_exHSC", p]
+        a, b = perf.at["IHSG_exHSC", p], perf.at["HSC", p]
         lines.append(f"{p:<10} {a:>+8.2f}% {b:>+8.2f}% {b - a:>+8.2f}%")
     lines.append(
         f"\nIHSG ex-HSC: {bench.IHSG_exHSC.iloc[-1]:,.2f} | "

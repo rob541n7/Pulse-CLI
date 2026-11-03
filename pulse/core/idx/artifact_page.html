@@ -125,23 +125,27 @@
         <div class="kpi"><div class="lab">IHSG ex-HSC</div>
           <div class="val" data-source="market" data-field="exhsc" data-row="0">—</div>
           <div class="sm">MA50 <span data-source="market" data-field="exhsc_ma50" data-row="0">—</span></div></div>
-        <div class="kpi"><div class="lab">Bobot HSC di IHSG (free float, cap 9%)</div>
+        <div class="kpi"><div class="lab">Bobot HSC di IHSG lama</div>
           <div class="val" data-source="market" data-field="hsc_weight" data-row="0">—</div>
-          <div class="sm"><span data-source="market" data-field="hsc_count" data-row="0">—</span> saham · daftar
+          <div class="sm">per <span data-source="market" data-field="hsc_weight_date" data-row="0">—</span> ·
+            <span data-source="market" data-field="hsc_count" data-row="0">—</span> saham · daftar
             <span data-source="market" data-field="hsc_as_of" data-row="0">—</span></div></div>
         <div class="kpi"><div class="lab">Setup Breakout</div>
           <div class="val" id="kpiBreakout">—</div>
           <div class="sm">dari <span data-source="market" data-field="universe_n" data-row="0">—</span> big cap</div></div>
       </div>
       <div class="box"><table id="perfTable" data-source="perf" data-row-key="period">
-        <thead><tr><th data-field="period">Periode</th><th data-field="ihsg">IHSG</th><th data-field="exhsc">ex-HSC</th><th data-field="diff">Selisih</th></tr></thead>
+        <thead><tr><th data-field="period">Periode</th><th data-field="exhsc">IHSG ex-HSC</th><th data-field="hsc">Keranjang HSC</th><th data-field="diff">HSC − ex-HSC</th></tr></thead>
         <tbody></tbody></table></div>
     </section>
     <section class="card" id="ihsg-chart">
-      <h2>IHSG vs IHSG ex-HSC</h2>
+      <h2>IHSG ex-HSC vs keranjang HSC</h2>
       <p class="note">1 tahun, basis 100</p>
-      <div class="legend"><span><i class="lg0"></i>IHSG ex-HSC</span><span><i class="lg1"></i>IHSG</span></div>
+      <div class="legend"><span><i class="lg0"></i>IHSG ex-HSC → IHSG resmi baru</span><span><i class="lg3"></i>Keranjang HSC</span><span><i class="lg1"></i>IHSG lama (dengan HSC)</span></div>
       <div class="chart" id="benchChart" data-source="bench"></div>
+      <p class="note">Sebelum <span data-source="market" data-field="ihsg_new_from" data-row="0">—</span>: IHSG ex-HSC = estimasi Pulse (IHSG resmi dikurangi kontribusi HSC).
+        Sejak tanggal itu mengikuti IHSG resmi, yang tidak lagi memuat HSC; IHSG lama berhenti dihitung IDX.
+        Keranjang HSC = saham HSC berbobot free float, hitungan Pulse. Daftar HSC terbaru dipakai untuk seluruh periode.</p>
     </section>
   </div>
 
@@ -262,7 +266,7 @@
   const setText = (el, t) => { el.textContent = t; el.classList.remove("dash-skeleton"); };
 
   // ---------- line chart with in-box tooltip ----------
-  function lineChart(el, { dates, series, hlines = [], height = 220, fmtY = (v) => f0(v) }) {
+  function lineChart(el, { dates, series, hlines = [], vlines = [], height = 220, fmtY = (v) => f0(v) }) {
     el.innerHTML = "";
     const W = Math.max(el.clientWidth || 600, 260), H = height, pad = { l: 44, r: 44, t: 8, b: 22 };
     const all = series.flatMap((s) => s.values).concat(hlines.map((h) => h.y)).filter(isNum);
@@ -284,6 +288,11 @@
       if (!isNum(h.y)) return;
       svg.append("line").attr("x1", pad.l).attr("x2", W - pad.r).attr("y1", y(h.y)).attr("y2", y(h.y)).style("stroke", h.color).attr("stroke-dasharray", "4 3");
       svg.append("text").attr("x", W - pad.r + 4).attr("y", y(h.y) + 3).text(h.label).style("fill", h.color);
+    });
+    vlines.forEach((v) => {
+      const i = dates.indexOf(v.date); if (i < 0) return;
+      svg.append("line").attr("x1", x(i)).attr("x2", x(i)).attr("y1", pad.t).attr("y2", H - pad.b).style("stroke", "var(--cds-chart-axis)").attr("stroke-dasharray", "3 3");
+      svg.append("text").attr("x", x(i) - 4).attr("y", pad.t + 10).attr("text-anchor", "end").text(v.label);
     });
     const line = d3.line().defined(isNum).x((_, i) => x(i)).y((v) => y(v));
     series.forEach((s) => svg.append("path").attr("d", line(s.values)).attr("fill", "none").style("stroke", s.color)
@@ -334,7 +343,7 @@
     if (!rows) { tb.innerHTML = ""; return; }
     tb.replaceChildren(...rows.map((r) => {
       const tr = document.createElement("tr");
-      [[r.period, ""], [pct(r.ihsg, f2), cls(r.ihsg)], [pct(r.exhsc, f2), cls(r.exhsc)], [pct(r.diff, f2), cls(r.diff)]].forEach(([t, c]) => {
+      [[r.period, ""], [pct(r.exhsc, f2), cls(r.exhsc)], [pct(r.hsc, f2), cls(r.hsc)], [pct(r.diff, f2), cls(r.diff)]].forEach(([t, c]) => {
         const td = document.createElement("td"); td.textContent = t; if (c) td.className = c; tr.append(td); });
       return tr;
     }));
@@ -343,8 +352,10 @@
   function drawBench() {
     const el = $("#benchChart"); if (failed(el, "bench")) return;
     const rows = get("bench"); if (!rows) { el.innerHTML = ""; return; }
-    lineChart(el, { dates: rows.map((r) => r.date), series: [
-      { name: "IHSG", values: rows.map((r) => r.ihsg), color: col(1), width: 1.5 },
+    const split = get("market")?.[0]?.ihsg_new_from;
+    lineChart(el, { dates: rows.map((r) => r.date), vlines: split ? [{ date: split, label: "IHSG baru" }] : [], series: [
+      { name: "IHSG lama", values: rows.map((r) => r.ihsg), color: col(1), width: 1.5 },
+      { name: "Keranjang HSC", values: rows.map((r) => r.hsc), color: col(3), width: 1.5 },
       { name: "IHSG ex-HSC", values: rows.map((r) => r.exhsc), color: col(0) }] });
   }
 
@@ -575,6 +586,7 @@
     document.querySelectorAll(".pl .lg0").forEach((i) => i.style.background = col(0));
     document.querySelectorAll(".pl .lg1").forEach((i) => i.style.background = col(1));
     document.querySelectorAll(".pl .lg2").forEach((i) => i.style.background = col(0));
+    document.querySelectorAll(".pl .lg3").forEach((i) => i.style.background = col(3));
     document.querySelectorAll("#backtest .legend .lg0").forEach((i) => i.style.background = col(2));
   }
 

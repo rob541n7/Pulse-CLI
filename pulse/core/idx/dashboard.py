@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 from pulse.core.idx import DATA_DIR, brokerflow, factors, fundamentals, rules, swing
-from pulse.core.idx.benchmark import performance_table
+from pulse.core.idx.benchmark import NEW_METHOD_FROM, hsc_weight_last, performance_table
 from pulse.core.idx.hsc import load_hsc
 from pulse.core.idx.ownership import load_ownership
 from pulse.core.idx.summary import HISTORY_FILE, latest_summary, update_history
@@ -167,6 +167,7 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
     bb = bench.tail(250)
     perf = performance_table(bench)
     hsc_as_of, hsc = load_hsc()
+    w_hsc, w_hsc_date = hsc_weight_last(bench)
     sectors = pd.Series({t: own["sector"].get(t) for t in tickers}) if "sector" in own else None
 
     return {
@@ -177,7 +178,9 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             "idx_days": int(history.date.nunique()) if history is not None else 0,
             "hsc_as_of": hsc_as_of,
             "hsc_count": len(hsc),
-            "hsc_weight": _num(bench.w_hsc.iloc[-1], 4),
+            "hsc_weight": _num(w_hsc, 4),
+            "hsc_weight_date": w_hsc_date,
+            "ihsg_new_from": str(NEW_METHOD_FROM.date()),
             "ksei_snapshot": uni.get("ksei_snapshot"),
             "universe_as_of": uni["as_of"],
             "universe_rules": uni["rules"],
@@ -195,10 +198,13 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
         "event_labels": fundamentals.EVENT_LABELS,
         "bench": {
             "dates": [d.strftime("%Y-%m-%d") for d in bb.index],
-            "ihsg": _series(bb.IHSG / bb.IHSG.iloc[0] * 100),
+            # IHSG lama (dengan HSC) berhenti 30 Okt 2026; basis 100 = awal jendela
+            "ihsg": _series(bb.IHSG_lama / bb.IHSG.iloc[0] * 100),
             "exhsc": _series(bb.IHSG_exHSC / bb.IHSG_exHSC.iloc[0] * 100),
+            "hsc": _series(bb.HSC / bb.HSC.iloc[0] * 100),
+            "split": str(NEW_METHOD_FROM.date()),
             "perf": {
-                col: {"ihsg": _num(perf.at["IHSG", col]), "exhsc": _num(perf.at["IHSG_exHSC", col])}
+                col: {"exhsc": _num(perf.at["IHSG_exHSC", col]), "hsc": _num(perf.at["HSC", col])}
                 for col in perf.columns
             },
         },
