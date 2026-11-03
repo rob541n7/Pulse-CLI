@@ -135,17 +135,17 @@
           <div class="sm">dari <span data-source="market" data-field="universe_n" data-row="0">—</span> big cap</div></div>
       </div>
       <div class="box"><table id="perfTable" data-source="perf" data-row-key="period">
-        <thead><tr><th data-field="period">Periode</th><th data-field="exhsc">IHSG ex-HSC</th><th data-field="hsc">Keranjang HSC</th><th data-field="diff">HSC − ex-HSC</th></tr></thead>
+        <thead><tr><th data-field="period">Periode</th><th data-field="exhsc">IHSG ex-HSC</th></tr></thead>
         <tbody></tbody></table></div>
     </section>
     <section class="card" id="ihsg-chart">
-      <h2>IHSG ex-HSC vs keranjang HSC</h2>
+      <h2>IHSG ex-HSC</h2>
       <p class="note">1 tahun, basis 100</p>
-      <div class="legend"><span><i class="lg0"></i>IHSG ex-HSC → IHSG resmi baru</span><span><i class="lg3"></i>Keranjang HSC</span><span><i class="lg1"></i>IHSG lama (dengan HSC)</span></div>
+      <div class="legend"><span><i class="lg0"></i>IHSG ex-HSC → IHSG resmi baru</span><span><i class="lg1"></i>IHSG lama (dengan HSC)</span></div>
       <div class="chart" id="benchChart" data-source="bench"></div>
       <p class="note">Sebelum <span data-source="market" data-field="ihsg_new_from" data-row="0">—</span>: IHSG ex-HSC = estimasi Pulse (IHSG resmi dikurangi kontribusi HSC).
         Sejak tanggal itu mengikuti IHSG resmi, yang tidak lagi memuat HSC; IHSG lama berhenti dihitung IDX.
-        Keranjang HSC = saham HSC berbobot free float, hitungan Pulse. Daftar HSC terbaru dipakai untuk seluruh periode.</p>
+        Daftar HSC terbaru dipakai untuk seluruh periode.</p>
     </section>
   </div>
 
@@ -207,7 +207,7 @@
       <span data-source="bt_stats" data-field="end" data-row="0">—</span> · universe dinamis top 70 market cap · hasil cenderung optimistis</p>
     <div class="kpis">
       <div class="kpi"><div class="lab">Total strategi</div><div class="val" data-source="bt_stats" data-field="total" data-row="0">—</div>
-        <div class="sm">IHSG ex-HSC <span data-source="bt_stats" data-field="exhsc_total" data-row="0">—</span></div></div>
+        <div class="sm">IHSG baru <span data-source="bt_stats" data-field="exhsc_total" data-row="0">—</span></div></div>
       <div class="kpi"><div class="lab">CAGR</div><div class="val" data-source="bt_stats" data-field="cagr" data-row="0">—</div>
         <div class="sm">Max DD <span data-source="bt_stats" data-field="max_dd" data-row="0">—</span></div></div>
       <div class="kpi"><div class="lab">Win rate</div><div class="val" data-source="bt_stats" data-field="win_rate" data-row="0">—</div>
@@ -220,7 +220,7 @@
         <thead><tr><th data-field="code" data-k="code">Trade</th><th data-field="entry_date" data-k="entry_date">Masuk</th><th data-field="exit_date" data-k="exit_date">Keluar</th>
           <th data-field="days" data-k="days">Hari</th><th data-field="reason" data-k="reason">Alasan</th><th data-field="ret" data-k="ret">Return</th></tr></thead><tbody></tbody></table></div>
       <div>
-        <div class="legend"><span><i class="lg2"></i>Strategi</span><span><i class="lg0"></i>IHSG ex-HSC</span><span><i class="lg1"></i>IHSG</span></div>
+        <div class="legend"><span><i class="lg2"></i>Strategi</span><span><i class="lg0"></i>IHSG versi baru (ex-HSC)</span></div>
         <div class="chart" id="btChart" data-source="bt_equity"></div>
       </div>
     </div>
@@ -343,7 +343,7 @@
     if (!rows) { tb.innerHTML = ""; return; }
     tb.replaceChildren(...rows.map((r) => {
       const tr = document.createElement("tr");
-      [[r.period, ""], [pct(r.exhsc, f2), cls(r.exhsc)], [pct(r.hsc, f2), cls(r.hsc)], [pct(r.diff, f2), cls(r.diff)]].forEach(([t, c]) => {
+      [[r.period, ""], [pct(r.exhsc, f2), cls(r.exhsc)]].forEach(([t, c]) => {
         const td = document.createElement("td"); td.textContent = t; if (c) td.className = c; tr.append(td); });
       return tr;
     }));
@@ -355,7 +355,6 @@
     const split = get("market")?.[0]?.ihsg_new_from;
     lineChart(el, { dates: rows.map((r) => r.date), vlines: split ? [{ date: split, label: "IHSG baru" }] : [], series: [
       { name: "IHSG lama", values: rows.map((r) => r.ihsg), color: col(1), width: 1.5 },
-      { name: "Keranjang HSC", values: rows.map((r) => r.hsc), color: col(3), width: 1.5 },
       { name: "IHSG ex-HSC", values: rows.map((r) => r.exhsc), color: col(0) }] });
   }
 
@@ -577,8 +576,7 @@
     const el = $("#btChart"); if (failed(el, "bt_equity")) return;
     const q = get("bt_equity"); if (!q) { el.innerHTML = ""; return; }
     lineChart(el, { dates: q.map((r) => r.date), series: [
-      { name: "IHSG", values: q.map((r) => r.ihsg), color: col(1), width: 1.5 },
-      { name: "IHSG ex-HSC", values: q.map((r) => r.exhsc), color: col(2), width: 1.5 },
+      { name: "IHSG baru", values: q.map((r) => r.exhsc), color: col(2), width: 1.5 },
       { name: "Strategi", values: q.map((r) => r.equity), color: col(0) }] });
   }
 
@@ -586,7 +584,6 @@
     document.querySelectorAll(".pl .lg0").forEach((i) => i.style.background = col(0));
     document.querySelectorAll(".pl .lg1").forEach((i) => i.style.background = col(1));
     document.querySelectorAll(".pl .lg2").forEach((i) => i.style.background = col(0));
-    document.querySelectorAll(".pl .lg3").forEach((i) => i.style.background = col(3));
     document.querySelectorAll("#backtest .legend .lg0").forEach((i) => i.style.background = col(2));
   }
 

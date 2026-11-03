@@ -135,21 +135,10 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
             "arb_pct_next": m.get("arb_pct_next"),
         }
     ]
-    perf = [
-        {
-            "period": p,
-            "exhsc": v["exhsc"],
-            "hsc": v["hsc"],
-            "diff": None
-            if v["hsc"] is None or v["exhsc"] is None
-            else round(v["hsc"] - v["exhsc"], 2),
-        }
-        for p, v in b["perf"].items()
-    ]
+    perf = [{"period": p, "exhsc": v["exhsc"]} for p, v in b["perf"].items()]
     # ihsg = IHSG lama (dengan HSC), kosong sejak IHSG baru berlaku
     bench = [
-        {"date": d, "ihsg": i, "exhsc": e, "hsc": h}
-        for d, i, e, h in zip(b["dates"], b["ihsg"], b["exhsc"], b["hsc"])
+        {"date": d, "ihsg": i, "exhsc": e} for d, i, e in zip(b["dates"], b["ihsg"], b["exhsc"])
     ]
     spark = [
         {"code": r["code"], "date": d, "close": c, "ma50": a}
@@ -197,8 +186,8 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
         }
     ]
     bt_equity = [
-        {"date": d, "equity": q, "exhsc": e, "ihsg": i}
-        for d, q, e, i in zip(bt["dates"], bt["equity"], bt["exhsc"], bt["ihsg"])
+        {"date": d, "equity": q, "exhsc": e}
+        for d, q, e in zip(bt["dates"], bt["equity"], bt["exhsc"])
     ]
     bt_trades = [{"n": i, **t} for i, t in enumerate(bt["recent"])]
 
@@ -211,13 +200,12 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
         ),
         "perf": (
             perf,
-            "IHSG ex-HSC vs keranjang HSC per periode",
-            "Return IHSG ex-HSC (sejak 2 Nov 2026 = IHSG resmi) dan keranjang saham HSC (%) per periode. "
-            + src,
+            "IHSG ex-HSC per periode",
+            "Return IHSG ex-HSC (sejak 2 Nov 2026 = IHSG resmi) per periode (%). " + src,
         ),
         "bench": (
             bench,
-            "IHSG ex-HSC, keranjang HSC, IHSG lama 1 tahun",
+            "IHSG ex-HSC dan IHSG lama 1 tahun",
             "Harian, basis 100. IHSG lama (dengan HSC) berhenti dihitung IDX per 2 Nov 2026. "
             + src,
         ),
@@ -254,7 +242,7 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
         "bt_equity": (
             bt_equity,
             "Kurva backtest",
-            "Ekuitas strategi vs IHSG dan ex-HSC, basis 100, mingguan. " + src,
+            "Ekuitas strategi vs IHSG versi baru (ex-HSC), basis 100, mingguan. " + src,
         ),
         "bt_trades": (bt_trades, "Trade backtest terakhir", "12 trade simulasi terakhir. " + src),
     }

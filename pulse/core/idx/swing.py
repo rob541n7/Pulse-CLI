@@ -363,7 +363,7 @@ def format_backtest(res: BacktestResult) -> str:
         f"{'':<14} {'Total':>9} {'CAGR':>8} {'MaxDD':>8}",
         f"{'Strategi':<14} {s['total']:>+8.1%} {s['cagr']:>+7.1%} {s['max_dd']:>+7.1%}",
     ]
-    for col, label in (("IHSG", "IHSG"), ("IHSG_exHSC", "IHSG ex-HSC")):
+    for col, label in (("IHSG_exHSC", "IHSG baru*"),):
         x = b[col].dropna()
         yrs = (x.index[-1] - x.index[0]).days / 365.25
         dd = (x / x.cummax() - 1).min()
@@ -373,6 +373,7 @@ def format_backtest(res: BacktestResult) -> str:
         "",
         f"Trade {s['trades']} | win rate {s['win_rate']:.0%} | rata-rata menang {s['avg_win']:+.1%} "
         f"/ kalah {s['avg_loss']:+.1%} | hold {s['avg_hold']:.0f} hari",
+        "* IHSG versi baru (tanpa HSC); sebelum 2 Nov 2026 = estimasi IHSG ex-HSC Pulse.",
         "Catatan: free float & HSC memakai data terkini untuk seluruh periode, jumlah saham",
         "dianggap tetap -> hasil cenderung optimistis.",
     ]

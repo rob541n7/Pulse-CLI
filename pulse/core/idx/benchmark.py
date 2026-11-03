@@ -19,7 +19,6 @@ Output columns:
     IHSG        official IHSG close (includes HSC up to 30 Oct 2026, excludes it after)
     IHSG_lama   official IHSG including HSC; stops on the last session before 2 Nov 2026
     IHSG_exHSC  Pulse estimate before 2 Nov 2026, official IHSG return from then on
-    HSC         free-float weighted basket of the current HSC list (own calculation)
     w_hsc       HSC weight inside the old IHSG; NaN once IHSG no longer contains HSC
 """
 
@@ -111,7 +110,7 @@ def free_float() -> pd.Series:
 
 
 def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.DataFrame:
-    """DataFrame with columns IHSG, IHSG_lama, IHSG_exHSC, HSC, w_hsc (index = trading date)."""
+    """DataFrame with columns IHSG, IHSG_lama, IHSG_exHSC, w_hsc (index = trading date)."""
     summary = latest_summary()
     if summary is None:
         raise FileNotFoundError(
@@ -142,18 +141,10 @@ def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.Da
             "IHSG": ihsg,
             "IHSG_lama": ihsg.where(old),
             "IHSG_exHSC": (1 + r_ex.fillna(0)).cumprod() * ihsg.iloc[0],
-            "HSC": (1 + hsc_basket_returns(ret, mcap_prev, hsc).fillna(0)).cumprod() * ihsg.iloc[0],
             "w_hsc": w_hsc.where(old),
         }
     )
     return out
-
-
-def hsc_basket_returns(stock_ret: pd.DataFrame, mcap_prev: pd.DataFrame, hsc) -> pd.Series:
-    """Daily return of the HSC stocks weighted by previous-day free float market cap."""
-    cols = [c for c in stock_ret.columns if c in hsc]
-    w = mcap_prev[cols].where(stock_ret[cols].notna())
-    return (stock_ret[cols] * w).sum(axis=1) / w.sum(axis=1)
 
 
 def hsc_weight_last(bench: pd.DataFrame) -> tuple[float | None, str | None]:
@@ -162,8 +153,8 @@ def hsc_weight_last(bench: pd.DataFrame) -> tuple[float | None, str | None]:
     return (float(w.iloc[-1]), str(w.index[-1].date())) if len(w) else (None, None)
 
 
-def performance_table(bench: pd.DataFrame, cols=("IHSG_exHSC", "HSC")) -> pd.DataFrame:
-    """Returns (%) over standard lookbacks, default ex-HSC (= IHSG resmi baru) and HSC basket."""
+def performance_table(bench: pd.DataFrame, cols=("IHSG_exHSC",)) -> pd.DataFrame:
+    """Returns (%) over standard lookbacks, default IHSG ex-HSC (= IHSG resmi baru sejak 2 Nov)."""
     s = bench[list(cols)]
     last = s.iloc[-1]
     ytd_base = s[s.index.year == s.index[-1].year].iloc[0]
@@ -178,18 +169,17 @@ def format_benchmark(bench: pd.DataFrame) -> str:
     hsc_as_of, hsc = load_hsc()
     w, w_date = hsc_weight_last(bench)
     lines = [
-        f"IHSG ex-HSC vs keranjang HSC (data s/d {bench.index[-1].date()})",
+        f"IHSG ex-HSC (data s/d {bench.index[-1].date()})",
         f"Sebelum {NEW_METHOD_FROM.date()}: ex-HSC = estimasi Pulse; sejak itu = IHSG resmi "
         "(IDX tidak lagi menghitung IHSG dengan HSC)",
         f"Bobot {len(hsc)} saham HSC di IHSG lama: "
         + (f"{w:.1%} per {w_date}" if w is not None else "-")
         + f" (free float, cap 9%; daftar HSC {hsc_as_of})",
         "",
-        f"{'Periode':<10} {'ex-HSC':>9} {'HSC':>9} {'Selisih':>9}",
+        f"{'Periode':<10} {'ex-HSC':>9}",
     ]
     for p in perf.columns:
-        a, b = perf.at["IHSG_exHSC", p], perf.at["HSC", p]
-        lines.append(f"{p:<10} {a:>+8.2f}% {b:>+8.2f}% {b - a:>+8.2f}%")
+        lines.append(f"{p:<10} {perf.at['IHSG_exHSC', p]:>+8.2f}%")
     lines.append(
         f"\nIHSG ex-HSC: {bench.IHSG_exHSC.iloc[-1]:,.2f} | "
         f"MA50: {bench.IHSG_exHSC.rolling(50).mean().iloc[-1]:,.2f}"

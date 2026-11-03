@@ -258,13 +258,3 @@ def test_ex_hsc_follows_official_ihsg_after_method_change():
     r_ex, _ = ex_hsc_returns(ihsg, ret, mcap, {"HSC1"}, cap=None)
     assert r_ex.iloc[0] == pytest.approx(0.0)
     assert r_ex.iloc[1] == pytest.approx(0.01)  # IHSG resmi sudah tanpa HSC
-
-
-def test_hsc_basket_weighted_by_free_float_cap():
-    from pulse.core.idx.benchmark import hsc_basket_returns
-
-    idx = pd.date_range("2026-11-02", periods=1)
-    ret = pd.DataFrame({"H1": [0.10], "H2": [-0.10], "X": [0.50]}, index=idx)
-    mcap = pd.DataFrame({"H1": [300.0], "H2": [100.0], "X": [1000.0]}, index=idx)
-    r = hsc_basket_returns(ret, mcap, {"H1", "H2"})
-    assert r.iloc[0] == pytest.approx(0.05)  # (0.3 - 0.1) / 4, saham non-HSC diabaikan

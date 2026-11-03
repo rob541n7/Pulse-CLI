@@ -201,12 +201,8 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             # IHSG lama (dengan HSC) berhenti 30 Okt 2026; basis 100 = awal jendela
             "ihsg": _series(bb.IHSG_lama / bb.IHSG.iloc[0] * 100),
             "exhsc": _series(bb.IHSG_exHSC / bb.IHSG_exHSC.iloc[0] * 100),
-            "hsc": _series(bb.HSC / bb.HSC.iloc[0] * 100),
             "split": str(NEW_METHOD_FROM.date()),
-            "perf": {
-                col: {"exhsc": _num(perf.at["IHSG_exHSC", col]), "hsc": _num(perf.at["HSC", col])}
-                for col in perf.columns
-            },
+            "perf": {col: {"exhsc": _num(perf.at["IHSG_exHSC", col])} for col in perf.columns},
         },
         "rows": rows,
         "sectors": factors.sector_rotation(ind["close"][tickers], sectors, bench.IHSG_exHSC)
@@ -218,7 +214,6 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             "dates": [d.strftime("%Y-%m-%d") for d in eq.index],
             "equity": _series(eq / eq.iloc[0] * 100),
             "exhsc": _series(b.IHSG_exHSC / b.IHSG_exHSC.iloc[0] * 100),
-            "ihsg": _series(b.IHSG / b.IHSG.iloc[0] * 100),
             "recent": [
                 {k: (str(val) if k.endswith("date") else _num(val, 4)) for k, val in t.items()}
                 for t in res.trades.tail(12).iloc[::-1].to_dict("records")
