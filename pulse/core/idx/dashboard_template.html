@@ -76,6 +76,12 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: v
 #screener th { cursor: pointer; user-select: none; position: sticky; top: 0; background: var(--panel); }
 #screener th.sorted::after { content: " ▾"; }
 #screener th.sorted.asc::after { content: " ▴"; }
+.subh { font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .04em; }
+#rbVariants td, #rbVariants th, #rbYears td, #rbYears th, #rbTop td, #rbTop th, #rbPull td, #rbPull th { padding: 5px 8px; }
+#rbVariants tr.base td { font-weight: 700; }
+#rbVariants tr.grp td { color: var(--muted); font-size: 12px; padding-top: 10px; }
+.hscflag { color: var(--amber); font-size: 11px; cursor: help; margin-left: 3px; }
+.hscflag.hi { color: var(--bear); }
 #btTrades th { cursor: pointer; user-select: none; }
 #btTrades th.sorted::after { content: " ▾"; }
 #btTrades th.sorted.asc::after { content: " ▴"; }
@@ -215,7 +221,27 @@ footer { margin-top: 22px; color: var(--muted); font-size: 12px; line-height: 1.
         <div id="btChart"></div>
       </div>
     </div>
-    <div class="note">Universe dinamis (top 70 market cap per tanggal). Free float & HSC memakai data terkini untuk seluruh periode, jumlah saham dianggap tetap → hasil cenderung optimistis.</div>
+    <div class="note" id="btNote"></div>
+  </section>
+
+  <section class="card" style="margin-top:16px">
+    <h2>Uji Ketahanan Backtest <span class="hint">seberapa rapuh angka di atas</span></h2>
+    <div class="kpis" id="rbKpis"></div>
+    <div class="grid g-top">
+      <div>
+        <h3 class="subh">Satu parameter diubah, lainnya tetap</h3>
+        <div class="scroll" style="max-height:420px;overflow-y:auto"><table id="rbVariants"></table></div>
+      </div>
+      <div>
+        <h3 class="subh">Hasil per tahun</h3>
+        <table id="rbYears"></table>
+        <h3 class="subh" style="margin-top:14px">Trade penyumbang laba terbesar</h3>
+        <table id="rbTop"></table>
+        <h3 class="subh" style="margin-top:14px">Setup PULLBACK (aturan keluar sama)</h3>
+        <table id="rbPull"></table>
+      </div>
+    </div>
+    <div class="note">Baris tebal = pengaturan yang dipakai dashboard. Rentang yang lebar berarti hasil backtest lebih tepat dibaca sebagai kisaran, bukan satu angka. Simulasi historis, bukan hasil trading nyata.</div>
   </section>
 
   <footer id="footer"></footer>
@@ -356,6 +382,10 @@ const COLS = [
   ["stage", "Fase"], ["factors", "Faktor"], ["cmf", "CMF"], ["vwap", "VWAP"], ["foreign_pct", "Asing"],
   ["vol_ratio", "Vol"], ["rsi", "RSI"], ["risk_pct", "SL %"], ["pe", "PE"], ["roe", "ROE"], ["mcap_t", "Mcap T"],
 ];
+const HSC_LABEL = { rendah: "Rendah", mungkin: "Mungkin", tinggi: "Tinggi", na: "–" };
+const hscText = (r) => !isNum(r.hsc_known) ? "Data kepemilikan tidak tersedia" :
+  `Estimasi dari data KSEI (snapshot ${M.ksei_snapshot}), bukan status resmi BEI. ${r.hsc_holders} pemegang ≥1% menguasai ${nf1.format(r.hsc_known)}%. ` +
+  `Kriteria HSC: ≤10 pemegang menguasai ≥92,5%.` + (isNum(r.hsc_need) ? ` Sisa slot 10 besar perlu rata-rata ${nf2.format(r.hsc_need)}% per pemegang untuk mencapai batas.` : "");
 const SETUPS = ["BREAKOUT", "PULLBACK", "TREND", "NETRAL", "HINDARI", "TIDAK AKTIF"].filter((s) => s !== "TIDAK AKTIF" || DATA.rows.some((r) => r.setup === s));
 let state = { setup: null, sector: "", q: "", sort: "score", asc: false, sel: null };
 try { Object.assign(state, JSON.parse(localStorage.getItem("pulse-filter") || "{}"), { sel: null }); } catch (e) {}
@@ -402,7 +432,7 @@ function renderTable() {
     return (va > vb ? 1 : va < vb ? -1 : 0) * (state.asc ? 1 : -1);
   });
   $("#screener tbody").innerHTML = rows.map((r) => `<tr data-c="${r.code}" class="${r.code === state.sel ? "sel" : ""}">
-    <td class="code">${r.code}${recentEvents(r).length ? ` <span class="evdot" title="${esc(recentEvents(r).map((e) => e.date + " " + e.label).join("\n"))}">●</span>` : ""}<span class="nm">${esc(r.name)}</span></td>
+    <td class="code">${r.code}${recentEvents(r).length ? ` <span class="evdot" title="${esc(recentEvents(r).map((e) => e.date + " " + e.label).join("\n"))}">●</span>` : ""}${r.hsc_risk === "mungkin" || r.hsc_risk === "tinggi" ? `<span class="hscflag ${r.hsc_risk === "tinggi" ? "hi" : ""}" title="${esc(hscText(r))}">▲HSC</span>` : ""}<span class="nm">${esc(r.name)}</span></td>
     <td><span class="chip ${SETUP_CLS[r.setup]}">${r.setup}</span></td>
     <td>${fmt(r.close)}</td><td class="${cls(r.chg1d)}">${pct(r.chg1d)}</td>
     <td class="${cls(r.rs4)}">${pct(r.rs4)}</td><td class="${cls(r.rs13)}">${pct(r.rs13)}</td>
@@ -481,7 +511,9 @@ function selectRow(code) {
       <div><div class="n">TP2 · 3R</div><div class="v pos">${fmt(r.tp2)}</div></div></div>
     <div class="levels" style="margin-top:8px">
       <div><div class="n">ARA ${esc(M.next_session || "")}</div><div class="v">${fmt(r.ara_next)}</div></div>
-      <div><div class="n">ARB ${esc(M.next_session || "")}</div><div class="v neg">${fmt(r.arb_next)}</div></div></div>
+      <div><div class="n">ARB ${esc(M.next_session || "")}</div><div class="v neg">${fmt(r.arb_next)}</div></div>
+      <div><div class="n">Risiko HSC (estimasi)</div><div class="v ${r.hsc_risk === "tinggi" ? "neg" : r.hsc_risk === "mungkin" ? "amber" : ""}" title="${esc(hscText(r))}">${esc(HSC_LABEL[r.hsc_risk] || "–")}</div></div>
+      <div><div class="n">Pemegang ≥1% (KSEI)</div><div class="v">${isNum(r.hsc_known) ? nf1.format(r.hsc_known) + "% · " + r.hsc_holders + " pihak" : "–"}</div></div></div>
     ${fundBlock(r)}
     ${eventBlock(r)}
     <div class="note">RS 4w ${pct(r.rs4)} · RSI ${fmt(r.rsi)} · Vol 5d/50d ${fmt(r.vol_ratio, nf2)}× · ke high 55h ${pct(r.to_hh55)} · ATR ${fmt(r.atr_pct, nf1)}%
@@ -548,6 +580,29 @@ function drawBacktestStatic() {
     <div class="kpi"><div class="label">CAGR · Max DD</div><div class="val">${pct(s.cagr * 100)}</div><div class="small">DD ${pct(s.max_dd * 100)}</div></div>
     <div class="kpi"><div class="label">Win rate</div><div class="val">${fmt(s.win_rate * 100)}%</div><div class="small">${s.trades} trade · menang ${pct(s.avg_win * 100)} / kalah ${pct(s.avg_loss * 100)}</div></div>`;
   drawBtTrades();
+  $("#btNote").textContent = `Universe dikunci sebulan sekali (snapshot terakhir ${esc(M.universe_as_of)}). Backtest memakai snapshot yang berlaku per tanggal; sejarah sebelum snapshot pertama (Okt 2026) memakai snapshot itu, jadi hasil lama tidak berubah lagi tetapi cenderung optimistis.`;
+  drawRobust();
+}
+
+/* ---------- robustness ---------- */
+function drawRobust() {
+  const X = DATA.robust; if (!X) return;
+  const g = X.range, p = X.pullback, P = (v) => pct(v * 100);
+  $("#rbKpis").innerHTML = `
+    <div class="kpi"><div class="label">Rentang total (${g.n} variasi)</div><div class="val">${P(g.min)} … ${P(g.max)}</div><div class="small">median ${P(g.median)} · dipakai ${P(g.base)}</div></div>
+    <div class="kpi"><div class="label">Variasi yang tetap untung</div><div class="val">${g.positive} / ${g.n}</div><div class="small">satu parameter diubah</div></div>
+    <div class="kpi"><div class="label">Laba dari 3 trade terbesar</div><div class="val ${X.top3_share > 0.5 ? "neg" : ""}">${isNum(X.top3_share) ? fmt(X.top3_share * 100) + "%" : "–"}</div><div class="small">dari total laba strategi</div></div>
+    <div class="kpi"><div class="label">Setup PULLBACK</div><div class="val ${cls(p.total)}">${P(p.total)}</div><div class="small">${p.trades} trade · DD ${P(p.max_dd)}</div></div>`;
+  let last = "";
+  $("#rbVariants").innerHTML = `<thead><tr><th>Parameter</th><th>Nilai</th><th>Total</th><th>CAGR</th><th>Max DD</th><th>Trade</th><th>Win</th></tr></thead><tbody>` +
+    X.variants.map((v) => { const head = v.param !== last ? `<tr class="grp"><td colspan="7">${esc(v.label)}</td></tr>` : ""; last = v.param;
+      return `${head}<tr class="${v.base ? "base" : ""}"><td></td><td>${esc(String(v.value))}${v.base ? " ←" : ""}</td><td class="${cls(v.total)}">${P(v.total)}</td>
+        <td class="${cls(v.cagr)}">${P(v.cagr)}</td><td class="neg">${P(v.max_dd)}</td><td>${v.trades}</td><td>${fmt(v.win_rate * 100)}%</td></tr>`; }).join("") + "</tbody>";
+  $("#rbYears").innerHTML = `<thead><tr>${X.yearly.map((y) => `<th>${y.year}</th>`).join("")}</tr></thead><tbody><tr>${X.yearly.map((y) => `<td class="${cls(y.ret)}">${P(y.ret)}</td>`).join("")}</tr></tbody>`;
+  $("#rbTop").innerHTML = `<thead><tr><th>Trade</th><th>Masuk</th><th>Return</th><th>Porsi laba</th></tr></thead><tbody>` +
+    X.top_trades.map((t) => `<tr><td><b>${esc(t.code)}</b></td><td>${esc(t.entry_date)}</td><td class="${cls(t.ret)}">${P(t.ret)}</td><td>${isNum(t.share) ? fmt(t.share * 100) + "%" : "–"}</td></tr>`).join("") + "</tbody>";
+  $("#rbPull").innerHTML = `<thead><tr><th>Total</th><th>CAGR</th><th>Max DD</th><th>Trade</th><th>Win</th><th>Menang / kalah</th></tr></thead><tbody><tr>
+    <td class="${cls(p.total)}">${P(p.total)}</td><td class="${cls(p.cagr)}">${P(p.cagr)}</td><td class="neg">${P(p.max_dd)}</td><td>${p.trades}</td><td>${fmt(p.win_rate * 100)}%</td><td>${P(p.avg_win)} / ${P(p.avg_loss)}</td></tr></tbody>`;
 }
 
 // Tabel trade backtest: klik judul kolom untuk mengurutkan (klik lagi = balik arah)
@@ -590,7 +645,7 @@ const R = M.universe_rules;
 $("#footer").innerHTML = `
   <b>Universe:</b> ${DATA.rows.length} big cap (data ${esc(M.universe_as_of)}), bukan HSC, free float riil KSEI ≥ ${R.min_ff_ksei}% (snapshot ${esc(M.ksei_snapshot)}), likuiditas ≥ Rp ${R.min_avg_value_bn} M/hari.<br>
   <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: ${FACTORS.map(([, n, d]) => `${n} (${esc(d)})`).join("; ")}.<br>
-  <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler hari itu (cek suspensi), harga basi.<br>
+  <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = di-backtest terpisah (lihat Uji Ketahanan) · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler hari itu (cek suspensi), harga basi.<br>
   <b>Broker:</b> Top 5 broker Stockbit ${esc(M.broker_window || "–")} (token milik pengguna). <b>ARB</b> ${M.arb_pct_next ?? "–"}% sejak 19 Okt 2026 (siaran pers BEI 095 & 096, berlaku s/d 31 Des 2026).<br>
   <b>Fundamental:</b> XBRL laporan keuangan idx.co.id (data ${esc(M.fund_generated || "–")}). Laba TTM = tahun buku terakhir + YTD berjalan − YTD tahun lalu; laporan USD dikonversi kurs ${fmt(M.usd_idr)} per USD. Fundamental adalah konteks, bukan sinyal timing.<br>
   <b>Sumber:</b> Yahoo Finance (OHLCV), Ringkasan Saham & XBRL & pengumuman idx.co.id, ff/1pct.klinikpenyesalan.com (free float BEI & KSEI), pengumuman HSC BEI.<br>

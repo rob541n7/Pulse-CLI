@@ -46,6 +46,10 @@
 .pl .scr th[aria-sort="ascending"]::after { content: " ▴"; }
 .pl .scr th[aria-sort="descending"]::after { content: " ▾"; }
 .pl .scr tbody tr { cursor: pointer; }
+.pl #rbVariants tr.base td { font-weight: 700; }
+.pl #rbVariants tr.grp td { color: var(--muted); font-size: var(--cds-font-size-caption); padding-top: 10px; }
+.pl .hscflag { color: var(--amber); font-size: 11px; margin-left: 4px; cursor: help; }
+.pl .hscflag.hi { color: var(--bear); }
 .pl #btTable th { cursor: pointer; user-select: none; }
 .pl #btTable th[aria-sort="ascending"]::after { content: " ▴"; }
 .pl #btTable th[aria-sort="descending"]::after { content: " ▾"; }
@@ -224,6 +228,27 @@
         <div class="chart" id="btChart" data-source="bt_equity"></div>
       </div>
     </div>
+    <p class="note">Universe dikunci sebulan sekali (snapshot terakhir <span data-source="market" data-field="universe_as_of" data-row="0">—</span>).
+      Backtest memakai snapshot yang berlaku per tanggal; sejarah sebelum snapshot pertama (Okt 2026) memakai snapshot itu.</p>
+  </section>
+
+  <section class="card" id="robust">
+    <h2>Uji Ketahanan Backtest</h2>
+    <p class="note">Seberapa rapuh angka backtest di atas: satu parameter diubah, lainnya tetap.</p>
+    <div class="kpis" id="rbKpis" data-source="robust"></div>
+    <div class="grid2">
+      <div class="box" style="max-height:26rem;overflow-y:auto"><table id="rbVariants" data-source="robust" data-row-key="n">
+        <thead><tr><th>Parameter</th><th data-field="value">Nilai</th><th data-field="total">Total</th><th data-field="cagr">CAGR</th><th data-field="max_dd">Max DD</th><th data-field="trades">Trade</th><th data-field="win_rate">Win</th></tr></thead><tbody></tbody></table></div>
+      <div>
+        <div class="subh">Hasil per tahun</div>
+        <div class="box"><table id="rbYears"><thead></thead><tbody></tbody></table></div>
+        <div class="subh" style="margin-top:12px">Trade penyumbang laba terbesar</div>
+        <div class="box"><table id="rbTop"><thead><tr><th>Trade</th><th>Masuk</th><th>Return</th><th>Porsi laba</th></tr></thead><tbody></tbody></table></div>
+        <div class="subh" style="margin-top:12px">Setup PULLBACK (aturan keluar sama)</div>
+        <div class="box"><table id="rbPull"><thead><tr><th>Total</th><th>CAGR</th><th>Max DD</th><th>Trade</th><th>Win</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+    <p class="note">Baris tebal = pengaturan yang dipakai dashboard. Rentang yang lebar berarti hasil backtest lebih tepat dibaca sebagai kisaran, bukan satu angka. Simulasi historis, bukan hasil trading nyata.</p>
   </section>
 
   <div class="foot" id="footer">
@@ -231,7 +256,7 @@
     (snapshot <span data-source="market" data-field="ksei_snapshot" data-row="0">—</span>), likuiditas ≥ Rp
     <span data-source="market" data-field="min_avg_value_bn" data-row="0">—</span> M/hari.<br>
     <b>Faktor</b> ditampilkan terpisah, tidak dijumlahkan: Fase (stage MA150), RS 13w vs IHSG ex-HSC, CMF 20, VWAP 20, Asing 20d, Lot besar, Broker 20h.<br>
-    <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = watchlist, belum di-backtest · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler.<br>
+    <b>Setup:</b> BREAKOUT = aturan yang di-backtest · PULLBACK = di-backtest terpisah (lihat Uji Ketahanan) · TREND = naik, tunggu breakout · HINDARI = di bawah MA50 dan kalah dari pasar · TIDAK AKTIF = tanpa transaksi reguler.<br>
     <b>Broker:</b> status Top 5 broker Stockbit <span data-source="market" data-field="broker_window" data-row="0">—</span>.
     <b>ARB</b> <span data-source="market" data-field="arb_pct_next" data-row="0">—</span>% sejak 19 Okt 2026 (siaran pers BEI 095 & 096, s/d 31 Des 2026).<br>
     <b>Fundamental:</b> XBRL idx.co.id (data <span data-source="market" data-field="fund_generated" data-row="0">—</span>), laba TTM, laporan USD dikonversi kurs
@@ -261,6 +286,10 @@
   const css = (name) => getComputedStyle(document.querySelector(".pl")).getPropertyValue(name).trim();
   const state = { setup: null, sector: "", q: "", sort: "score", asc: false, sel: null, ev: null };
 
+  const HSC_LABEL = { rendah: "Rendah", mungkin: "Mungkin", tinggi: "Tinggi", na: "–" };
+  const hscText = (r) => !isNum(r.hsc_known) ? "Data kepemilikan tidak tersedia" :
+    `Estimasi dari data KSEI, bukan status resmi BEI. ${r.hsc_holders} pemegang ≥1% menguasai ${f1(r.hsc_known)}%. Kriteria HSC: ≤10 pemegang menguasai ≥92,5%.` +
+    (isNum(r.hsc_need) ? ` Sisa slot 10 besar perlu rata-rata ${f2(r.hsc_need)}% per pemegang.` : "");
   const get = (id) => { const d = dash.data(id); return d.status === "ok" ? d.data : null; };
   const failed = (el, id) => { const d = dash.data(id); if (d.status === "error") { el.innerHTML = '<div class="failed">Failed to load</div>'; return true; } return false; };
   const setText = (el, t) => { el.textContent = t; el.classList.remove("dash-skeleton"); };
@@ -398,6 +427,7 @@
       const tr = document.createElement("tr"); tr.dataset.key = r.code; if (r.code === state.sel) tr.className = "sel";
       const td = (text, c) => { const x = document.createElement("td"); x.textContent = text; if (c) x.className = c; tr.append(x); return x; };
       const c0 = td(r.code, "code");
+      if (r.hsc_risk === "mungkin" || r.hsc_risk === "tinggi") { const s = document.createElement("span"); s.className = "hscflag" + (r.hsc_risk === "tinggi" ? " hi" : ""); s.textContent = "▲HSC"; s.title = hscText(r); c0.append(s); }
       if (recent.has(r.code)) { const s = document.createElement("span"); s.className = "evdot"; s.textContent = "●"; s.title = "Ada pengumuman penting ≤14 hari"; c0.append(s); }
       const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = r.name || ""; c0.append(nm);
       const cs = td(""); const chip = document.createElement("span"); chip.className = `chip ${SETUP_CLS[r.setup] || ""}`; chip.textContent = r.setup; cs.append(chip);
@@ -446,7 +476,9 @@
         x.textContent = `hari ini: ${r.broker_top5_1d || "–"} · beli: ${r.broker_buyers || "–"} · jual: ${r.broker_sellers || "–"}`; d.append(x); }
       return d; }));
     el.querySelector(".lv").replaceChildren(...[["Entry", "close", fmt(r.close), ""], ["Stop (2 ATR)", "stop", fmt(r.stop), "neg"],
-      ["TP1 · 2R", "tp1", fmt(r.tp1), "pos"], ["TP2 · 3R", "tp2", fmt(r.tp2), "pos"], ["ARA besok", "ara_next", fmt(r.ara_next), ""], ["ARB besok", "arb_next", fmt(r.arb_next), "neg"]].map(([n, k, v, c]) => {
+      ["TP1 · 2R", "tp1", fmt(r.tp1), "pos"], ["TP2 · 3R", "tp2", fmt(r.tp2), "pos"], ["ARA besok", "ara_next", fmt(r.ara_next), ""], ["ARB besok", "arb_next", fmt(r.arb_next), "neg"],
+      ["Risiko HSC (estimasi)", "hsc_risk", HSC_LABEL[r.hsc_risk] || "–", r.hsc_risk === "tinggi" ? "neg" : ""],
+      ["Pemegang ≥1% (KSEI)", "hsc_known", isNum(r.hsc_known) ? f1(r.hsc_known) + "% · " + r.hsc_holders + " pihak" : "–", ""]].map(([n, k, v, c]) => {
       const d = document.createElement("div"); const a = document.createElement("div"); a.className = "n"; a.textContent = n;
       const b = document.createElement("div"); b.className = "v " + c; b.textContent = v; mark(b, k, r.code); d.append(a, b); return d; }));
     const fund = el.querySelector(".fund");
@@ -580,6 +612,35 @@
       { name: "Strategi", values: q.map((r) => r.equity), color: col(0) }] });
   }
 
+  // ---------- uji ketahanan ----------
+  function drawRobust() {
+    const kp = $("#rbKpis"); if (failed(kp, "robust")) return;
+    const rows = get("robust"); if (!rows) return;
+    const g = rows.find((r) => r.kind === "range"), p = rows.find((r) => r.kind === "pullback");
+    const cell = (t, c) => { const td = document.createElement("td"); td.textContent = t; if (c) td.className = c; return td; };
+    const tr = (cells, c) => { const r = document.createElement("tr"); if (c) r.className = c; r.append(...cells); return r; };
+    const kpi = (lab, val, sm, c) => { const d = document.createElement("div"); d.className = "kpi";
+      const a = document.createElement("div"); a.className = "lab"; a.textContent = lab; const b = document.createElement("div"); b.className = "val " + (c || ""); b.textContent = val;
+      const s = document.createElement("div"); s.className = "sm"; s.textContent = sm; d.append(a, b, s); return d; };
+    if (g && p) kp.replaceChildren(
+      kpi(`Rentang total (${g.n} variasi)`, `${pctFrac(g.min)} … ${pctFrac(g.max)}`, `median ${pctFrac(g.median)} · dipakai ${pctFrac(g.base)}`),
+      kpi("Variasi yang tetap untung", `${g.positive} / ${g.n}`, "satu parameter diubah"),
+      kpi("Laba dari 3 trade terbesar", isNum(g.top3_share) ? d3.format(".0%")(g.top3_share) : "–", "dari total laba strategi", g.top3_share > 0.5 ? "neg" : ""),
+      kpi("Setup PULLBACK", pctFrac(p.total), `${p.trades} trade · DD ${pctFrac(p.max_dd)}`, cls(p.total)));
+    let last = ""; const out = [];
+    rows.filter((r) => r.kind === "variant").forEach((v) => {
+      if (v.param !== last) { const h = cell(v.label, ""); h.colSpan = 7; out.push(tr([h], "grp")); last = v.param; }
+      const r = tr([cell(""), cell(v.value + (v.base ? " ←" : "")), cell(pctFrac(v.total), cls(v.total)), cell(pctFrac(v.cagr), cls(v.cagr)), cell(pctFrac(v.max_dd), "neg"),
+        cell(String(v.trades)), cell(d3.format(".0%")(v.win_rate))], v.base ? "base" : ""); r.dataset.key = v.n; out.push(r); });
+    $("#rbVariants tbody").replaceChildren(...out);
+    const ys = rows.filter((r) => r.kind === "year");
+    $("#rbYears thead").replaceChildren(tr(ys.map((y) => { const th = document.createElement("th"); th.textContent = y.year; return th; })));
+    $("#rbYears tbody").replaceChildren(tr(ys.map((y) => cell(pctFrac(y.ret), cls(y.ret)))));
+    $("#rbTop tbody").replaceChildren(...rows.filter((r) => r.kind === "top").map((t) =>
+      tr([cell(t.code, "code"), cell(t.entry_date), cell(pctFrac(t.ret), cls(t.ret)), cell(isNum(t.share) ? d3.format(".0%")(t.share) : "–")])));
+    if (p) $("#rbPull tbody").replaceChildren(tr([cell(pctFrac(p.total), cls(p.total)), cell(pctFrac(p.cagr), cls(p.cagr)), cell(pctFrac(p.max_dd), "neg"), cell(String(p.trades)), cell(d3.format(".0%")(p.win_rate))]));
+  }
+
   function legendColors() {
     document.querySelectorAll(".pl .lg0").forEach((i) => i.style.background = col(0));
     document.querySelectorAll(".pl .lg1").forEach((i) => i.style.background = col(1));
@@ -590,7 +651,7 @@
   dash.onData(() => {
     legendColors();
     const screener = get("screener");
-    drawMarket(screener); drawPerf(); drawBench(); drawScreener(); drawRRG(); drawForeign(); drawEvents(); drawBacktest();
+    drawMarket(screener); drawPerf(); drawBench(); drawScreener(); drawRRG(); drawForeign(); drawEvents(); drawBacktest(); drawRobust();
   });
 
   const named = document.getElementById(location.hash.slice(1));

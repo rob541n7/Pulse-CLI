@@ -94,6 +94,10 @@ def _screener_row(r: dict) -> dict:
         "broker_pct_1d",
         "ara_next",
         "arb_next",
+        "hsc_known",
+        "hsc_holders",
+        "hsc_need",
+        "hsc_risk",
     ):
         row[k] = r.get(k)
     row["broker_buyers"] = ", ".join(
@@ -190,6 +194,17 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
         for d, q, e in zip(bt["dates"], bt["equity"], bt["exhsc"])
     ]
     bt_trades = [{"n": i, **t} for i, t in enumerate(bt["recent"])]
+    rb = data.get("robust") or {}
+    robust = (
+        [{"kind": "range", **rb["range"], "top3_share": rb.get("top3_share")}]
+        + [{"kind": "pullback", **rb["pullback"]}]
+        + [{"kind": "variant", **v, "value": str(v["value"])} for v in rb["variants"]]
+        + [{"kind": "year", **y} for y in rb["yearly"]]
+        + [{"kind": "top", **t} for t in rb["top_trades"]]
+        if rb
+        else []
+    )
+    robust = [{"n": i, **r} for i, r in enumerate(robust)]
 
     src = f"Salinan dashboard lokal Pulse (harga s/d {m['price_date']}, file IDX {m['idx_file_date']})."
     return {
@@ -245,6 +260,12 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
             "Ekuitas strategi vs IHSG versi baru (ex-HSC), basis 100, mingguan. " + src,
         ),
         "bt_trades": (bt_trades, "Trade backtest terakhir", "12 trade simulasi terakhir. " + src),
+        "robust": (
+            robust,
+            "Uji ketahanan backtest",
+            "Variasi satu parameter, hasil per tahun, konsentrasi laba dan backtest setup pullback. "
+            + src,
+        ),
     }
 
 
