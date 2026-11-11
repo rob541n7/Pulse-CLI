@@ -196,7 +196,13 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
     bt_trades = [{"n": i, **t} for i, t in enumerate(bt["recent"])]
     rb = data.get("robust") or {}
     robust = (
-        [{"kind": "range", **rb["range"], "top3_share": rb.get("top3_share")}]
+        [
+            {
+                "kind": "range",
+                **{("count" if k == "n" else k): v for k, v in rb["range"].items()},
+                "top3_share": rb.get("top3_share"),
+            }
+        ]
         + [{"kind": "pullback", **rb["pullback"]}]
         + [{"kind": "variant", **v, "value": str(v["value"])} for v in rb["variants"]]
         + [{"kind": "year", **y} for y in rb["yearly"]]

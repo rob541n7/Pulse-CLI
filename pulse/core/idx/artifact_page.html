@@ -623,8 +623,8 @@
       const a = document.createElement("div"); a.className = "lab"; a.textContent = lab; const b = document.createElement("div"); b.className = "val " + (c || ""); b.textContent = val;
       const s = document.createElement("div"); s.className = "sm"; s.textContent = sm; d.append(a, b, s); return d; };
     if (g && p) kp.replaceChildren(
-      kpi(`Rentang total (${g.n} variasi)`, `${pctFrac(g.min)} … ${pctFrac(g.max)}`, `median ${pctFrac(g.median)} · dipakai ${pctFrac(g.base)}`),
-      kpi("Variasi yang tetap untung", `${g.positive} / ${g.n}`, "satu parameter diubah"),
+      kpi(`Rentang total (${g.count} variasi)`, `${pctFrac(g.min)} … ${pctFrac(g.max)}`, `median ${pctFrac(g.median)} · dipakai ${pctFrac(g.base)}`),
+      kpi("Variasi yang tetap untung", `${g.positive} / ${g.count}`, "satu parameter diubah"),
       kpi("Laba dari 3 trade terbesar", isNum(g.top3_share) ? d3.format(".0%")(g.top3_share) : "–", "dari total laba strategi", g.top3_share > 0.5 ? "neg" : ""),
       kpi("Setup PULLBACK", pctFrac(p.total), `${p.trades} trade · DD ${pctFrac(p.max_dd)}`, cls(p.total)));
     let last = ""; const out = [];
