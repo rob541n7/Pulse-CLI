@@ -7,6 +7,9 @@ Strategy "Relative-Strength Breakout" (weekly signal, next-day open execution):
              optional market filter IHSG ex-HSC > MA50
     exit   : close < max(entry - 2 ATR, peak close - 2.5 ATR), or 40 trading days
     sizing : equal weight, max 5 positions; fees 0.15% buy / 0.25% sell
+
+Variant "pullback" (SwingParams.setup): same trend and exits, entry when price pulls back
+to MA20 (close <= MA20 + 0.5 ATR) with RSI 38-55.
 """
 
 from dataclasses import dataclass
@@ -19,7 +22,7 @@ from pulse.core.idx.hsc import load_hsc
 from pulse.core.idx.ownership import load_ownership
 from pulse.core.idx.prices import fetch_panel
 from pulse.core.idx.summary import latest_summary
-from pulse.core.idx.universe import DELISTING_STATUS, load_universe
+from pulse.core.idx.universe import eligible_shares, load_universe, snapshots
 from pulse.utils.logger import get_logger
 
 log = get_logger(__name__)
@@ -38,6 +41,7 @@ class SwingParams:
     min_ff_ksei: float = 12.5
     min_avg_value: float = 5e9
     market_filter: bool = True
+    setup: str = "breakout"  # atau "pullback"
 
 
 # ---------------------------------------------------------------- utilities
@@ -108,28 +112,55 @@ def breakout_signal(ind: dict, near_high_pct: float) -> pd.DataFrame:
     )
 
 
+def pullback_signal(ind: dict) -> pd.DataFrame:
+    return (
+        (ind["close"] > ind["ma50"])
+        & (ind["ma50"] > ind["ma100"])
+        & (ind["rs13"] > 0)
+        & (ind["close"] <= ind["ma20"] + 0.5 * ind["atr"])
+        & (ind["rsi"] >= 38)
+        & (ind["rsi"] <= 55)
+    )
+
+
 # ---------------------------------------------------------------- data loading
 
 
-def _eligible_codes(p: SwingParams) -> list[str]:
-    own = load_ownership()
+def _eligibility(p: SwingParams, shares: pd.Series) -> list[tuple[pd.Timestamp, dict]]:
+    """[(berlaku mulai, {code: listed shares})] from the monthly universe snapshots.
+
+    Without snapshots (fresh install) the current ownership data is used for all dates.
+    """
+    snaps = [s for s in snapshots() if s.get("eligible")]
+    if snaps:
+        return [(pd.Timestamp(s["as_of"]), s["eligible"]) for s in snaps]
     _, hsc = load_hsc()
-    ok = own[
-        (own.ff_ksei >= p.min_ff_ksei) & ~own.code.isin(hsc) & ~own.ff_status.isin(DELISTING_STATUS)
-    ]
-    return ok.code.tolist()
+    return [(pd.Timestamp.min, eligible_shares(load_ownership(), hsc, shares, p.min_ff_ksei))]
 
 
 def load_market(p: SwingParams, refresh: bool = False):
-    """Return (indicators, benchmark DataFrame, market cap DataFrame) for eligible stocks."""
+    """Return (indicators, benchmark DataFrame, market cap DataFrame) for eligible stocks.
+
+    Market cap is NaN where a stock is not eligible under the snapshot in force on that date.
+    """
     bench = build_ihsg_ex_hsc(refresh=refresh)
     summary = latest_summary()
     shares = summary.set_index("code")["listed_shares"]
-    codes = [c for c in _eligible_codes(p) if c in shares.index]
+    periods = _eligibility(p, shares)
+    codes = sorted({c for _, el in periods for c in el if c in shares.index})
     panel = fetch_panel(shares.index.tolist() + ["^JKSE"], name="all_stocks")
     panel = {f: df.reindex(columns=codes) for f, df in panel.items()}
     ind = indicators(panel, bench["IHSG_exHSC"])
-    mcap = ind["close"] * shares.reindex(codes).values
+    mcap = pd.DataFrame(np.nan, index=ind["close"].index, columns=codes)
+    for i, (start, el) in enumerate(periods):
+        end = periods[i + 1][0] if i + 1 < len(periods) else None
+        rows = np.ones(len(mcap), dtype=bool)
+        if i:
+            rows &= mcap.index >= start
+        if end is not None:
+            rows &= mcap.index < end
+        sh = pd.Series(el, dtype=float).reindex(codes)
+        mcap.loc[rows] = (ind["close"].loc[rows] * sh.values).values
     return ind, bench, mcap
 
 
@@ -168,7 +199,8 @@ def backtest(
         mcap.where(ind["value20"] >= p.min_avg_value).rank(axis=1, ascending=False)
         <= p.universe_size
     )
-    signal = breakout_signal(ind, p.near_high_pct) & in_uni
+    raw = pullback_signal(ind) if p.setup == "pullback" else breakout_signal(ind, p.near_high_pct)
+    signal = raw & in_uni
     dates = close.loc[start:].index
     week_end = set(pd.Series(dates, index=dates).groupby(dates.to_period("W")).max())
 
@@ -190,6 +222,8 @@ def backtest(
                     "days": ps["age"],
                     "reason": ps["reason"],
                     "ret": px * (1 - p.sell_fee) / (ps["entry"] * (1 + p.buy_fee)) - 1,
+                    # laba/rugi dalam satuan modal awal (modal awal = 1)
+                    "pnl": ps["shares"] * (px * (1 - p.sell_fee) - ps["entry"] * (1 + p.buy_fee)),
                 }
             )
         to_sell = []
@@ -236,6 +270,96 @@ def backtest(
     return BacktestResult(
         pd.Series(equity, index=dates), pd.DataFrame(trades), bench.loc[start:], p
     )
+
+
+# ---------------------------------------------------------------- robustness
+
+ROBUST_GRID = {
+    "near_high_pct": [3, 4, 6, 8],
+    "atr_stop": [1.5, 2.5, 3.0],
+    "atr_trail": [2.0, 3.0, 3.5],
+    "max_hold": [20, 30, 60],
+    "slots": [3, 4, 6, 8],
+    "universe_size": [50, 60],
+}
+ROBUST_LABELS = {
+    "near_high_pct": "Jarak ke high 55 hari (%)",
+    "atr_stop": "Stop awal (x ATR)",
+    "atr_trail": "Trailing stop (x ATR)",
+    "max_hold": "Maks. tahan (hari)",
+    "slots": "Jumlah posisi",
+    "universe_size": "Ukuran universe",
+    "market_filter": "Filter pasar",
+    "fee": "Biaya transaksi",
+}
+
+
+def robustness(ind: dict, mcap: pd.DataFrame, bench: pd.DataFrame, p: SwingParams) -> dict:
+    """How fragile the backtest is: one-parameter variations, yearly returns, trade concentration."""
+    from dataclasses import replace
+
+    def row(param, value, q, base=False):
+        s = backtest(ind, mcap, bench, q).stats()
+        return {
+            "param": param,
+            "label": ROBUST_LABELS.get(param, param),
+            "value": value,
+            "base": base,
+            **{k: float(s[k]) for k in ("total", "cagr", "max_dd", "win_rate")},
+            "trades": int(s["trades"]),
+        }
+
+    variants = []
+    for k, vals in ROBUST_GRID.items():
+        for v in sorted({*vals, getattr(p, k)}):
+            variants.append(row(k, v, replace(p, **{k: v}), base=v == getattr(p, k)))
+    for flag in (True, False):
+        variants.append(
+            row("market_filter", "ON" if flag else "OFF", replace(p, market_filter=flag), flag)
+        )
+    variants.append(row("fee", "1x", p, True))
+    variants.append(row("fee", "2x", replace(p, buy_fee=p.buy_fee * 2, sell_fee=p.sell_fee * 2)))
+
+    res = backtest(ind, mcap, bench, p)
+    eq, t = res.equity, res.trades
+    totals = sorted(v["total"] for v in variants if not v["base"])
+    profit = float(eq.iloc[-1] / eq.iloc[0] - 1)
+    top = t.sort_values("pnl", ascending=False).head(5) if len(t) else t
+    pull = backtest(ind, mcap, bench, replace(p, setup="pullback"))
+    ps = pull.stats()
+    return {
+        "variants": variants,
+        "range": {
+            "n": len(totals),
+            "positive": sum(x > 0 for x in totals),
+            "min": totals[0],
+            "median": float(np.median(totals)),
+            "max": totals[-1],
+            "base": profit,
+        },
+        "yearly": [
+            {"year": int(y), "ret": float(g.iloc[-1] / g.iloc[0] - 1)}
+            for y, g in eq.groupby(eq.index.year)
+        ],
+        "top_trades": [
+            {
+                "code": r.code,
+                "entry_date": str(r.entry_date),
+                "ret": float(r.ret),
+                "pnl": float(r.pnl),
+                "share": float(r.pnl / profit) if profit else None,
+            }
+            for r in top.itertuples()
+        ],
+        "top3_share": float(top.pnl.head(3).sum() / profit) if len(t) and profit else None,
+        "pullback": {
+            **{
+                k: float(ps[k])
+                for k in ("total", "cagr", "max_dd", "win_rate", "avg_win", "avg_loss")
+            },
+            "trades": int(ps["trades"]),
+        },
+    }
 
 
 # ---------------------------------------------------------------- screener
@@ -290,7 +414,7 @@ def screen(ind: dict, tickers: list[str], p: SwingParams) -> pd.DataFrame:
 
 SETUP_NOTES = {
     "BREAKOUT": "setup yang di-backtest",
-    "PULLBACK": "watchlist, belum di-backtest",
+    "PULLBACK": "di-backtest terpisah, lihat uji ketahanan",
     "TREND": "sedang naik, tunggu breakout berikutnya",
 }
 
@@ -381,4 +505,6 @@ def format_backtest(res: BacktestResult) -> str:
 
 
 def current_universe() -> list[str]:
-    return load_universe()["tickers"]
+    """Locked monthly universe minus stocks that BEI has since put on the official HSC list."""
+    _, hsc = load_hsc()
+    return [t for t in load_universe()["tickers"] if t not in hsc]

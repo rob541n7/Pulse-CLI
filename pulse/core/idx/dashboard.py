@@ -49,7 +49,9 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
     params = params or swing.SwingParams()
     ind, bench, mcap = swing.load_market(params)
     uni = load_universe()
-    tickers = [t for t in uni["tickers"] if t in ind["close"].columns]
+    live = set(swing.current_universe())
+    hsc_dropped = [t for t in uni["tickers"] if t not in live]
+    tickers = [t for t in uni["tickers"] if t in live and t in ind["close"].columns]
     snap = swing.screen(ind, tickers, params)
 
     summary = latest_summary()
@@ -92,6 +94,7 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
         b = brokers.get(code) or {}
         labels["broker"] = b.get("label", "na")
         ara, arb = rules.auto_rejection(float(r.close), next_session)
+        hr = factors.hsc_risk(own["holders_1pct"].get(code), own["ff_ksei"].get(code))
         closes = ind["close"][code].tail(SPARK_DAYS)
         rows.append(
             {
@@ -130,6 +133,7 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
                 "broker_pct_1d": _num(b.get("top5_pct_d1"), 1),
                 "broker_buyers": b.get("buyers_20d") or [],
                 "broker_sellers": b.get("sellers_20d") or [],
+                **hr,
                 "ara_next": _num(ara, 0),
                 "arb_next": _num(arb, 0),
                 "labels": labels,
@@ -184,6 +188,7 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             "ksei_snapshot": uni.get("ksei_snapshot"),
             "universe_as_of": uni["as_of"],
             "universe_rules": uni["rules"],
+            "universe_hsc_dropped": hsc_dropped,
             "market_ok": bool(ind["market_ok"].iloc[-1]),
             "exhsc": _num(bench.IHSG_exHSC.iloc[-1]),
             "exhsc_ma50": _num(bench.IHSG_exHSC.rolling(50).mean().iloc[-1]),
@@ -219,6 +224,7 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
                 for t in res.trades.tail(12).iloc[::-1].to_dict("records")
             ],
         },
+        "robust": swing.robustness(ind, mcap, bench, params),
     }
 
 

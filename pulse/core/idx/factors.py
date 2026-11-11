@@ -180,3 +180,33 @@ def label(factor: str, v) -> str:
         "foreign": lambda x: "bull" if x > 2 else "bear" if x < -2 else "neutral",
     }
     return rules[factor](v)
+
+
+HSC_THRESHOLD = 92.5  # kriteria BEI 11 Nov 2026: <=10 pemegang menguasai >=92,5%
+HSC_SLOTS = 10
+
+
+def hsc_risk(holders_1pct, ff_ksei) -> dict:
+    """Estimated HSC exposure from KSEI holders above 1% (not an official status).
+
+    known = stake of holders >=1%. With n such holders, the other 10-n top-10 slots hold
+    below 1% each, so the top 10 can reach at most known + (10-n) x 1%.
+    "need" = average stake those empty slots must hold to reach the threshold.
+    """
+    if pd.isna(holders_1pct) or pd.isna(ff_ksei):
+        return {"hsc_known": None, "hsc_holders": None, "hsc_need": None, "hsc_risk": "na"}
+    n, known = int(holders_1pct), 100 - float(ff_ksei)
+    empty = max(HSC_SLOTS - n, 0)
+    need = (HSC_THRESHOLD - known) / empty if empty else None
+    if n <= HSC_SLOTS and known >= HSC_THRESHOLD:
+        risk = "tinggi"
+    elif known >= HSC_THRESHOLD or (need is not None and need < 1.0):
+        risk = "mungkin"
+    else:
+        risk = "rendah"
+    return {
+        "hsc_known": round(known, 2),
+        "hsc_holders": n,
+        "hsc_need": round(max(need, 0), 2) if need is not None else None,
+        "hsc_risk": risk,
+    }

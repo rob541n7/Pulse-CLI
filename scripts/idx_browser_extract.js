@@ -3,7 +3,9 @@
  *
  * idx.co.id blocks non-browser clients, so this script runs in YOUR browser on an
  * idx.co.id page, reads the same JSON/XBRL the website itself uses, and saves one JSON
- * file you move to Pulse-CLI/data/fundamentals/.
+ * file. One run covers everything the daily update needs: fundamentals, announcements,
+ * the daily Ringkasan Saham, the official IHSG close and the official HSC page.
+ * `python -m pulse.core.idx daily` picks the file up from your Downloads folder.
  *
  * Usage (Chrome):
  *   1. Open https://www.idx.co.id/id/perusahaan-tercatat/laporan-keuangan-dan-tahunan/
@@ -150,6 +152,34 @@
     return out;
   }
 
+  // Data pasar harian: Ringkasan Saham, penutupan IHSG resmi dan halaman HSC resmi.
+  async function market(days = 10) {
+    const out = { summaries: {}, ihsg: {}, hsc: [] };
+    for (let i = 0; i < days; i++) {
+      const d = new Date(Date.now() + 7 * 36e5 - i * 864e5); // WIB
+      if ([0, 6].includes(d.getUTCDay())) continue;
+      const ymd = d.toISOString().slice(0, 10).replaceAll("-", "");
+      const idx = await getJSON(`/primary/TradingSummary/GetIndexSummary?length=100&start=0&date=${ymd}`);
+      const comp = (idx.data || []).find((x) => x.IndexCode === "COMPOSITE");
+      await sleep(DELAY_MS);
+      if (!comp) continue; // libur atau data hari ini belum terbit
+      out.ihsg[comp.Date.slice(0, 10)] = comp.Close;
+      const s = await getJSON(`/primary/TradingSummary/GetStockSummary?length=9999&start=0&date=${ymd}`);
+      if (s.data?.length) out.summaries[ymd] = s.data;
+      await sleep(DELAY_MS);
+    }
+    try {
+      const html = await (await fetch("/id/perusahaan-tercatat/kepemilikan-saham-terkonsentrasi-tinggi/")).text();
+      const src = html.match(/window\.__NUXT__=([\s\S]*?);?<\/script>/)[1];
+      const nuxt = (0, eval)("(" + src + ")");
+      const table = Object.values(nuxt.fetch || {}).find((v) => Array.isArray(v?.tableData))?.tableData || [];
+      out.hsc = table.map((r) => ({ description: r.Description, date: r.ListingDate, url: r.Prospectus }));
+    } catch (e) {
+      out.hsc_error = String(e);
+    }
+    return out;
+  }
+
   // Progres disimpan di localStorage per hari: kalau halaman reload, jalankan lagi dan proses lanjut.
   const storageKey = () => `pulse_idx_${new Date().toISOString().slice(0, 10).replaceAll("-", "")}`;
 
@@ -176,6 +206,8 @@
 
   async function run(codes = DEFAULT_TICKERS, opts = {}) {
     const data = await collect(codes, opts);
+    (opts.onProgress || console.log)("data pasar (Ringkasan Saham, IHSG, HSC)");
+    data.market = await market(opts.marketDays);
     const name = `pulse_idx_${new Date().toISOString().slice(0, 10).replaceAll("-", "")}.json`;
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
@@ -185,6 +217,6 @@
     return `Tersimpan: ${name} (${codes.length} saham)`;
   }
 
-  window.pulseIdx = { collect, run, fundamentals, announcements, DEFAULT_TICKERS };
+  window.pulseIdx = { collect, run, market, fundamentals, announcements, DEFAULT_TICKERS };
   return "pulseIdx siap. Jalankan: await pulseIdx.run()";
 })();

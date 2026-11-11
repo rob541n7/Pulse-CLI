@@ -7,7 +7,9 @@ python -m pulse.core.idx ihsgx           # IHSG vs IHSG ex-HSC
 python -m pulse.core.idx swing [TICKER]  # screener swing / analisa satu saham
 python -m pulse.core.idx backtest [--nofilter]
 python -m pulse.core.idx dashboard [--open]  # bangun data/reports/dashboard.html
-python -m pulse.core.idx daily [--open]  # update + ihsgx + swing + dashboard
+python -m pulse.core.idx daily [--open]  # ingest + update + ihsgx + swing + dashboard
+python -m pulse.core.idx ingest            # proses bundel pulse_idx_*.json dari folder Downloads
+python -m pulse.core.idx universe --force  # susun ulang di luar jadwal kunci bulanan
 python -m pulse.core.idx broker             # broker flow 70 big cap (token Stockbit milik pengguna)
 python -m pulse.core.idx artifact-export   # salin dashboard lokal -> data/reports/artifact/*.json
 """
@@ -45,8 +47,24 @@ def _broker() -> str:
         return f"Broker flow dilewati: {e}"
 
 
+def _monthly_lock() -> None:
+    """Renew the universe once a month (last weekday); otherwise leave it locked."""
+    from pulse.core.idx.summary import latest_summary
+    from pulse.core.idx.universe import rebuild_due
+
+    if rebuild_due(latest_summary().date.iloc[0].date()):
+        u = build_universe(UniverseRules(), refresh_ownership=True)
+        print(f"Kunci bulanan: universe disusun ulang per {u['as_of']} ({len(u['tickers'])} saham)")
+
+
 def main(argv: list[str]) -> None:
     cmd, args = (argv[0], argv[1:]) if argv else ("daily", [])
+    if cmd in ("ingest", "daily"):
+        from pulse.core.idx.ingest import ingest
+
+        report = ingest()
+        if report:
+            print(report)
     if cmd in ("update", "daily"):
         hist = update_history()
         if len(hist):
@@ -57,8 +75,17 @@ def main(argv: list[str]) -> None:
         df = fetch_ownership()
         print(f"Ownership tersimpan: {len(df)} emiten")
     elif cmd == "universe":
-        size = int(args[0]) if args else 70
-        print(format_universe(build_universe(UniverseRules(size=size), refresh_ownership=True)))
+        from pulse.core.idx.summary import latest_summary
+        from pulse.core.idx.universe import load_universe, rebuild_due
+
+        nums = [a for a in args if a.isdigit()]
+        size = int(nums[0]) if nums else 70
+        if "--force" in args or rebuild_due(latest_summary().date.iloc[0].date()):
+            u = build_universe(UniverseRules(size=size), refresh_ownership=True)
+        else:
+            u = load_universe()
+            print(f"Universe terkunci (snapshot {u['as_of']}); kunci berikutnya di akhir bulan.\n")
+        print(format_universe(u))
     elif cmd == "ihsgx":
         print(format_benchmark(build_ihsg_ex_hsc(refresh=True)))
     elif cmd == "swing":
@@ -77,12 +104,13 @@ def main(argv: list[str]) -> None:
     elif cmd == "broker":
         print(_broker())
     elif cmd == "daily":
+        _monthly_lock()
         print(_broker())
         print(format_benchmark(build_ihsg_ex_hsc(refresh=True)))
         print()
         print(_swing([]))
         print(f"\nDashboard: {build_dashboard(open_browser='--open' in args, update=False)}")
-    elif cmd != "update":
+    elif cmd not in ("update", "ingest"):
         print(__doc__)
 
 

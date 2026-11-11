@@ -1,11 +1,16 @@
 """IDX daily trading summary (Ringkasan Saham).
 
 idx.co.id protects its JSON API with Cloudflare bot detection, so Pulse does not
-scrape it. Instead, download the daily Excel file from
-https://www.idx.co.id/id/data-pasar/ringkasan-perdagangan/ringkasan-saham/
-(updated ~17:00 WIB on trading days) and drop it into ``data/idx/``.
+scrape it. Two ways to get a day into ``data/idx/``:
+
+- download the daily Excel file from
+  https://www.idx.co.id/id/data-pasar/ringkasan-perdagangan/ringkasan-saham/
+  (updated ~17:00 WIB on trading days), or
+- run scripts/idx_browser_extract.js in your own browser tab; `ingest` then writes
+  ``Ringkasan Saham-YYYYMMDD.json`` with the same data the website shows.
 """
 
+import json
 import re
 from datetime import date, datetime
 from pathlib import Path
@@ -49,12 +54,47 @@ COLUMN_MAP = {
     "Non Regular Frequency": "nonreg_frequency",
 }
 
+# Nama field GetStockSummary (JSON situs IDX) -> nama kolom file Excel
+JSON_MAP = {
+    "StockCode": "Kode Saham",
+    "StockName": "Nama Perusahaan",
+    "Remarks": "Remarks",
+    "Previous": "Sebelumnya",
+    "OpenPrice": "Open Price",
+    "FirstTrade": "First Trade",
+    "High": "Tertinggi",
+    "Low": "Terendah",
+    "Close": "Penutupan",
+    "Change": "Selisih",
+    "Volume": "Volume",
+    "Value": "Nilai",
+    "Frequency": "Frekuensi",
+    "IndexIndividual": "Index Individual",
+    "Offer": "Offer",
+    "OfferVolume": "Offer Volume",
+    "Bid": "Bid",
+    "BidVolume": "Bid Volume",
+    "ListedShares": "Listed Shares",
+    "TradebleShares": "Tradeble Shares",
+    "WeightForIndex": "Weight For Index",
+    "ForeignSell": "Foreign Sell",
+    "ForeignBuy": "Foreign Buy",
+    "NonRegularVolume": "Non Regular Volume",
+    "NonRegularValue": "Non Regular Value",
+    "NonRegularFrequency": "Non Regular Frequency",
+}
+
 _FILE_DATE = re.compile(r"(\d{8})")
 
 
 def parse_summary_file(path: Path) -> pd.DataFrame:
-    """Parse one 'Ringkasan Saham-YYYYMMDD.xlsx' file into a normalized DataFrame."""
-    df = pd.read_excel(path).rename(columns=COLUMN_MAP)
+    """Parse one 'Ringkasan Saham-YYYYMMDD.xlsx' (or .json) file into a normalized DataFrame."""
+    if path.suffix == ".json":
+        raw = pd.DataFrame(json.loads(path.read_text(encoding="utf-8")))
+        raw = raw[[c for c in JSON_MAP if c in raw.columns]].rename(columns=JSON_MAP)
+    else:
+        raw = pd.read_excel(path)
+    df = raw.rename(columns=COLUMN_MAP)
     missing = {"code", "close", "listed_shares"} - set(df.columns)
     if missing:
         raise ValueError(f"{path.name}: kolom tidak ditemukan {sorted(missing)}")
@@ -74,8 +114,15 @@ def parse_summary_file(path: Path) -> pd.DataFrame:
 
 
 def summary_files() -> list[Path]:
-    """All IDX summary Excel files in data/idx, oldest first."""
-    return sorted(IDX_DIR.glob("Ringkasan Saham-*.xlsx"))
+    """All IDX summary files in data/idx, oldest first (Excel wins over JSON for a day)."""
+    by_day: dict[str, Path] = {}
+    for path in sorted(IDX_DIR.glob("Ringkasan Saham-*.json")) + sorted(
+        IDX_DIR.glob("Ringkasan Saham-*.xlsx")
+    ):
+        m = _FILE_DATE.search(path.stem)
+        if m:
+            by_day[m.group(1)] = path
+    return [by_day[d] for d in sorted(by_day)]
 
 
 def latest_summary() -> pd.DataFrame | None:

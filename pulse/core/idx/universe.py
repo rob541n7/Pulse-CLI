@@ -1,7 +1,15 @@
-"""Big-cap universe: large, liquid, genuinely free-floating, non-HSC stocks."""
+"""Big-cap universe: large, liquid, genuinely free-floating, non-HSC stocks.
+
+The universe is locked once a month: every build is also saved as a snapshot in
+data/universe/snapshots/bigcap_YYYYMM.json together with the eligible stocks and their
+listed shares on that date. The backtest reads those snapshots point-in-time (the first
+one also covers all earlier history), so later ownership / HSC changes never rewrite
+past results.
+"""
 
 import json
 from dataclasses import asdict, dataclass
+from datetime import date
 
 import pandas as pd
 
@@ -15,6 +23,7 @@ from pulse.utils.logger import get_logger
 log = get_logger(__name__)
 
 UNIVERSE_FILE = UNIVERSE_DIR / "bigcap.json"
+SNAPSHOT_DIR = UNIVERSE_DIR / "snapshots"
 DELISTING_STATUS = {"Voluntary Delisting", "Force Delisting"}
 
 
@@ -69,6 +78,7 @@ def build_universe(rules: UniverseRules | None = None, refresh_ownership: bool =
     cutoff_mcap = members.market_cap.min()
     excluded = df[(df.excluded != "") & (df.market_cap >= cutoff_mcap)]
 
+    shares = summary.set_index("code")["listed_shares"]
     result = {
         "as_of": str(summary.date.iloc[0].date()),
         "hsc_as_of": hsc_as_of,
@@ -83,12 +93,57 @@ def build_universe(rules: UniverseRules | None = None, refresh_ownership: bool =
         "excluded": excluded[["code", "market_cap", "ff_ksei", "avg_value_bn", "excluded"]]
         .round(2)
         .to_dict("records"),
+        "eligible": eligible_shares(own, hsc, shares, rules.min_ff_ksei),
     }
     UNIVERSE_DIR.mkdir(parents=True, exist_ok=True)
     with open(UNIVERSE_FILE, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, ensure_ascii=False, default=str)
+    save_snapshot(result)
     log.info(f"Universe: {len(members)} saham, {len(excluded)} big cap dieliminasi")
     return result
+
+
+def eligible_shares(own: pd.DataFrame, hsc, shares: pd.Series, min_ff_ksei: float) -> dict:
+    """{code: listed shares} of every stock that passes free float / HSC / delisting rules."""
+    ok = own[
+        (own.ff_ksei >= min_ff_ksei) & ~own.code.isin(hsc) & ~own.ff_status.isin(DELISTING_STATUS)
+    ]
+    return {c: float(shares[c]) for c in ok.code if c in shares.index and pd.notna(shares[c])}
+
+
+def save_snapshot(u: dict) -> None:
+    SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
+    path = SNAPSHOT_DIR / f"bigcap_{u['as_of'][:7].replace('-', '')}.json"
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(u, f, ensure_ascii=False, default=str)
+
+
+def snapshots() -> list[dict]:
+    """Monthly locked universes, oldest first."""
+    out = []
+    for path in sorted(SNAPSHOT_DIR.glob("bigcap_*.json")):
+        with open(path, encoding="utf-8") as f:
+            out.append(json.load(f))
+    return sorted(out, key=lambda u: u["as_of"])
+
+
+def rebuild_due(latest: date) -> bool:
+    """True when the monthly lock should be renewed for the session `latest`.
+
+    One snapshot per month, taken on the month's last weekday (or on the first run after
+    a month ended without one). Within a locked month nothing changes.
+    """
+    snaps = snapshots()
+    if not snaps:
+        return True
+    last = date.fromisoformat(snaps[-1]["as_of"])
+    months = (latest.year - last.year) * 12 + latest.month - last.month
+    if months <= 0:
+        return False
+    if months >= 2:
+        return True
+    nxt = latest + pd.Timedelta(days=3 if latest.weekday() == 4 else 1)
+    return nxt.month != latest.month
 
 
 def load_universe() -> dict:
