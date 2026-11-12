@@ -189,7 +189,7 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             "hsc_count": len(hsc),
             "hsc_weight": _num(w_hsc, 4),
             "hsc_weight_date": w_hsc_date,
-            "hsc_weight_count": len(estimate_hsc()[1]),
+            "hsc_locked_count": len(estimate_hsc()[1]),
             "ihsg_new_from": str(NEW_METHOD_FROM.date()),
             "ksei_snapshot": uni.get("ksei_snapshot"),
             "universe_as_of": uni["as_of"],

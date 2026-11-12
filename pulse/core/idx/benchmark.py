@@ -147,6 +147,10 @@ def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.Da
 
     r_ex, w_hsc = ex_hsc_returns(ihsg.pct_change(), ret, mcap_prev, hsc)
     old = ihsg.index < NEW_METHOD_FROM
+    # Bobot daftar HSC resmi terkini di IHSG lama, pada sesi terakhir sebelum IHSG baru
+    now_as_of, now = load_hsc()
+    last_old = ihsg.index[old][-1:]
+    w_now = cap_weights(mcap_prev.loc[last_old])[[c for c in ret.columns if c in now]].sum(axis=1)
     out = pd.DataFrame(
         {
             "IHSG": ihsg,
@@ -155,6 +159,12 @@ def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.Da
             "w_hsc": w_hsc.where(old),
         }
     )
+    out.attrs["hsc_weight_now"] = {
+        "weight": float(w_now.iloc[0]) if len(w_now) else None,
+        "date": str(last_old[0].date()) if len(last_old) else None,
+        "count": len(now),
+        "as_of": now_as_of,
+    }
     return out
 
 
@@ -171,7 +181,13 @@ def chain_level(growth: pd.Series, ihsg: pd.Series) -> pd.Series:
 
 
 def hsc_weight_last(bench: pd.DataFrame) -> tuple[float | None, str | None]:
-    """Last known HSC weight inside the old IHSG and its date."""
+    """Weight of the current official HSC list inside the old IHSG (last pre-Nov session).
+
+    Falls back to the weight of the frozen list behind the ex-HSC estimate.
+    """
+    now = bench.attrs.get("hsc_weight_now") or {}
+    if now.get("weight") is not None:
+        return now["weight"], now["date"]
     w = bench["w_hsc"].dropna()
     return (float(w.iloc[-1]), str(w.index[-1].date())) if len(w) else (None, None)
 
@@ -189,7 +205,7 @@ def performance_table(bench: pd.DataFrame, cols=("IHSG_exHSC",)) -> pd.DataFrame
 
 def format_benchmark(bench: pd.DataFrame) -> str:
     perf = performance_table(bench)
-    hsc_as_of, hsc = estimate_hsc()
+    hsc_as_of, hsc = load_hsc()
     w, w_date = hsc_weight_last(bench)
     lines = [
         f"IHSG ex-HSC (data s/d {bench.index[-1].date()})",
