@@ -25,8 +25,8 @@ from pulse.core.idx.universe import UniverseRules, exclusion_reason
 
 def test_hsc_list():
     as_of, tickers = load_hsc()
-    assert as_of == "2026-11-06"
-    assert len(tickers) == 83
+    assert as_of == "2026-11-11"
+    assert len(tickers) == 383
     assert is_hsc("byan") and is_hsc("TBIG")
     assert not is_hsc("MGLV")  # dicabut 12 Okt 2026
     assert not is_hsc("BBCA")

@@ -17,7 +17,12 @@ import numpy as np
 import pandas as pd
 
 from pulse.core.idx import DATA_DIR, brokerflow, factors, fundamentals, rules, swing
-from pulse.core.idx.benchmark import NEW_METHOD_FROM, hsc_weight_last, performance_table
+from pulse.core.idx.benchmark import (
+    NEW_METHOD_FROM,
+    estimate_hsc,
+    hsc_weight_last,
+    performance_table,
+)
 from pulse.core.idx.hsc import load_hsc
 from pulse.core.idx.ownership import load_ownership
 from pulse.core.idx.summary import HISTORY_FILE, latest_summary, update_history
@@ -184,6 +189,7 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
             "hsc_count": len(hsc),
             "hsc_weight": _num(w_hsc, 4),
             "hsc_weight_date": w_hsc_date,
+            "hsc_weight_count": len(estimate_hsc()[1]),
             "ihsg_new_from": str(NEW_METHOD_FROM.date()),
             "ksei_snapshot": uni.get("ksei_snapshot"),
             "universe_as_of": uni["as_of"],

@@ -368,7 +368,7 @@ $("#kpis").innerHTML = `
   <div class="kpi"><div class="label">IHSG ex-HSC</div><div class="val">${fmt(M.exhsc, nf2)}</div>
     <div class="small">MA50 ${fmt(M.exhsc_ma50, nf2)}</div></div>
   <div class="kpi"><div class="label">Bobot HSC di IHSG lama${M.hsc_weight_date ? " (per " + esc(M.hsc_weight_date) + ")" : ""}</div><div class="val">${fmt(M.hsc_weight * 100, nf1)}%</div>
-    <div class="small">${M.hsc_count} saham · daftar ${esc(M.hsc_as_of)}</div></div>
+    <div class="small">${M.hsc_weight_count ?? M.hsc_count} saham saat itu · kini ${M.hsc_count} (daftar ${esc(M.hsc_as_of)})</div></div>
   <div class="kpi"><div class="label">Setup Breakout</div><div class="val">${counts.BREAKOUT || 0}</div>
     <div class="small">dari ${DATA.rows.length} big cap</div></div>`;
 const P = DATA.bench.perf, periods = Object.keys(P);
@@ -659,7 +659,7 @@ function renderCharts() {
              { name: "IHSG ex-HSC", values: DATA.bench.exhsc, color: "var(--accent)" }] });
   $("#benchNote").textContent = `Sebelum ${DATA.bench.split}: IHSG ex-HSC = estimasi Pulse (IHSG resmi dikurangi kontribusi HSC). ` +
     `Sejak ${DATA.bench.split}: mengikuti IHSG resmi, yang tidak lagi memuat HSC; IHSG lama berhenti dihitung IDX. ` +
-    `Daftar HSC terbaru (${M.hsc_count} saham, ${M.hsc_as_of}) dipakai untuk seluruh periode.`;
+    `Estimasi sebelum ${DATA.bench.split} memakai daftar HSC yang dikunci Okt 2026 (${M.hsc_weight_count ?? M.hsc_count} saham); daftar resmi kini ${M.hsc_count} saham (${M.hsc_as_of}).`;
   const B = DATA.backtest;
   lineChart($("#btChart"), { dates: B.dates, fmtY: (v) => nf0.format(v),
     series: [{ name: "IHSG baru", values: B.exhsc, color: "var(--accent)", width: 1.4 },

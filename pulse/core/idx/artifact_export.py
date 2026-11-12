@@ -124,6 +124,7 @@ def build_datasets(data: dict) -> dict[str, tuple[list[dict], str, str]]:
             "exhsc_ma50": m["exhsc_ma50"],
             "hsc_weight": m["hsc_weight"],
             "hsc_weight_date": m.get("hsc_weight_date"),
+            "hsc_weight_count": m.get("hsc_weight_count"),
             "ihsg_new_from": m.get("ihsg_new_from"),
             "hsc_count": m["hsc_count"],
             "hsc_as_of": m["hsc_as_of"],

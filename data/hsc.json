@@ -1,93 +1,1893 @@
 {
-  "as_of": "2026-11-06",
+  "as_of": "2026-11-11",
   "source": "idx.co.id > Perusahaan Tercatat > Kepemilikan Saham Terkonsentrasi Tinggi (pengenaan & pencabutan 2026)",
-  "notes": "Sejak 9 Okt 2026 cakupan review HSC diperluas ke saham market cap > Rp5 T (siaran pers BEI No. 090/BEI.SPR/10-2026).",
+  "notes": "Sejak 11 Nov 2026 kriteria HSC: <=10 pemegang menguasai >=92,5% (Peng-HSC-00088/BEI.WAS/11-2026), tanpa batas kapitalisasi pasar; 300 saham ditambahkan sekaligus. Sebelumnya (9 Okt 2026): cakupan review diperluas ke market cap > Rp5 T (siaran pers BEI 090).",
   "tickers": [
+    "ABDA",
+    "ACST",
+    "ADCP",
     "ADES",
+    "ADMF",
+    "ADMG",
     "AGAR",
     "AGII",
+    "AGRS",
+    "AKPI",
+    "AKSI",
     "ALII",
     "ALKA",
+    "ALMI",
+    "AMAG",
+    "AMAN",
+    "AMAR",
+    "AMFG",
+    "AMOR",
+    "ANJT",
+    "APII",
+    "APLI",
+    "AREA",
+    "ARGO",
+    "ARTA",
+    "ASBI",
+    "ASDM",
+    "ASRM",
+    "AWAN",
+    "AXIO",
+    "BABY",
     "BAJA",
     "BALI",
+    "BATA",
+    "BATR",
     "BBHI",
+    "BBLD",
     "BBMD",
+    "BBRM",
     "BBSI",
+    "BBSS",
+    "BCIC",
     "BDKR",
+    "BDMN",
     "BELI",
+    "BESS",
+    "BIKA",
     "BIKE",
+    "BIMA",
     "BINA",
+    "BINO",
     "BKDP",
+    "BKSW",
+    "BLES",
+    "BLOG",
+    "BLTZ",
+    "BLUE",
     "BMAS",
+    "BNBA",
+    "BNGA",
     "BNII",
     "BNLI",
+    "BOAT",
+    "BOBA",
+    "BOLT",
+    "BPFI",
+    "BPII",
+    "BPTR",
+    "BRAM",
     "BREN",
+    "BRIS",
+    "BRNA",
+    "BSSR",
     "BSWD",
+    "BTON",
     "BTPN",
+    "BUAH",
+    "BUDI",
+    "BUKK",
     "BYAN",
+    "CAKK",
+    "CAMP",
+    "CANI",
+    "CASH",
+    "CASS",
+    "CBPE",
+    "CBUT",
+    "CCSI",
+    "CDIA",
+    "CEKA",
+    "CENT",
     "CITA",
+    "CITY",
     "CLAY",
+    "CLEO",
     "CMNP",
     "CMNT",
+    "CMPP",
+    "CNMA",
+    "CRAB",
+    "CRSN",
+    "CSAP",
+    "CSRA",
+    "CTBN",
+    "DAAZ",
+    "DART",
+    "DAYA",
     "DCII",
+    "DEPO",
     "DGWG",
+    "DLTA",
     "DMND",
+    "DNAR",
     "DNET",
     "DSSA",
     "DUTI",
+    "DVLA",
+    "DWGL",
+    "ECII",
+    "EDGE",
+    "EKAD",
     "ELPI",
+    "EMDE",
+    "ENAK",
     "EPMT",
+    "ERTX",
+    "ESTA",
+    "ESTI",
+    "ETWA",
     "FAPA",
+    "FAST",
+    "FASW",
     "FILM",
+    "FISH",
     "FITT",
+    "FMII",
+    "FOOD",
+    "FORE",
+    "FORU",
+    "FPNI",
+    "GDST",
+    "GDYR",
     "GEMS",
+    "GGRP",
+    "GHON",
+    "GIAA",
+    "GLOB",
+    "GMFI",
+    "GMTD",
+    "GOLD",
+    "GOLF",
+    "GRIA",
+    "GSMF",
+    "GTBO",
+    "GTRA",
+    "GUNA",
+    "GWSA",
+    "HALO",
     "HATM",
+    "HDFA",
+    "HERO",
+    "HITS",
+    "HMSP",
+    "HOMI",
+    "HOTL",
+    "HYGN",
+    "IBST",
+    "IDPR",
+    "IFII",
     "IFSH",
+    "IGAR",
+    "IKBI",
+    "IKPM",
+    "IMAS",
+    "IMJS",
+    "INAF",
     "INDO",
+    "INDR",
+    "INDS",
     "INPP",
+    "INRU",
+    "INTD",
+    "IPAC",
+    "IPCM",
+    "IPOL",
+    "JARR",
+    "JAWA",
+    "JECC",
+    "JRPT",
+    "JSPT",
+    "KAEF",
+    "KBLM",
+    "KDSI",
+    "KEJU",
+    "KIAS",
     "KING",
+    "KINO",
+    "KLIN",
+    "KMTR",
+    "KOBX",
+    "KOIN",
     "KONI",
+    "KOPI",
+    "KSIX",
+    "LFLO",
     "LIFE",
+    "LINK",
+    "LION",
+    "LMPI",
+    "LPCK",
+    "LPGI",
+    "LRNA",
+    "MAPB",
+    "MAPI",
+    "MASB",
     "MAYA",
+    "MBAP",
+    "MBSS",
     "MCOL",
+    "MCOR",
     "MDIA",
+    "MDKI",
+    "MDLA",
     "MEGA",
+    "MERK",
+    "META",
+    "MFMI",
+    "MGNA",
     "MGRO",
+    "MINE",
+    "MKAP",
     "MKNT",
     "MKPI",
+    "MKTR",
+    "MLBI",
+    "MLIA",
     "MLPT",
+    "MMLP",
+    "MOLI",
     "MORA",
     "MPRO",
+    "MPXL",
     "MSJA",
+    "MSTI",
     "MTEL",
+    "MTMH",
+    "MTSM",
+    "MTWI",
+    "MYOH",
+    "MYTX",
+    "NCKL",
+    "NELY",
+    "NEST",
+    "NETV",
+    "NICE",
     "NICK",
+    "NISP",
+    "NOBU",
+    "NZIA",
+    "OCAP",
+    "OMED",
+    "OMRE",
+    "PALM",
+    "PANI",
+    "PANR",
+    "PBID",
+    "PBSA",
+    "PDES",
+    "PDPP",
+    "PEVE",
+    "PGEO",
     "PGUN",
+    "PJAA",
+    "PLIN",
+    "PMJS",
+    "PMUI",
+    "PNBS",
+    "PNGO",
+    "PNSE",
+    "POLI",
+    "POLL",
     "POLU",
+    "PORT",
     "PRAY",
     "PSAB",
+    "PSAT",
+    "PSDN",
+    "PSGO",
+    "PSSI",
+    "PTIS",
+    "PTMR",
+    "PTPW",
+    "PTSN",
+    "RAAM",
+    "RANC",
+    "RDTX",
+    "RELI",
     "RISE",
     "RLCO",
     "ROCK",
+    "RODA",
+    "RONY",
+    "ROTI",
+    "RSCH",
+    "RSGK",
     "SAFE",
     "SAME",
+    "SAMF",
+    "SAPX",
     "SATU",
+    "SCCO",
+    "SCNP",
+    "SCPI",
+    "SDPC",
+    "SDRA",
+    "SGRO",
+    "SHID",
     "SHIP",
     "SILO",
+    "SIPD",
+    "SKBM",
+    "SKLT",
+    "SKRN",
     "SMAR",
+    "SMCB",
+    "SMDM",
+    "SMIL",
+    "SMKL",
     "SMMT",
     "SOHO",
+    "SONA",
+    "SOSS",
     "SOTS",
     "SRAJ",
+    "SRTG",
     "SSMS",
+    "SSTM",
+    "STAA",
     "STTP",
+    "SUNI",
+    "SUPA",
+    "SUPR",
+    "SURE",
+    "SWID",
+    "TALF",
+    "TAMU",
     "TBIG",
+    "TBMS",
+    "TCID",
     "TCPI",
     "TFCO",
+    "TGKA",
+    "TIFA",
+    "TIRA",
+    "TKIM",
+    "TLDN",
     "TMAS",
+    "TOTO",
+    "TRGU",
+    "TRIO",
+    "TRIS",
+    "TRJA",
+    "TRUS",
+    "TSPC",
+    "TYRE",
+    "UANG",
+    "UFOE",
+    "URBN",
+    "VAST",
+    "VERN",
+    "VICI",
+    "VINS",
+    "VOKS",
+    "VRNA",
     "WBSA",
-    "YUPI"
+    "WICO",
+    "WIKA",
+    "WOMF",
+    "YPAS",
+    "YUPI",
+    "ZBRA",
+    "ZONE",
+    "ZYRX"
   ],
   "events": [
+    {
+      "code": "ABDA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ACST",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ADCP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ADMF",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ADMG",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AGRS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AKPI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AKSI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ALMI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AMAG",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AMAN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AMAR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AMFG",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AMOR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ANJT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "APII",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "APLI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AREA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ARGO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ARTA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ASBI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ASDM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ASRM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AWAN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "AXIO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BABY",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BATA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BATR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BBLD",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BBRM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BBSS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BCIC",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BDMN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BESS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BIKA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BIMA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BINO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BKSW",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BLES",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BLOG",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BLTZ",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BLUE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BNBA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BNGA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BOAT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BOBA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BOLT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BPFI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BPII",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BPTR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BRAM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BRIS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BRNA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BSSR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BTON",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BUAH",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BUDI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "BUKK",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CAKK",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CAMP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CANI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CASH",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CASS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CBPE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CBUT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CCSI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CDIA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CEKA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CENT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CITY",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CLEO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CMPP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CNMA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CRAB",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CRSN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CSAP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CSRA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "CTBN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "DAAZ",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "DART",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "DAYA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "DEPO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "DLTA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "DNAR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "DVLA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "DWGL",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ECII",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "EDGE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "EKAD",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "EMDE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ENAK",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ERTX",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ESTA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ESTI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ETWA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "FAST",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "FASW",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "FISH",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "FMII",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "FOOD",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "FORE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "FORU",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "FPNI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GDST",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GDYR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GGRP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GHON",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GIAA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GLOB",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GMFI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GMTD",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GOLD",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GOLF",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GRIA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GSMF",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GTBO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GTRA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GUNA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "GWSA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "HALO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "HDFA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "HERO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "HITS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "HMSP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "HOMI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "HOTL",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "HYGN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IBST",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IDPR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IFII",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IGAR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IKBI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IKPM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IMAS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IMJS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "INAF",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "INDR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "INDS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "INRU",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "INTD",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IPAC",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IPCM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "IPOL",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "JARR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "JAWA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "JECC",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "JRPT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "JSPT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KAEF",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KBLM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KDSI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KEJU",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KIAS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KINO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KLIN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KMTR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KOBX",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KOIN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KOPI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "KSIX",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "LFLO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "LINK",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "LION",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "LMPI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "LPCK",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "LPGI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "LRNA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MAPB",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MAPI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MASB",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MBAP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MBSS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MCOR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MDKI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MDLA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MERK",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "META",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MFMI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MGNA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MINE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MKAP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MKTR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MLBI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MLIA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MMLP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MOLI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MPXL",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MSTI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MTMH",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MTSM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MTWI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MYOH",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "MYTX",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "NCKL",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "NELY",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "NEST",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "NETV",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "NICE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "NISP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "NOBU",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "NZIA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "OCAP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "OMED",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "OMRE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PALM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PANI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PANR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PBID",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PBSA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PDES",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PDPP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PEVE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PGEO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PJAA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PLIN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PMJS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PMUI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PNBS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PNGO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PNSE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "POLI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "POLL",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PORT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PSAT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PSDN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PSGO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PSSI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PTIS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PTMR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PTPW",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "PTSN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "RAAM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "RANC",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "RDTX",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "RELI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "RODA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "RONY",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ROTI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "RSCH",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "RSGK",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SAMF",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SAPX",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SCCO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SCNP",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SCPI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SDPC",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SDRA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SGRO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SHID",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SIPD",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SKBM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SKLT",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SKRN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SMCB",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SMDM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SMIL",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SMKL",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SONA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SOSS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SRTG",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SSTM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "STAA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SUNI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SUPA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SUPR",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SURE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "SWID",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TALF",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TAMU",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TBMS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TCID",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TGKA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TIFA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TIRA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TKIM",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TLDN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TOTO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TRGU",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TRIO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TRIS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TRJA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TRUS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TSPC",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "TYRE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "UANG",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "UFOE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "URBN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "VAST",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "VERN",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "VICI",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "VINS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "VOKS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "VRNA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "WICO",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "WIKA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "WOMF",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "YPAS",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ZBRA",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ZONE",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
+    {
+      "code": "ZYRX",
+      "action": "pengenaan",
+      "date": "2026-11-11"
+    },
     {
       "code": "MKNT",
       "action": "pengenaan",

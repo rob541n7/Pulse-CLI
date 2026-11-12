@@ -94,6 +94,7 @@ def build_universe(rules: UniverseRules | None = None, refresh_ownership: bool =
         .round(2)
         .to_dict("records"),
         "eligible": eligible_shares(own, hsc, shares, rules.min_ff_ksei),
+        "hsc_tickers": sorted(hsc),
     }
     UNIVERSE_DIR.mkdir(parents=True, exist_ok=True)
     with open(UNIVERSE_FILE, "w", encoding="utf-8") as f:
@@ -125,6 +126,14 @@ def snapshots() -> list[dict]:
         with open(path, encoding="utf-8") as f:
             out.append(json.load(f))
     return sorted(out, key=lambda u: u["as_of"])
+
+
+def history_hsc() -> tuple[str, frozenset[str]] | None:
+    """(as_of, HSC list) frozen in the first snapshot, used for all pre-Nov-2026 history."""
+    for s in snapshots():
+        if s.get("hsc_tickers"):
+            return s["hsc_as_of"], frozenset(s["hsc_tickers"])
+    return None
 
 
 def rebuild_due(latest: date) -> bool:

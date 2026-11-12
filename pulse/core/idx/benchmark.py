@@ -7,6 +7,9 @@ Method: take the official IHSG daily return and strip out the HSC contribution
 
     r_ex = (r_IHSG - w_hsc * r_hsc) / (1 - w_hsc)
 
+The HSC list for that estimate is the one frozen in the first universe snapshot (Oct 2026),
+so later additions to the official list do not rewrite history.
+
 with weights as IDX computes IHSG: capped free-float adjusted market cap (cap 9% per
 stock, previous close x listed shares x free float BEI), Papan Akselerasi excluded.
 w_hsc is HSC's share of that and r_hsc the weighted HSC return.
@@ -89,6 +92,13 @@ def ex_hsc_returns(
     return r_ex, w_hsc
 
 
+def estimate_hsc() -> tuple[str, frozenset[str]]:
+    """HSC list behind the pre-Nov-2026 ex-HSC estimate: frozen snapshot list, else current."""
+    from pulse.core.idx.universe import history_hsc
+
+    return history_hsc() or load_hsc()
+
+
 def official_ihsg() -> pd.Series:
     if not IHSG_OFFICIAL_FILE.exists():
         return pd.Series(dtype=float)
@@ -118,7 +128,7 @@ def build_ihsg_ex_hsc(start: str = "2023-01-01", refresh: bool = False) -> pd.Da
             "Butuh file Ringkasan Saham di data/idx/ untuk jumlah saham tercatat"
         )
     shares = summary.set_index("code")["listed_shares"]
-    _, hsc = load_hsc()
+    _, hsc = estimate_hsc()
 
     panel = fetch_panel(
         shares.index.tolist() + [IHSG_SYMBOL], start=start, name="all_stocks", refresh=refresh
@@ -179,7 +189,7 @@ def performance_table(bench: pd.DataFrame, cols=("IHSG_exHSC",)) -> pd.DataFrame
 
 def format_benchmark(bench: pd.DataFrame) -> str:
     perf = performance_table(bench)
-    hsc_as_of, hsc = load_hsc()
+    hsc_as_of, hsc = estimate_hsc()
     w, w_date = hsc_weight_last(bench)
     lines = [
         f"IHSG ex-HSC (data s/d {bench.index[-1].date()})",
