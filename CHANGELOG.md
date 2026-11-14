@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `pulse.core.idx` package: IDX Ringkasan Saham Excel loader + foreign-flow history,
+  free float (BEI) & >=1% ownership (KSEI), HSC list, cached OHLCV panel
+- Big cap universe (`/universe`): top-N market cap, non-HSC, real free float >= 12.5%, liquid
+- IHSG ex-HSC benchmark (`/ihsgx`)
+- Swing 2-8 week screener and Relative-Strength Breakout backtest (`/swing`)
+- Batch entry point `python -m pulse.core.idx` for scheduled daily updates
+- Self-contained HTML dashboard (`/dashboard`, `update_dashboard.bat`): market regime,
+  IHSG vs ex-HSC, screener with detail panel, sector rotation (RRG), foreign flow, backtest
+- Fundamentals & disclosures from idx.co.id via in-browser extractor
+  (`scripts/idx_browser_extract.js`): XBRL TTM valuation (PE, PBV, ROE, growth, DER, OCF/NI)
+  with USD->IDR conversion, quality flags, and filtered important announcements in the dashboard
+- Per-stock factors shown side by side: stage (MA150), RS 13w, CMF 20, VWAP 20,
+  foreign net 20d, big-lot ratio
 - Initial public release preparation
 - Comprehensive README documentation
 - Contributing guidelines
