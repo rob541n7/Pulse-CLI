@@ -81,6 +81,8 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
     bf = brokerflow.load(str(price_date)) or {}
     brokers = bf.get("brokers", {})
 
+    # Evaluasi resmi BEI yang lebih baru dari snapshot KSEI mengalahkan estimasi risiko HSC
+    hsc_cleared = load_hsc()[0] >= str(uni.get("ksei_snapshot") or "9999")
     rows = []
     for code in snap.index:
         r = snap.loc[code]
@@ -99,7 +101,9 @@ def build_payload(params: swing.SwingParams | None = None) -> dict:
         b = brokers.get(code) or {}
         labels["broker"] = b.get("label", "na")
         ara, arb = rules.auto_rejection(float(r.close), next_session)
-        hr = factors.hsc_risk(own["holders_1pct"].get(code), own["ff_ksei"].get(code))
+        hr = factors.hsc_risk(
+            own["holders_1pct"].get(code), own["ff_ksei"].get(code), cleared=hsc_cleared
+        )
         closes = ind["close"][code].tail(SPARK_DAYS)
         rows.append(
             {

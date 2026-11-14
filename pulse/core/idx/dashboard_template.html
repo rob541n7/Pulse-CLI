@@ -382,8 +382,9 @@ const COLS = [
   ["stage", "Fase"], ["factors", "Faktor"], ["cmf", "CMF"], ["vwap", "VWAP"], ["foreign_pct", "Asing"],
   ["vol_ratio", "Vol"], ["rsi", "RSI"], ["risk_pct", "SL %"], ["pe", "PE"], ["roe", "ROE"], ["mcap_t", "Mcap T"],
 ];
-const HSC_LABEL = { rendah: "Rendah", mungkin: "Mungkin", tinggi: "Tinggi", na: "–" };
+const HSC_LABEL = { rendah: "Rendah", mungkin: "Mungkin", tinggi: "Tinggi", bukan: "Bukan HSC", na: "–" };
 const hscText = (r) => !isNum(r.hsc_known) ? "Data kepemilikan tidak tersedia" :
+  r.hsc_risk === "bukan" ? `Tidak masuk daftar HSC resmi BEI (${M.hsc_as_of}). Data KSEI ${M.ksei_snapshot}: ${r.hsc_holders} pemegang ≥1% menguasai ${nf1.format(r.hsc_known)}%.` :
   `Estimasi dari data KSEI (snapshot ${M.ksei_snapshot}), bukan status resmi BEI. ${r.hsc_holders} pemegang ≥1% menguasai ${nf1.format(r.hsc_known)}%. ` +
   `Kriteria HSC: ≤10 pemegang menguasai ≥92,5%.` + (isNum(r.hsc_need) ? ` Sisa slot 10 besar perlu rata-rata ${nf2.format(r.hsc_need)}% per pemegang untuk mencapai batas.` : "");
 const SETUPS = ["BREAKOUT", "PULLBACK", "TREND", "NETRAL", "HINDARI", "TIDAK AKTIF"].filter((s) => s !== "TIDAK AKTIF" || DATA.rows.some((r) => r.setup === s));
@@ -512,7 +513,7 @@ function selectRow(code) {
     <div class="levels" style="margin-top:8px">
       <div><div class="n">ARA ${esc(M.next_session || "")}</div><div class="v">${fmt(r.ara_next)}</div></div>
       <div><div class="n">ARB ${esc(M.next_session || "")}</div><div class="v neg">${fmt(r.arb_next)}</div></div>
-      <div><div class="n">Risiko HSC (estimasi)</div><div class="v ${r.hsc_risk === "tinggi" ? "neg" : r.hsc_risk === "mungkin" ? "amber" : ""}" title="${esc(hscText(r))}">${esc(HSC_LABEL[r.hsc_risk] || "–")}</div></div>
+      <div><div class="n">${r.hsc_risk === "bukan" ? "Status HSC (resmi BEI " + esc(M.hsc_as_of) + ")" : "Risiko HSC (estimasi)"}</div><div class="v ${r.hsc_risk === "tinggi" ? "neg" : r.hsc_risk === "mungkin" ? "amber" : ""}" title="${esc(hscText(r))}">${esc(HSC_LABEL[r.hsc_risk] || "–")}</div></div>
       <div><div class="n">Pemegang ≥1% (KSEI)</div><div class="v">${isNum(r.hsc_known) ? nf1.format(r.hsc_known) + "% · " + r.hsc_holders + " pihak" : "–"}</div></div></div>
     ${fundBlock(r)}
     ${eventBlock(r)}

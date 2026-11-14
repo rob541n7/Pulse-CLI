@@ -186,8 +186,11 @@ HSC_THRESHOLD = 92.5  # kriteria BEI 11 Nov 2026: <=10 pemegang menguasai >=92,5
 HSC_SLOTS = 10
 
 
-def hsc_risk(holders_1pct, ff_ksei) -> dict:
+def hsc_risk(holders_1pct, ff_ksei, cleared: bool = False) -> dict:
     """Estimated HSC exposure from KSEI holders above 1% (not an official status).
+
+    cleared=True: BEI's official HSC evaluation is newer than the KSEI snapshot and did not
+    list the stock, so the estimate is superseded ("bukan") and only kept as context.
 
     known = stake of holders >=1%. With n such holders, the other 10-n top-10 slots hold
     below 1% each, so the top 10 can reach at most known + (10-n) x 1%.
@@ -204,6 +207,8 @@ def hsc_risk(holders_1pct, ff_ksei) -> dict:
         risk = "mungkin"
     else:
         risk = "rendah"
+    if cleared:
+        risk = "bukan"
     return {
         "hsc_known": round(known, 2),
         "hsc_holders": n,

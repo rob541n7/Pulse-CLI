@@ -286,8 +286,9 @@
   const css = (name) => getComputedStyle(document.querySelector(".pl")).getPropertyValue(name).trim();
   const state = { setup: null, sector: "", q: "", sort: "score", asc: false, sel: null, ev: null };
 
-  const HSC_LABEL = { rendah: "Rendah", mungkin: "Mungkin", tinggi: "Tinggi", na: "–" };
+  const HSC_LABEL = { rendah: "Rendah", mungkin: "Mungkin", tinggi: "Tinggi", bukan: "Bukan HSC (resmi BEI)", na: "–" };
   const hscText = (r) => !isNum(r.hsc_known) ? "Data kepemilikan tidak tersedia" :
+    r.hsc_risk === "bukan" ? `Tidak masuk daftar HSC resmi BEI. Data KSEI: ${r.hsc_holders} pemegang ≥1% menguasai ${f1(r.hsc_known)}%.` :
     `Estimasi dari data KSEI, bukan status resmi BEI. ${r.hsc_holders} pemegang ≥1% menguasai ${f1(r.hsc_known)}%. Kriteria HSC: ≤10 pemegang menguasai ≥92,5%.` +
     (isNum(r.hsc_need) ? ` Sisa slot 10 besar perlu rata-rata ${f2(r.hsc_need)}% per pemegang.` : "");
   const get = (id) => { const d = dash.data(id); return d.status === "ok" ? d.data : null; };
@@ -477,7 +478,7 @@
       return d; }));
     el.querySelector(".lv").replaceChildren(...[["Entry", "close", fmt(r.close), ""], ["Stop (2 ATR)", "stop", fmt(r.stop), "neg"],
       ["TP1 · 2R", "tp1", fmt(r.tp1), "pos"], ["TP2 · 3R", "tp2", fmt(r.tp2), "pos"], ["ARA besok", "ara_next", fmt(r.ara_next), ""], ["ARB besok", "arb_next", fmt(r.arb_next), "neg"],
-      ["Risiko HSC (estimasi)", "hsc_risk", HSC_LABEL[r.hsc_risk] || "–", r.hsc_risk === "tinggi" ? "neg" : ""],
+      [r.hsc_risk === "bukan" ? "Status HSC" : "Risiko HSC (estimasi)", "hsc_risk", HSC_LABEL[r.hsc_risk] || "–", r.hsc_risk === "tinggi" ? "neg" : ""],
       ["Pemegang ≥1% (KSEI)", "hsc_known", isNum(r.hsc_known) ? f1(r.hsc_known) + "% · " + r.hsc_holders + " pihak" : "–", ""]].map(([n, k, v, c]) => {
       const d = document.createElement("div"); const a = document.createElement("div"); a.className = "n"; a.textContent = n;
       const b = document.createElement("div"); b.className = "v " + c; b.textContent = v; mark(b, k, r.code); d.append(a, b); return d; }));

@@ -161,3 +161,8 @@ def test_pullback_signal_needs_uptrend_and_cooled_rsi():
         "FAR": False,
         "DOWN": False,
     }
+
+
+def test_hsc_risk_cleared_by_official_evaluation():
+    r = hsc_risk(2, 12.73, cleared=True)  # estimasi "mungkin", tapi lolos evaluasi resmi BEI
+    assert r["hsc_risk"] == "bukan" and r["hsc_known"] == pytest.approx(87.27)
